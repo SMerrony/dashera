@@ -1,0 +1,53 @@
+with "gtkada";
+
+project Dashera is
+
+   type Mode_Type is 
+      ("debug", "profile", "release"); -- all possible values
+   Mode : Mode_Type := external ("mode", "debug"); -- default
+
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   for Main use ("dashera.adb");
+   
+   package Compiler is
+      case Mode is
+         when "debug" =>
+            for Switches ("Ada") use ("-g");
+         when "profile" =>
+            for Switches ("Ada") use ("-O2", "-pg");
+         when "release" =>
+            for Switches ("Ada") use ("-O2");
+            for Switches ("ada") use ("-O2");
+      end case;
+   end Compiler;
+
+   package Builder is
+      case Mode is
+         when "debug" =>
+            for Switches ("ada") use ("-j4", "-g");
+         when "release" =>
+            for Switches ("ada") use ("-j4");
+      end case;
+   end Builder;
+
+   package Binder is
+      case Mode is
+         when "debug" =>
+            for Switches ("ada") use ("-E");
+         when "release" =>
+
+      end case;
+   end Binder;
+
+   package Linker is
+      case Mode is
+         when "debug" =>
+            for Switches ("ada") use ("-g");
+         when"profile" =>
+            for Switches ("Ada") use ("-pg");
+         when "release" =>
+
+      end case;
+   end Linker;
+end Dashera;
