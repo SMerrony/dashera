@@ -13,7 +13,7 @@ project Dashera is
    package Compiler is
       case Mode is
          when "debug" =>
-            for Switches ("Ada") use ("-g");
+            for Switches ("Ada") use ("-g", "-O0", "-gnaty-s", "-gnatwJ");
          when "profile" =>
             for Switches ("Ada") use ("-O2", "-pg");
          when "release" =>

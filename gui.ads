@@ -38,15 +38,12 @@ package GUI is
 
    History_Lines    :  constant Glib.Gdouble := 1000.0;
       
-   Main_Window : Gtk.Window.Gtk_Window;
-   Main_Menu_Bar : Gtk.Menu_Bar.Gtk_Menu_Bar;
-
    Crt_Drawing_Area : Gtk.Drawing_Area.Gtk_Drawing_Area;
    
    -- procedure Exit_Main (Object : access Gtkada_Builder_Record'Class);
 
    -- procedure Init_Gtk (Builder : Gtkada_Builder);
 
-   procedure Create_Window;
+   function Create_Window return Gtk.Window.Gtk_Window;
 
 end GUI;

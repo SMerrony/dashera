@@ -22,17 +22,15 @@ with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Glib; use Glib;
-with Glib.Application;
 with Glib.Error; use Glib.Error;
 
 -- with Gtk.Builder;
 -- with Gtkada.Builder;
-with Gtk.Application;
+-- with Gtk.Application;
 with Gdk.Threads;
 with Gtk.Main;
 with Gtk.Window;  use Gtk.Window;
 
-with BDF_Font;
 -- with Local_Listener;
 with GUI;
 
@@ -41,11 +39,10 @@ procedure Dashera is
 
    Semantic_Version : constant String := "v0.11.0x";  -- TODO Update Version each release!
 
-   Font_Filename  : constant String := "D410-b-12.bdf";
-   Glade_Filename : constant String := "resources/dashera.glade";  
+   -- Glade_Filename : constant String := "resources/dashera.glade";  
 
    -- GUI stuff
-   -- Window : Gtk_Window;
+   Main_Window : Gtk_Window;
 
    task type Local_Listener_Type is
       entry Start;
@@ -102,17 +99,10 @@ procedure Dashera is
 
    end Local_Listener_Type;
 
-   Font : BDF_Font.Decoded;
-   App  : Gtk.Application.Gtk_Application;
+
+   -- App  : Gtk.Application.Gtk_Application;
 
 begin
-
-   -- these 3 lines really _must_ come first...
-   App := Gtk.Application.Gtk_Application_New ("Fred", Glib.Application.G_Application_Flags_None);
-   Gdk.Threads.G_Init;
-   Gdk.Threads.Init;
-   
-   Gtk.Main.Init;
 
    while Arg_Ix <= Argument_Count loop
       if Argument (Arg_Ix) = "-version" then
@@ -132,6 +122,11 @@ begin
       Arg_Ix := Arg_Ix + 1;
    end loop;
 
+   -- App := Gtk.Application.Gtk_Application_New ("Fred", Glib.Application.G_Application_Flags_None);
+   -- Gdk.Threads.G_Init;
+   -- Gdk.Threads.Init;
+   Gtk.Main.Init;
+
    -- --  Load glade file
    -- Gtk.Builder.Initialize_From_File (Builder, Glade_Filename);
    -- -- Gtk_New (Builder);
@@ -146,13 +141,11 @@ begin
 
    -- Local_Listener.Start;
 
-
-
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
-   Gdk.Threads.Enter;
-   Font := BDF_Font.Load_Font (Font_Filename, BDF_Font.Normal);
-   Gui.Create_Window;
+   -- Gdk.Threads.Enter;
+   Main_Window := Gui.Create_Window;
+   Main_Window.Show_All;
    Gtk.Main.Main;
-   Gdk.Threads.Leave;
+   -- Gdk.Threads.Leave;
   
 end Dashera;
