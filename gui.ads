@@ -19,16 +19,12 @@
 
 -- with Gtkada.Builder; use Gtkada.Builder;
 
-with Gtk.Drawing_Area;
 with Gtk.Handlers;
-with Gtk.Menu_Bar;
-with Gtk.Notebook;
-with Gtk.Widget; use Gtk.Widget;
-with Gtk.Window;
-with Glib;
+with Gtk.Widget;
+with Gtk.Window; 
 
 package GUI is
-   package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk_Widget_Record);
+   package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
    
    App_Title        : constant String := "DasherA";
    App_Comment      : constant String := "A Data General DASHER terminal emulator";
@@ -36,9 +32,9 @@ package GUI is
    App_Icon         : constant String := "DGlogoOrange.ico";
    App_Website      : constant String := "https://github.com/SMerrony/DasherG"; -- FIXME
 
-   History_Lines    :  constant Glib.Gdouble := 1000.0;
+   History_Lines    :  constant Natural := 1000;
       
-   Crt_Drawing_Area : Gtk.Drawing_Area.Gtk_Drawing_Area;
+   -- Crt_Drawing_Area : Gtk.Drawing_Area.Gtk_Drawing_Area;
    
    -- procedure Exit_Main (Object : access Gtkada_Builder_Record'Class);
 

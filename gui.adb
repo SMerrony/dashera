@@ -198,6 +198,7 @@ package body GUI is
       VBox.Pack_Start (Create_Menu_Bar);
       VBox.Pack_End (Create_Status_Box);
       Main_Window.Add (Vbox);
+      Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");
       return Main_Window;
       -- Ada.Text_IO.Put_Line ("DEBUG: Calling Show_All");
       -- Main_Window.Show_All;

@@ -123,8 +123,8 @@ begin
    end loop;
 
    -- App := Gtk.Application.Gtk_Application_New ("Fred", Glib.Application.G_Application_Flags_None);
-   -- Gdk.Threads.G_Init;
-   -- Gdk.Threads.Init;
+   Gdk.Threads.G_Init;
+   Gdk.Threads.Init;
    Gtk.Main.Init;
 
    -- --  Load glade file
@@ -142,10 +142,10 @@ begin
    -- Local_Listener.Start;
 
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
-   -- Gdk.Threads.Enter;
+   Gdk.Threads.Enter;
    Main_Window := Gui.Create_Window;
    Main_Window.Show_All;
    Gtk.Main.Main;
-   -- Gdk.Threads.Leave;
+   Gdk.Threads.Leave;
   
 end Dashera;
