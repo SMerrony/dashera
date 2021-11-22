@@ -19,8 +19,17 @@
 
 with Gtk.Drawing_Area;
 
+with Display;
+
 package Crt is
 
-   procedure Init_Crt (this : in out Gtk.Drawing_Area.Gtk_Drawing_Area); 
+   type Crt_T is record
+      DA : Gtk.Drawing_Area.Gtk_Drawing_Area;
+      Disp : Display.Display_Acc_T;
+   end record;
+
+   type Crt_Acc_T is access all Crt_T;
+
+   function Create (Disp : in Display.Display_Acc_T) return Crt_Acc_T;
    
 end Crt;

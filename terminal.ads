@@ -25,23 +25,27 @@ package Terminal is
    type Emulation_T is (D200, D210);
    type Connection_T is (Disconnected, Serial, Telnet);
 
-   Emulation : Emulation_T;
-   Connection : Connection_T;
+   type Terminal_T is record
+      Emulation : Emulation_T;
+      Connection : Connection_T;
 
-   Cursor_X, Cursor_Y : Natural;
+      Cursor_X, Cursor_Y : Natural;
 
-   Roll_Enabled, Blink_Enabled, Protection_Enabled : Boolean;
-   Blink_State : Boolean;
-   Holding, Logging, Scrolled_Back : Boolean;
-   Expecting : Boolean;
-   Raw_Mode : Boolean; -- in rawMode all host data is passed straight through to rawChan
-   -- Selection_Region...
-   -- Log_File : File;
+      Roll_Enabled, Blink_Enabled, Protection_Enabled : Boolean;
+      Blink_State : Boolean;
+      Holding, Logging, Scrolled_Back : Boolean;
+      Expecting : Boolean;
+      Raw_Mode : Boolean; -- in rawMode all host data is passed straight through to rawChan
+      -- Selection_Region...
+      -- Log_File : File;
 
-   Display : Display_T;
+      Display : Display_Acc_T;
 
-   Updated : Boolean;
+      Updated : Boolean;
+   end record;
 
-   procedure Setup;
+   type Terminal_Acc_T is access all Terminal_T;
+
+   function Create (Emul : in Emulation_T; Disp : in Display_Acc_T) return Terminal_Acc_T;
 
 end Terminal;

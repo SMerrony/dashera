@@ -40,13 +40,15 @@ package BDF_Font is
 
    type Font_Array is array (0..Max_Chars) of BDF_Char;
 
-   type Decoded is record
+   type Decoded_T is tagged record
       Font : Font_Array;
       Char_Width, Char_Height : Gint;
    end record;
 
+   type Decoded_Acc_T is access Decoded_T;
+
    function Load_Font (File_Name : String; Zoom : Zoom_Type)
-      return Decoded;
+      return Decoded_Acc_T;
 
    OPEN_FAILURE,
    BDF_DECODE : exception;

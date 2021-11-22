@@ -33,3 +33,8 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
 * Dashera - the main entry point
 * Display - holds a matrix of ASCII characters (Cells)
 * Terminal - implements the Dasher behaviour
+
+
+## Terminal setting on Linux host:
+
+`export TERM=d210-dg`

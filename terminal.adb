@@ -19,12 +19,29 @@
 
 package body Terminal is
 
-
-   procedure Setup is
-
+   function Create (Emul : in Emulation_T; Disp : in Display_Acc_T) return Terminal_Acc_T is
+      T : aliased Terminal_Acc_T := new Terminal_T;
    begin
-      Emulation := D210;
-      Display.Setup;
-   end Setup;
+      T.Emulation := Emul;
+      T.Connection := Disconnected;
+      T.Cursor_X := 0;
+      T.Cursor_Y := 0;
+      T.Roll_Enabled := True;
+      T.Blink_Enabled := True;
+      T.Protection_Enabled := True;
+      T.Blink_State := False;
+      T.Holding := False;
+      T.Logging := False;
+      T.Scrolled_Back := False;
+      T.Expecting := False;
+      T.Raw_Mode := False;
+
+      T.Display := Disp;
+
+      T.Updated := True;
+      
+
+      return T;
+   end Create;
 
 end Terminal;

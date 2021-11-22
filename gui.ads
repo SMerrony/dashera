@@ -23,6 +23,8 @@ with Gtk.Handlers;
 with Gtk.Widget;
 with Gtk.Window; 
 
+with Display;
+
 package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
    
@@ -39,6 +41,9 @@ package GUI is
    -- procedure Exit_Main (Object : access Gtkada_Builder_Record'Class);
 
    -- procedure Init_Gtk (Builder : Gtkada_Builder);
+
+   Disp : Display.Display_T;
+   Disp_Acc : Display.Display_Acc_T;
 
    function Create_Window return Gtk.Window.Gtk_Window;
 

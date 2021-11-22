@@ -23,12 +23,14 @@ with Gtk.Drawing_Area;
 
 package body Crt is
 
-   procedure Init_Crt (this : in out Gtk.Drawing_Area.Gtk_Drawing_Area) is
-
+   function Create (Disp : in Display.Display_Acc_T) return Crt_Acc_T is
+      C : aliased Crt_Acc_T := new Crt_T;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Entering Crt.Init_Crt()");
-      this.Set_Size_Request(400, 200);
-
-   end Init_Crt;
+      Ada.Text_IO.Put_Line ("DEBUG: Creating Crt");
+      Gtk.Drawing_Area.Gtk_New (C.DA);
+      C.DA.Set_Size_Request(600, 400);
+      C.Disp := Disp;
+      return C;
+   end Create;
 
 end Crt;

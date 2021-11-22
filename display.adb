@@ -19,14 +19,15 @@
 
 package body Display is   
 
-   procedure Setup (This : in out Display_T) is
-
+   function Create return Display_Acc_T is
+      D : aliased Display_Acc_T := new Display_T;
    begin
-      This.Visible_Lines := Default_Lines;
-      This.Visible_Cols := Default_Cols;
-      This.Cells(12,39).Char_Value := 'O';
-      This.Cells(12,40).Char_Value := 'K';
-   end Setup;
+      D.Visible_Lines := Default_Lines;
+      D.Visible_Cols := Default_Cols;
+      D.Cells(12,39).Char_Value := 'O';
+      D.Cells(12,40).Char_Value := 'K';
+      return D;
+   end Create;
 
    procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer) is
    begin

@@ -34,7 +34,9 @@ package Display is
       Visible_Lines, Visible_Cols : Integer;
    end record;
 
-   procedure Setup (This : in out Display_T);
+   type Display_Acc_T is access all Display_T;
+
+   function Create return Display_Acc_T;
    procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer);
 
 end Display;

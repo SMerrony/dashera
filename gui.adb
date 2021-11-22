@@ -19,6 +19,7 @@
 
 with Ada.Text_IO;
 
+with Gdk.Main;
 with Glib.Main;
 with Gtk.Action;
 with Gtk.Adjustment;
@@ -45,6 +46,7 @@ with Gtk.Window; use Gtk.Window;
 
 with BDF_Font;
 with Crt;
+with Display;
 with Terminal;
 
 package body GUI is
@@ -80,13 +82,18 @@ package body GUI is
    -- end Init_Gtk;
    
    Font_Filename  : constant String := "D410-b-12.bdf";
-   Font : BDF_Font.Decoded;
+   Font : BDF_Font.Decoded_Acc_T;
 
    procedure Exit_Gui (Window : access Gtk_Widget_Record'Class) is
+      -- Done : Boolean;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Calling Main_Quit");
+      Ada.Text_IO.Put_Line ("DEBUG: Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
       -- Glib.Main.Idle_Add (Gtk.Main.Main_Quit'Access);
       Gtk.Main.Main_Quit;
+      -- Gtk.Main.Main_Quit;
+      -- Gdk.Main.Gdk_Exit (0);
+      -- Done := Gtk.Main.Main_Iteration_Do (false);
+      -- return;
    end Exit_Gui;
 
    function Create_Menu_Bar return Gtk.Menu_Bar.Gtk_Menu_Bar is
@@ -174,15 +181,38 @@ package body GUI is
 
    function Create_Status_Box return Gtk.Box.Gtk_Hbox is
       Status_Box : Gtk.Box.Gtk_Hbox;
+      Online_Frame, Host_Frame, Logging_Frame, Emul_Frame : Gtk.Frame.Gtk_Frame;
+      Online_Label, Host_Label, Logging_Label, Emul_Label : Gtk.Label.Gtk_Label;
    begin
       Gtk.Box.Gtk_New_Hbox (Status_Box, True, 2);
+      Gtk.Frame.Gtk_New (Online_Frame);
+      Gtk.Label.Gtk_New (Online_Label, "Offline");
+      Online_Frame.Add (Online_Label);
+      Status_Box.Pack_Start (Online_Frame);
+
+      Gtk.Frame.Gtk_New (Host_Frame);
+      Gtk.Label.Gtk_New (Host_Label, "Not Connected");
+      Host_Frame.Add (Host_Label);
+      Status_Box.Pack_Start (Host_Frame);
+
+      Gtk.Frame.Gtk_New (Logging_Frame);
+      Gtk.Label.Gtk_New (Logging_Label, "Not Logging");
+      Logging_Frame.Add (Logging_Label);
+      Status_Box.Pack_Start (Logging_Frame);
+
+      Gtk.Frame.Gtk_New (Emul_Frame);
+      Gtk.Label.Gtk_New (Emul_Label, "D210");
+      Emul_Frame.Add (Emul_Label);
+      Status_Box.Pack_Start (Emul_Frame);
 
       return Status_Box;
    end Create_Status_Box;
 
-   function Create_Window  return Gtk.Window.Gtk_Window is
+   function Create_Window return Gtk.Window.Gtk_Window is
       Main_Window :Gtk.Window.Gtk_Window;
       Vbox : Gtk.Box.Gtk_Vbox;
+      Term : Terminal.Terminal_Acc_T;
+      Tube : Crt.Crt_Acc_T;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
 
@@ -196,8 +226,14 @@ package body GUI is
 
       Gtk.Box.Gtk_New_Vbox (Vbox, Homogeneous => False, Spacing => 1);
       VBox.Pack_Start (Create_Menu_Bar);
+
+      Disp_Acc := Display.Create;
+      Term := Terminal.Create (Terminal.D210, Disp_Acc);
+      Tube := Crt.Create (Disp_Acc);
+      VBox.Pack_Start (Tube.DA);
       VBox.Pack_End (Create_Status_Box);
       Main_Window.Add (Vbox);
+      Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
       Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");
       return Main_Window;
       -- Ada.Text_IO.Put_Line ("DEBUG: Calling Show_All");

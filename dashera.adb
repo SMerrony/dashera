@@ -125,6 +125,7 @@ begin
    -- App := Gtk.Application.Gtk_Application_New ("Fred", Glib.Application.G_Application_Flags_None);
    Gdk.Threads.G_Init;
    Gdk.Threads.Init;
+   -- Gtk.Main.Set_Locale;
    Gtk.Main.Init;
 
    -- --  Load glade file
