@@ -51,10 +51,10 @@ with Terminal;
 
 package body GUI is
    -- package Handlers is new Gtk.Handlers.Callback (Gtk_Widget_Record);
-   PACKAGE P_Simple_Callback is new Gtk.Handlers.Callback(Gtk_widget_Record);
-   use P_Simple_Callback;
-   package Return_Handlers is new Gtk.Handlers.Return_Callback
-     (Gtk_Widget_Record, Boolean);
+   -- PACKAGE P_Simple_Callback is new Gtk.Handlers.Callback(Gtk_widget_Record);
+   -- use P_Simple_Callback;
+   -- package Return_Handlers is new Gtk.Handlers.Return_Callback
+   --   (Gtk_Widget_Record, Boolean);
 
    -- procedure Exit_Main (Object : access Gtkada_Builder_Record'Class) is
    --    pragma Unreferenced (Object);

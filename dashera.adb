@@ -21,19 +21,22 @@ with Ada.Command_Line;        use Ada.Command_Line;
 with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
-with Glib; use Glib;
-with Glib.Error; use Glib.Error;
+with Gdk.Event;   use Gdk.Event;
+with Glib;        use Glib;
+with Glib.Error;  use Glib.Error;
 
 -- with Gtk.Builder;
 -- with Gtkada.Builder;
 -- with Gtk.Application;
 with Gdk.Threads;
 with Gtk.Main;
+with Gtk.Widget;
 with Gtk.Window;  use Gtk.Window;
 
 -- with Local_Listener;
 with GUI;
-
+with Keyboard;
+with Terminal;
 
 procedure Dashera is
 
@@ -99,6 +102,21 @@ procedure Dashera is
 
    end Local_Listener_Type;
 
+   -- TODO this feels like it's in the wrong place, but should it be in Gui or Keyboard?
+   function Handle_Key_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
+      return Boolean 
+   is
+   begin
+
+      Ada.Text_IO.Put_Line ("DEBUG: Caught key event for:" & Event.Keyval'Image & ", Type: " & Event.The_Type'Image);
+      if Event.The_Type = Gdk.Event.Key_Press then
+         Keyboard.Key_Handler.Press (Event.Keyval);
+      elsif Event.The_Type = Gdk.Event.Key_Release then
+         Keyboard.Key_Handler.Release (Event.Keyval);
+      end if;
+      return True;
+
+   end Handle_Key_Event_CB;
 
    -- App  : Gtk.Application.Gtk_Application;
 
@@ -140,11 +158,14 @@ begin
 
    -- GUI.Init_Gtk (Builder);
 
-   -- Local_Listener.Start;
+   Local_Listener.Start;
 
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
    Main_Window := Gui.Create_Window;
+   Keyboard.Key_Handler.Start (Terminal.Disconnected);
+   Main_Window.On_Key_Press_Event (Handle_Key_Event_CB'Unrestricted_Access);
+   Main_Window.On_Key_Release_Event (Handle_Key_Event_CB'Unrestricted_Access);
    Main_Window.Show_All;
    Gtk.Main.Main;
    Gdk.Threads.Leave;

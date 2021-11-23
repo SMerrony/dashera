@@ -17,40 +17,17 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Gdk.Pixbuf; use Gdk.Pixbuf;
-with Glib;       use Glib;
+with Gdk.Types;
 
-package BDF_Font is
+with Terminal;
 
-   Max_Chars : constant Positive := 128;
-   BPP       : constant Positive := 8;
-   -- raw font dimensions
-   Font_Width  : constant Positive := 10;
-   Font_Height : constant Positive := 12;
+package Keyboard is
 
-   type Zoom_Type is (Large, Normal, Smaller, Tiny);
+   task Key_Handler is
+      entry Start (Dest : in Terminal.Connection_T);
+      entry Stop;
+      entry Press (Key : in Gdk.Types.Gdk_Key_Type);
+      entry Release (Key : in Gdk.Types.Gdk_Key_Type);
+   end Key_Handler;
 
-   type Matrix is array(0..Font_Width-1,0..Font_Height-1) of Boolean;
-
-   type BDF_Char is record
-      Loaded                                : Boolean;
-      Pix_Buf, Dim_Pix_Buf, Reverse_Pix_Buf : Gdk_Pixbuf;
-      Pixels : Matrix;
-   end record;
-
-   type Font_Array is array (0..Max_Chars-1) of BDF_Char;
-
-   type Decoded_T is tagged record
-      Font : Font_Array;
-      Char_Width, Char_Height : Gint;
-   end record;
-
-   type Decoded_Acc_T is access Decoded_T;
-
-   function Load_Font (File_Name : String; Zoom : Zoom_Type)
-      return Decoded_Acc_T;
-
-   OPEN_FAILURE,
-   BDF_DECODE : exception;
-
-end BDF_Font;
+end Keyboard;
