@@ -17,19 +17,36 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Cairo;
+with Gdk.Event;
+with Glib.Main;
 with Gtk.Drawing_Area;
+with Gtk.Widget;
 
+with BDF_Font;
 with Display;
 
 package Crt is
 
    type Crt_T is record
-      DA : Gtk.Drawing_Area.Gtk_Drawing_Area;
-      Disp : Display.Display_Acc_T;
+      DA         : Gtk.Drawing_Area.Gtk_Drawing_Area;
+      Disp       : Display.Display_Acc_T;
+      Zoom       : BDF_Font.Zoom_T;
+      Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
 
-   type Crt_Acc_T is access all Crt_T;
+   -- type Crt_Acc_T is access all Crt_T;
 
-   function Create (Disp : in Display.Display_Acc_T) return Crt_Acc_T;
-   
+   Tube : Crt_T;
+
+   procedure Create (Disp : in Display.Display_Acc_T; Zoom : in BDF_Font.Zoom_T);
+
+   function Configure_Event_CB
+     (Self  : access Gtk.Widget.Gtk_Widget_Record'Class;
+      Event : Gdk.Event.Gdk_Event_Configure)
+      return  Boolean;
+   function Draw_CB
+     (Self : access Gtk.Widget.Gtk_Widget_Record'Class;
+      Cr   : Cairo.Cairo_Context)
+      return Boolean;
 end Crt;

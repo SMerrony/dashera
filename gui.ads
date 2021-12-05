@@ -19,11 +19,13 @@
 
 -- with Gtkada.Builder; use Gtkada.Builder;
 
+with Gtk.Box;
 with Gtk.Handlers;
 with Gtk.Widget;
 with Gtk.Window; 
 
 with Display;
+with Terminal;
 
 package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
@@ -36,14 +38,14 @@ package GUI is
 
    History_Lines    :  constant Natural := 1000;
       
-   -- Crt_Drawing_Area : Gtk.Drawing_Area.Gtk_Drawing_Area;
-   
-   -- procedure Exit_Main (Object : access Gtkada_Builder_Record'Class);
-
    -- procedure Init_Gtk (Builder : Gtkada_Builder);
 
    Disp : Display.Display_T;
    Disp_Acc : Display.Display_Acc_T;
+
+   Main_Window :Gtk.Window.Gtk_Window;
+   Vbox : Gtk.Box.Gtk_Vbox;
+   Term : Terminal.Terminal_Acc_T;
 
    function Create_Window return Gtk.Window.Gtk_Window;
 

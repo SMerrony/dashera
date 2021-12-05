@@ -34,6 +34,7 @@ with Gtk.Widget;
 with Gtk.Window;  use Gtk.Window;
 
 -- with Local_Listener;
+with Crt;
 with GUI;
 with Keyboard;
 with Terminal;

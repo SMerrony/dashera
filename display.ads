@@ -32,6 +32,7 @@ package Display is
    type Display_T is tagged record
       Cells : Cell_Array;
       Visible_Lines, Visible_Cols : Integer;
+      Dirty : Boolean;
    end record;
 
    type Display_Acc_T is access all Display_T;

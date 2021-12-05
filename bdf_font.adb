@@ -58,7 +58,7 @@ package body BDF_Font is
 
    end Parse_BBX;
 
-   function Load_Font (File_Name : String; Zoom : Zoom_Type) return Decoded_Acc_T is
+   function Load_Font (File_Name : String; Zoom : Zoom_T) return Decoded_Acc_T is
       
       Font                                              : aliased Decoded_Acc_T := new Decoded_T;
       Char_Count                                        : Positive;

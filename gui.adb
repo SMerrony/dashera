@@ -25,11 +25,9 @@ with Gtk.Action;
 with Gtk.Adjustment;
 with Gtk.Box;
 with Gtk.Button;
--- with Gtk.Container;
 with Gtk.Drawing_Area;
 with Gtk.Enums;
 with Gtk.Frame;
-with Gtk.Handlers; 
 with Gtk.Label;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
@@ -50,37 +48,7 @@ with Display;
 with Terminal;
 
 package body GUI is
-   -- package Handlers is new Gtk.Handlers.Callback (Gtk_Widget_Record);
-   -- PACKAGE P_Simple_Callback is new Gtk.Handlers.Callback(Gtk_widget_Record);
-   -- use P_Simple_Callback;
-   -- package Return_Handlers is new Gtk.Handlers.Return_Callback
-   --   (Gtk_Widget_Record, Boolean);
 
-   -- procedure Exit_Main (Object : access Gtkada_Builder_Record'Class) is
-   --    pragma Unreferenced (Object);
-   -- begin
-   --    Ada.Text_IO.Put_Line ("DEBUG: Quitting main event loop");
-   --    Destroy (Main_Window);
-   --    Gtk.Main.Main_Quit;
-   -- end Exit_Main;
-
-   -- procedure Init_Gtk (Builder : Gtkada_Builder) is
-   -- begin
-   --    Ada.Text_IO.Put_Line ("DEBUG: Entering Gui.Init_Gtk ()");
-   --    Main_Window := Gtk.Window.Gtk_Window (Get_Object (Builder, "Main_Window"));
-   --    Main_Menu_Bar := Gtk.Menu_Bar.Gtk_Menu_Bar (Get_Object (Builder, "Main_Menu_Bar"));
-   --    Crt_Drawing_Area := Gtk.Drawing_Area.Gtk_Drawing_Area (Get_Object (Builder, "Crt_Drawing_Area"));
-   --    Crt.Init_Crt (Crt_Drawing_Area);
-
-   --    Register_Handler (Builder, "Main_Window_destroy_cb", Exit_Main'Access);
-   --    Register_Handler (Builder, "Quit_Menu_Item_activate_cb", Exit_Main'Access);
-
-   --    Do_Connect (Builder);
-
-   --    Main_Window.Show_All;
-   --    Ada.Text_IO.Put_Line ("DEBUG: Leaving Gui.Init_Gtk ()");
-   -- end Init_Gtk;
-   
    Font_Filename  : constant String := "D410-b-12.bdf";
    Font : BDF_Font.Decoded_Acc_T;
 
@@ -209,10 +177,6 @@ package body GUI is
    end Create_Status_Box;
 
    function Create_Window return Gtk.Window.Gtk_Window is
-      Main_Window :Gtk.Window.Gtk_Window;
-      Vbox : Gtk.Box.Gtk_Vbox;
-      Term : Terminal.Terminal_Acc_T;
-      Tube : Crt.Crt_Acc_T;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
 
@@ -229,15 +193,17 @@ package body GUI is
 
       Disp_Acc := Display.Create;
       Term := Terminal.Create (Terminal.D210, Disp_Acc);
-      Tube := Crt.Create (Disp_Acc);
-      VBox.Pack_Start (Tube.DA);
+      Crt.Create (Disp => Disp_Acc, Zoom => BDF_Font.Normal);
+      Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
+      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
+      VBox.Pack_Start (Crt.Tube.DA);
       VBox.Pack_End (Create_Status_Box);
       Main_Window.Add (Vbox);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
       Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");
+
       return Main_Window;
-      -- Ada.Text_IO.Put_Line ("DEBUG: Calling Show_All");
-      -- Main_Window.Show_All;
+
    end Create_Window;
 
 end GUI;

@@ -28,7 +28,7 @@ package BDF_Font is
    Font_Width  : constant Positive := 10;
    Font_Height : constant Positive := 12;
 
-   type Zoom_Type is (Large, Normal, Smaller, Tiny);
+   type Zoom_T is (Large, Normal, Smaller, Tiny);
 
    type Matrix is array(0..Font_Width-1,0..Font_Height-1) of Boolean;
 
@@ -47,7 +47,7 @@ package BDF_Font is
 
    type Decoded_Acc_T is access Decoded_T;
 
-   function Load_Font (File_Name : String; Zoom : Zoom_Type)
+   function Load_Font (File_Name : String; Zoom : Zoom_T)
       return Decoded_Acc_T;
 
    OPEN_FAILURE,
