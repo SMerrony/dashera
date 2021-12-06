@@ -34,7 +34,7 @@ package body Display is
       Disp.Visible_Lines := Default_Lines;
       Disp.Visible_Cols := Default_Cols;
       Disp.Cells(12,39).Char_Value := 'O';
-      Disp.Cells(13,40).Char_Value := 'K';
+      Disp.Cells(12,40).Char_Value := 'K';
    end Init;
 
    procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer) is

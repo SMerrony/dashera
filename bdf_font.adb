@@ -64,14 +64,13 @@ package body BDF_Font is
       Font_File                                         : File_Type;
       Font_Line                                         : String (1 .. 80);
       Font_Line_Length                                  : Natural;
-      Tmp_Pix_Buf, Tmp_Dim_Pix_Buf, Tmp_Reverse_Pix_Buf : Gdk_Pixbuf;
-      Pixels, Dim_Pixels, Reverse_Pixels                : Rgb_Buffer_Access;
-      Pixel_Index                                       : Guint;
+      Tmp_Pix_Buf, Tmp_Dim_Pix_Buf, Tmp_Reverse_Pix_Buf,
+      Green_Pix_Buf, Dim_Pix_Buf, Black_Pix_Buf         : Gdk_Pixbuf;
       ASCII_Code                                        : Natural;
       Pix_Width, Pix_Height                             : Integer;
       X_Offset, Y_Offset                                : Integer;
+      X, Y                                              : Gint;
       Line_Byte                                         : Unsigned_8;
-      Num_Chans, Row_Stride                             : Integer;
 
    begin
       case Zoom is
@@ -115,6 +114,13 @@ package body BDF_Font is
       Tmp_Dim_Pix_Buf     := Gdk_New (Width => Font_Width, Height => Font_Height);
       Tmp_Reverse_Pix_Buf := Gdk_New (Width => Font_Width, Height => Font_Height);
 
+      Green_Pix_Buf := Gdk_New (Width => 1, Height => 1);
+      Fill (Green_Pix_Buf, 16#00ff00ff#);
+      Dim_Pix_Buf := Gdk_New (Width => 1, Height => 1);
+      Fill (Dim_Pix_Buf, 16#008800ff#);
+      Black_Pix_Buf := Gdk_New (Width => 1, Height => 1);
+      Fill (Black_Pix_Buf, 16#000000ff#);
+
       for CC in 0 .. Char_Count - 1 loop
          Put_Line ("DEBUG: Loading char No. " & Integer'Image(CC));
 
@@ -144,31 +150,27 @@ package body BDF_Font is
          Fill (Tmp_Pix_Buf, 0);
          Fill (Tmp_Dim_Pix_Buf, 0);
          Fill (Tmp_Reverse_Pix_Buf, 16#00FF_0000#);
-         Pixels := Get_Pixels(Tmp_Pix_Buf);
-         Dim_Pixels := Get_Pixels(Tmp_Dim_Pix_Buf);
-         Reverse_Pixels := Get_Pixels(Tmp_Reverse_Pix_Buf);
-         -- Put_Line ("DEBUG: Pixels Length: " & Integer'Image(Pixels') & ", Reverse_Pixels Length: " & Integer'Image(Reverse_Pixels'Length));
-
-         -- for Bitmap_Line in reverse 0 .. Pix_Height - 1 loop
          for Bitmap_Line in 0 .. Pix_Height - 1 loop
             Get_Line (Font_File, Font_Line, Font_Line_Length);
             Line_Byte := Unsigned_8'Value ("16#" & Font_Line (1 .. 2) & "#");
             for I in 0 .. Pix_Width - 1 loop
                if (Line_Byte and 16#80#) /= 0 then
-                  Num_Chans  := Integer(Get_N_Channels (Tmp_Pix_Buf));
-                  Row_Stride := Integer(Get_Rowstride (Tmp_Pix_Buf));
-                  Pixel_Index := Guint(((Y_Offset + Bitmap_Line) * Row_Stride) + ((X_Offset + I) * Num_Chans) + 1);
-                  Pixels(Pixel_Index).Green := 255;
-                  Dim_Pixels(Pixel_Index).Green := 128;
-                  Reverse_Pixels(Pixel_Index).Green := 0;
+                  X := Gint(X_Offset + I);
+                  Y := Gint(Bitmap_Line + 12 - Pix_Height - Y_Offset);
+                  Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Green_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1, 
+                                        Dest_Pixbuf => Tmp_Pix_Buf, Dest_X => X, Dest_Y => Y);
+                  Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Dim_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1, 
+                                        Dest_Pixbuf => Tmp_Dim_Pix_Buf, Dest_X => X, Dest_Y => Y);
+                  Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Black_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1, 
+                                        Dest_Pixbuf => Tmp_Reverse_Pix_Buf, Dest_X => X, Dest_Y => Y);
                   -- Decoded.Font(ASCII_Code).Pixels (X_Offset + I, Y_Offset + Bitmap_Line) := True;
                end if;
                Line_Byte := Shift_Left (Line_Byte, 1);
             end loop;
          end loop;
 
-         Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Hyper);
-         -- Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Pix_Buf);
+         Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
+         --Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Pix_Buf);
          Decoded.Font(ASCII_Code).Dim_Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Dim_Pix_Buf);
          Decoded.Font(ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Reverse_Pix_Buf);
          Decoded.Font(ASCII_Code).Loaded  := true;

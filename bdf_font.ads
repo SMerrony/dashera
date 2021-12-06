@@ -25,8 +25,8 @@ package BDF_Font is
    Max_Chars : constant Positive := 128;
    BPP       : constant Positive := 8;
    -- raw font dimensions
-   Font_Width  : constant Gint := 40;
-   Font_Height : constant Gint := 44;
+   Font_Width  : constant Gint := 10;
+   Font_Height : constant Gint := 12;
 
    type Zoom_T is (Large, Normal, Smaller, Tiny);
 

@@ -90,8 +90,6 @@ package body Crt is
       use Glib;
    begin
       Cr := Cairo.Create (surface);
-      Cairo.Rectangle (cr, 20.0, 30.0, 20.0, 30.0);
-      Cairo.Fill (cr);
 
       for Line in 1 .. Display.Disp.Visible_Lines loop
          for Col in 1 .. Display.Disp.Visible_Cols loop
