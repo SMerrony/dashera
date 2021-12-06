@@ -19,11 +19,7 @@
 
 with Ada.Text_IO;
 
-with Gdk.Types;
-
 with Interfaces; use Interfaces;
-
-with Terminal;
 
 package body Keyboard is
 

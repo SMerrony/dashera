@@ -24,13 +24,15 @@ with Gtk.Drawing_Area;
 with Gtk.Widget;
 
 with BDF_Font;
-with Display;
+-- with Display;
 
 package Crt is
 
+   Font_Filename  : constant String := "D410-b-12.bdf";
+
    type Crt_T is record
       DA         : Gtk.Drawing_Area.Gtk_Drawing_Area;
-      Disp       : Display.Display_Acc_T;
+      -- Disp       : Display.Display_Acc_T;
       Zoom       : BDF_Font.Zoom_T;
       Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
@@ -39,7 +41,7 @@ package Crt is
 
    Tube : Crt_T;
 
-   procedure Create (Disp : in Display.Display_Acc_T; Zoom : in BDF_Font.Zoom_T);
+   procedure Create (Zoom : in BDF_Font.Zoom_T);
 
    function Configure_Event_CB
      (Self  : access Gtk.Widget.Gtk_Widget_Record'Class;

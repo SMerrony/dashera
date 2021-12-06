@@ -22,8 +22,8 @@ with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Gdk.Event;   use Gdk.Event;
-with Glib;        use Glib;
-with Glib.Error;  use Glib.Error;
+-- with Glib;        use Glib;
+-- with Glib.Error;  use Glib.Error;
 
 -- with Gtk.Builder;
 -- with Gtkada.Builder;
@@ -109,7 +109,7 @@ procedure Dashera is
    is
    begin
 
-      Ada.Text_IO.Put_Line ("DEBUG: Caught key event for:" & Event.Keyval'Image & ", Type: " & Event.The_Type'Image);
+      -- Ada.Text_IO.Put_Line ("DEBUG: Caught key event for:" & Event.Keyval'Image & ", Type: " & Event.The_Type'Image);
       if Event.The_Type = Gdk.Event.Key_Press then
          Keyboard.Key_Handler.Press (Event.Keyval);
       elsif Event.The_Type = Gdk.Event.Key_Release then
@@ -164,6 +164,8 @@ begin
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
    Main_Window := Gui.Create_Window;
+         Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
+      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
    Keyboard.Key_Handler.Start (Terminal.Disconnected);
    Main_Window.On_Key_Press_Event (Handle_Key_Event_CB'Unrestricted_Access);
    Main_Window.On_Key_Release_Event (Handle_Key_Event_CB'Unrestricted_Access);

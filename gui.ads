@@ -24,7 +24,6 @@ with Gtk.Handlers;
 with Gtk.Widget;
 with Gtk.Window; 
 
-with Display;
 with Terminal;
 
 package GUI is
@@ -40,10 +39,9 @@ package GUI is
       
    -- procedure Init_Gtk (Builder : Gtkada_Builder);
 
-   Disp : Display.Display_T;
-   Disp_Acc : Display.Display_Acc_T;
+   -- Disp_Acc : Display.Display_Acc_T;
 
-   Main_Window :Gtk.Window.Gtk_Window;
+   Main_Window : Gtk.Window.Gtk_Window;
    Vbox : Gtk.Box.Gtk_Vbox;
    Term : Terminal.Terminal_Acc_T;
 

@@ -25,8 +25,8 @@ package BDF_Font is
    Max_Chars : constant Positive := 128;
    BPP       : constant Positive := 8;
    -- raw font dimensions
-   Font_Width  : constant Positive := 10;
-   Font_Height : constant Positive := 12;
+   Font_Width  : constant Gint := 40;
+   Font_Height : constant Gint := 44;
 
    type Zoom_T is (Large, Normal, Smaller, Tiny);
 
@@ -40,15 +40,16 @@ package BDF_Font is
 
    type Font_Array is array (0..Max_Chars-1) of BDF_Char;
 
-   type Decoded_T is tagged record
+   type Decoded_T is record
       Font : Font_Array;
       Char_Width, Char_Height : Gint;
    end record;
 
-   type Decoded_Acc_T is access Decoded_T;
+   Decoded : Decoded_T;
 
-   function Load_Font (File_Name : String; Zoom : Zoom_T)
-      return Decoded_Acc_T;
+   -- function Load_Font (File_Name : String; Zoom : Zoom_T)
+   --    return Decoded_Acc_T;
+   procedure Load_Font (File_Name : String; Zoom : Zoom_T);
 
    OPEN_FAILURE,
    BDF_DECODE : exception;

@@ -20,25 +20,27 @@
 with Ada.Text_IO;
 
 with Cairo;               use Cairo;
-with Cairo.Image_Surface; use Cairo.Image_Surface;
 
-with Gdk.Threads;
+with Gdk.Cairo;
 with Gdk.Window;
-with Glib.Main;
-with Gtk.Drawing_Area;
+with Glib;
+
+with Display;
 
 package body Crt is
 
    surface : Cairo.Cairo_Surface;
    use type Cairo.Cairo_Surface;
 
-   procedure Create (Disp : in Display.Display_Acc_T; Zoom : in BDF_Font.Zoom_T) is
+   procedure Create (Zoom : in BDF_Font.Zoom_T) is
       -- C : aliased Crt_Acc_T := new Crt_T;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Creating Crt");
+      -- Tube.Font := BDF_Font.Load_Font (Font_Filename, Zoom);
+      BDF_Font.Load_Font (Font_Filename, Zoom);
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
       Tube.DA.Set_Size_Request(600, 400);
-      Tube.Disp := Disp;
+      -- Tube.Disp := Disp;
       Tube.Zoom := Zoom;
       -- C.DA.On_Draw (Draw_CB'Access);
       -- C.Timeout_ID := Glib.Main.Timeout_Add (1000, Draw2'Access); -- Draw2'Access
@@ -52,7 +54,7 @@ package body Crt is
       Cr : Cairo.Cairo_Context;
    begin
       Cr := Cairo.Create (surface);
-      Cairo.Set_Source_Rgb (Cr, 1.0, 0.0, 1.0);
+      Cairo.Set_Source_Rgb (Cr, 0.1, 0.5, 0.1);
       Cairo.Paint (Cr);
       Cairo.Destroy (Cr);
    end Clear_Surface;
@@ -62,6 +64,7 @@ package body Crt is
       Event : Gdk.Event.Gdk_Event_Configure)
       return  Boolean
    is
+      pragma Unreferenced (Event);
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Entering Configure_Event_CB");
       if surface /= Cairo.Null_Surface then
@@ -80,13 +83,52 @@ package body Crt is
       return True;
    end Configure_Event_CB;
 
+   -- Draw_Crt is called from within a Callback - so it's safe to use PixBufs etc.
+   procedure Draw_Crt is
+      Cr : Cairo.Cairo_Context;
+      Char_Ix : Natural;
+      use Glib;
+   begin
+      Cr := Cairo.Create (surface);
+      Cairo.Rectangle (cr, 20.0, 30.0, 20.0, 30.0);
+      Cairo.Fill (cr);
+
+      for Line in 1 .. Display.Disp.Visible_Lines loop
+         for Col in 1 .. Display.Disp.Visible_Cols loop
+            -- TODO Blinking
+            Char_Ix := Character'Pos (Display.Disp.Cells(Line, Col).Char_Value);
+            if Char_Ix > 31 and Char_Ix < 128 then
+               Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt @ Line: " & Line'Image & ", Col: " & Col'Image & 
+               " char is: " &  Display.Disp.Cells(Line, Col).Char_Value & " char index is: " & Char_Ix'Image);
+               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                            Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
+                                            Pixbuf_X => Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width), 
+                                            Pixbuf_Y => Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height));
+               Cairo.Paint (Cr);
+            end if;
+            -- TESTING...
+            if Line = 20 then
+               Char_Ix := 32 + Col;
+               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                              Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
+                              Pixbuf_X => Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width), 
+                              Pixbuf_Y => Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height));
+               Cairo.Paint (Cr);
+            end if;
+         end loop;
+      end loop;
+      Cairo.Destroy (Cr);
+   end Draw_Crt;
+
    function Draw_CB
      (Self : access Gtk.Widget.Gtk_Widget_Record'Class;
       Cr   : Cairo.Cairo_Context)
       return Boolean
    is
+      pragma Unreferenced (Self);
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Entering Draw_CB");
+      Draw_Crt;
       Cairo.Set_Source_Surface (Cr, surface, 0.0, 0.0);
       Cairo.Paint (Cr);
       return False;

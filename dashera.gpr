@@ -28,11 +28,11 @@ project Dashera is
    for Exec_Dir use "obj/";
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-O0", "-gnaty-s", "-gnatwJ")
-        & External_As_List ("ADAFLAGS", " ");
+      for Switches ("Ada") use ("-g", "-O0", "-gnatwa", "-p", "-fstack-check");
+      --   & External_As_List ("ADAFLAGS", " ");
    end Compiler;
-   package Linker is
-      for Leading_Switches ("Ada") use External_As_List("LDFLAGS", " ");
-   end Linker;
+   -- package Linker is
+   --    for Leading_Switches ("Ada") use External_As_List("LDFLAGS", " ");
+   -- end Linker;
 
 end Dashera;

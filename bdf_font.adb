@@ -17,17 +17,16 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Ada.Strings;       use Ada.Strings;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-with Ada.Strings.Maps;  use Ada.Strings.Maps;
 with Ada.Text_IO;       use Ada.Text_IO;
 with Interfaces;        use Interfaces;
 
 package body BDF_Font is
 
    procedure Parse_BBX
-     (Font_Line             : in     String; Font_Line_Length : in Positive;
-      Pix_Width, Pix_Height :    out Integer; X_Offset, Y_Offset : out Integer)
+     (Font_Line             : in String; 
+      Font_Line_Length      : in Positive;
+      Pix_Width, Pix_Height : out Integer; 
+      X_Offset, Y_Offset    : out Integer)
    is
       Start_Pos, End_Pos : Positive;
    begin
@@ -58,9 +57,9 @@ package body BDF_Font is
 
    end Parse_BBX;
 
-   function Load_Font (File_Name : String; Zoom : Zoom_T) return Decoded_Acc_T is
-      
-      Font                                              : aliased Decoded_Acc_T := new Decoded_T;
+   -- function Load_Font (File_Name : String; Zoom : Zoom_T) return Decoded_Acc_T is
+   procedure Load_Font (File_Name : String; Zoom : Zoom_T) is
+      -- Font                                              : aliased Decoded_Acc_T := new Decoded_T;
       Char_Count                                        : Positive;
       Font_File                                         : File_Type;
       Font_Line                                         : String (1 .. 80);
@@ -77,17 +76,17 @@ package body BDF_Font is
    begin
       case Zoom is
          when Large =>
-            Font.Char_Width  := 10;
-            Font.Char_Height := 24;
+            Decoded.Char_Width  := 10;
+            Decoded.Char_Height := 24;
          when Normal =>
-            Font.Char_Width  := 10;
-            Font.Char_Height := 18;
+            Decoded.Char_Width  := 10;
+            Decoded.Char_Height := 18;
          when Smaller =>
-            Font.Char_Width  := 8;
-            Font.Char_Height := 12;
+            Decoded.Char_Width  := 8;
+            Decoded.Char_Height := 12;
          when Tiny =>
-            Font.Char_Width  := 7;
-            Font.Char_Height := 10;
+            Decoded.Char_Width  := 7;
+            Decoded.Char_Height := 10;
       end case;
 
       begin
@@ -112,33 +111,31 @@ package body BDF_Font is
 
       Char_Count := Positive'Value (Font_Line (7 .. Font_Line_Length));
 
-      Tmp_Pix_Buf         := Gdk_New (Width => Gint(Font_Width), Height => Gint(Font_Height));
-      Tmp_Dim_Pix_Buf     := Gdk_New (Width => Gint(Font_Width), Height => Gint(Font_Height));
-      Tmp_Reverse_Pix_Buf := Gdk_New (Width => Gint(Font_Width), Height => Gint(Font_Height));
+      Tmp_Pix_Buf         := Gdk_New (Has_Alpha => False, Width => Font_Width, Height => Font_Height);
+      Tmp_Dim_Pix_Buf     := Gdk_New (Width => Font_Width, Height => Font_Height);
+      Tmp_Reverse_Pix_Buf := Gdk_New (Width => Font_Width, Height => Font_Height);
 
       for CC in 0 .. Char_Count - 1 loop
          Put_Line ("DEBUG: Loading char No. " & Integer'Image(CC));
 
-         Get_Line (Font_File, Font_Line, Font_Line_Length);
-         if Font_Line (1 .. 9) /= "STARTCHAR" then
-            raise BDF_DECODE with "ERROR: BDF_Font - STARTCHAR line not found";
-
-         end if;
+         loop
+            Get_Line (Font_File, Font_Line, Font_Line_Length);
+            exit when Font_Line (1 .. 9) = "STARTCHAR";
+         end loop;
 
          Get_Line (Font_File, Font_Line, Font_Line_Length);
          if Font_Line (1 .. 8) /= "ENCODING" then
            raise BDF_DECODE with "ERROR: BDF_Font - ENCODING line not found";
          end if;
          ASCII_Code := Natural'Value (Font_Line (10 .. Font_Line_Length));
+         Put_Line ("DEBUG: ... ASCII Code: " & ASCII_Code'Image);
 
          -- skip 2 lines
          Get_Line (Font_File, Font_Line, Font_Line_Length);
          Get_Line (Font_File, Font_Line, Font_Line_Length);
 
          Get_Line (Font_File, Font_Line, Font_Line_Length);
-         Parse_BBX
-           (Font_Line, Font_Line_Length, Pix_Width, Pix_Height, X_Offset,
-            Y_Offset);
+         Parse_BBX (Font_Line, Font_Line_Length, Pix_Width, Pix_Height, X_Offset, Y_Offset);
 
          -- skip the BITMAP line
          Get_Line (Font_File, Font_Line, Font_Line_Length);
@@ -152,40 +149,33 @@ package body BDF_Font is
          Reverse_Pixels := Get_Pixels(Tmp_Reverse_Pix_Buf);
          -- Put_Line ("DEBUG: Pixels Length: " & Integer'Image(Pixels') & ", Reverse_Pixels Length: " & Integer'Image(Reverse_Pixels'Length));
 
-         for Bitmap_Line in reverse 0 .. Pix_Height - 1 loop
+         -- for Bitmap_Line in reverse 0 .. Pix_Height - 1 loop
+         for Bitmap_Line in 0 .. Pix_Height - 1 loop
             Get_Line (Font_File, Font_Line, Font_Line_Length);
             Line_Byte := Unsigned_8'Value ("16#" & Font_Line (1 .. 2) & "#");
             for I in 0 .. Pix_Width - 1 loop
                if (Line_Byte and 16#80#) /= 0 then
-                  Num_Chans  := 1; -- Integer(Get_N_Channels (Tmp_Pix_Buf));
+                  Num_Chans  := Integer(Get_N_Channels (Tmp_Pix_Buf));
                   Row_Stride := Integer(Get_Rowstride (Tmp_Pix_Buf));
-                  Pixel_Index := Guint(((Y_Offset + Bitmap_Line) * Row_Stride) + ((X_Offset + I) * Num_Chans));
+                  Pixel_Index := Guint(((Y_Offset + Bitmap_Line) * Row_Stride) + ((X_Offset + I) * Num_Chans) + 1);
                   Pixels(Pixel_Index).Green := 255;
                   Dim_Pixels(Pixel_Index).Green := 128;
-                  -- RGBBA := Get_Pixels(Tmp_Reverse_Pix_Buf);
-                  -- declare
-                  --    RL : Integer := RGBBA'Length;
-                  -- begin
-                  --    RGBBA(Pixel_Index).Green := 0;
-                  -- end;
-                  -- RGBBA(Pixel_Index).Green := 0;
                   Reverse_Pixels(Pixel_Index).Green := 0;
-                  Font.Font(ASCII_Code).Pixels (X_Offset + I, Y_Offset + Bitmap_Line) := True;
+                  -- Decoded.Font(ASCII_Code).Pixels (X_Offset + I, Y_Offset + Bitmap_Line) := True;
                end if;
                Line_Byte := Shift_Left (Line_Byte, 1);
             end loop;
          end loop;
 
-         Font.Font(ASCII_Code).Pix_Buf := Tmp_Pix_Buf;
-         Font.Font(ASCII_Code).Dim_Pix_Buf := Tmp_Dim_Pix_Buf;
-         Font.Font(ASCII_Code).Reverse_Pix_Buf := Tmp_Reverse_Pix_Buf;
-         Font.Font(ASCII_Code).Loaded  := true;
-         -- skip the ENDCHAR line
-         Get_Line (Font_File, Font_Line, Font_Line_Length);
+         Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Hyper);
+         -- Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Pix_Buf);
+         Decoded.Font(ASCII_Code).Dim_Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Dim_Pix_Buf);
+         Decoded.Font(ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Reverse_Pix_Buf);
+         Decoded.Font(ASCII_Code).Loaded  := true;
 
       end loop;
 
-      return Font;
+      -- return Font;
 
    end Load_Font;
 

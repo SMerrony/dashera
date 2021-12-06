@@ -29,15 +29,16 @@ package Display is
 
    type Cell_Array is array(1..Total_Lines,1..Total_Cols) of Cell.Cell_T;
 
-   type Display_T is tagged record
+   type Display_T is record
       Cells : Cell_Array;
       Visible_Lines, Visible_Cols : Integer;
       Dirty : Boolean;
    end record;
 
-   type Display_Acc_T is access all Display_T;
+   Disp : Display_T;
 
-   function Create return Display_Acc_T;
+   -- function Create return Display_Acc_T;
+   procedure Init;
    procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer);
 
 end Display;

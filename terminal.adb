@@ -19,7 +19,7 @@
 
 package body Terminal is
 
-   function Create (Emul : in Emulation_T; Disp : in Display_Acc_T) return Terminal_Acc_T is
+   function Create (Emul : in Emulation_T) return Terminal_Acc_T is
       T : aliased Terminal_Acc_T := new Terminal_T;
    begin
       T.Emulation := Emul;
@@ -35,8 +35,6 @@ package body Terminal is
       T.Scrolled_Back := False;
       T.Expecting := False;
       T.Raw_Mode := False;
-
-      T.Display := Disp;
 
       T.Updated := True;
       

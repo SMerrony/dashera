@@ -23,7 +23,6 @@ with Gdk.Main;
 with Glib.Main;
 with Gtk.Action;
 with Gtk.Adjustment;
-with Gtk.Box;
 with Gtk.Button;
 with Gtk.Drawing_Area;
 with Gtk.Enums;
@@ -31,29 +30,26 @@ with Gtk.Frame;
 with Gtk.Label;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
-with Gtk.Enums;               use Gtk.Enums;
+-- with Gtk.Enums;               -- use Gtk.Enums;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
-with Gtk.Menu_Button;         use Gtk.Menu_Button;
+with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
 with Gtk.Menu_Item;           use Gtk.Menu_Item;
-with Gtk.Radio_Menu_Item;     use Gtk.Radio_Menu_Item;
+with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
-with Gtk.Scrollbar;
-with Gtk.Table;
+-- with Gtk.Scrollbar;
+-- with Gtk.Table;
 with Gtk.Widget; use Gtk.Widget;
 with Gtk.Window; use Gtk.Window;
 
 with BDF_Font;
 with Crt;
 with Display;
-with Terminal;
 
-package body GUI is
-
-   Font_Filename  : constant String := "D410-b-12.bdf";
-   Font : BDF_Font.Decoded_Acc_T;
+package body GUI is  
 
    procedure Exit_Gui (Window : access Gtk_Widget_Record'Class) is
       -- Done : Boolean;
+      pragma Unreferenced (Window);
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
       -- Glib.Main.Idle_Add (Gtk.Main.Main_Quit'Access);
@@ -186,16 +182,14 @@ package body GUI is
       Main_Window.Set_Title (App_Title);
       Main_Window.On_Destroy (Exit_Gui'Access);
       
-      Font := BDF_Font.Load_Font (Font_Filename, BDF_Font.Normal);
-
       Gtk.Box.Gtk_New_Vbox (Vbox, Homogeneous => False, Spacing => 1);
       VBox.Pack_Start (Create_Menu_Bar);
 
-      Disp_Acc := Display.Create;
-      Term := Terminal.Create (Terminal.D210, Disp_Acc);
-      Crt.Create (Disp => Disp_Acc, Zoom => BDF_Font.Normal);
-      Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
-      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
+      Display.Init;
+      Term := Terminal.Create (Terminal.D210);
+      Crt.Create (Zoom => BDF_Font.Normal);
+      -- Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
+      -- Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
       VBox.Pack_Start (Crt.Tube.DA);
       VBox.Pack_End (Create_Status_Box);
       Main_Window.Add (Vbox);
