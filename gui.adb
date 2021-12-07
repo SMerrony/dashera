@@ -19,8 +19,6 @@
 
 with Ada.Text_IO;
 
-with Gdk.Main;
-with Glib.Main;
 with Gtk.Action;
 with Gtk.Adjustment;
 with Gtk.Button;
@@ -30,7 +28,6 @@ with Gtk.Frame;
 with Gtk.Label;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
--- with Gtk.Enums;               -- use Gtk.Enums;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
 with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
 with Gtk.Menu_Item;           use Gtk.Menu_Item;
@@ -47,18 +44,18 @@ with Display;
 
 package body GUI is  
 
-   procedure Exit_Gui (Window : access Gtk_Widget_Record'Class) is
-      -- Done : Boolean;
+   procedure Window_Close_CB (Window : access Gtk_Widget_Record'Class) is
       pragma Unreferenced (Window);
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
-      -- Glib.Main.Idle_Add (Gtk.Main.Main_Quit'Access);
       Gtk.Main.Main_Quit;
-      -- Gtk.Main.Main_Quit;
-      -- Gdk.Main.Gdk_Exit (0);
-      -- Done := Gtk.Main.Main_Iteration_Do (false);
-      -- return;
-   end Exit_Gui;
+   end Window_Close_CB;
+
+   procedure Quit_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      Gtk.Main.Main_Quit;
+   end Quit_CB;
 
    function Create_Menu_Bar return Gtk.Menu_Bar.Gtk_Menu_Bar is
       Menu_Bar : Gtk.Menu_Bar.Gtk_Menu_Bar;
@@ -104,7 +101,7 @@ package body GUI is
 
       Gtk_New (Quit_Item, "Quit");
       File_Menu.Append (Quit_Item);
-      -- Connect (Quit_Item, "activate", Exit_Gui'Access);
+      Quit_Item.On_Activate (Quit_CB'Access);
 
       Gtk_New (Menu_Item, "Edit");
       Menu_Bar.Append(Menu_Item);
@@ -180,18 +177,27 @@ package body GUI is
       Gtk.Window.Gtk_New (Main_Window);
       Ada.Text_IO.Put_Line ("DEBUG: New Window Created");
       Main_Window.Set_Title (App_Title);
-      Main_Window.On_Destroy (Exit_Gui'Access);
-      
+      Main_Window.On_Destroy (Window_Close_CB'Access);
+
+      -- Everything is in a Vbox...
       Gtk.Box.Gtk_New_Vbox (Vbox, Homogeneous => False, Spacing => 1);
+
+      -- Menu
       VBox.Pack_Start (Create_Menu_Bar);
 
+      -- Virtual Function Keys and Template
+
+      -- CRT area
       Display.Init;
       Term := Terminal.Create (Terminal.D210);
-      Crt.Create (Zoom => BDF_Font.Normal);
-      -- Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
-      -- Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
+      Crt.Init (Zoom => BDF_Font.Normal);
+      Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
+      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
       VBox.Pack_Start (Crt.Tube.DA);
+
+      -- Status Bar
       VBox.Pack_End (Create_Status_Box);
+
       Main_Window.Add (Vbox);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
       Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");

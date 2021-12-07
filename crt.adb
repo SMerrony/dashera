@@ -23,7 +23,7 @@ with Cairo;               use Cairo;
 
 with Gdk.Cairo;
 with Gdk.Window;
-with Glib;
+with Glib; use Glib;
 
 with Display;
 
@@ -32,14 +32,15 @@ package body Crt is
    surface : Cairo.Cairo_Surface;
    use type Cairo.Cairo_Surface;
 
-   procedure Create (Zoom : in BDF_Font.Zoom_T) is
+   procedure Init (Zoom : in BDF_Font.Zoom_T) is
       -- C : aliased Crt_Acc_T := new Crt_T;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Creating Crt");
       -- Tube.Font := BDF_Font.Load_Font (Font_Filename, Zoom);
       BDF_Font.Load_Font (Font_Filename, Zoom);
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
-      Tube.DA.Set_Size_Request(600, 400);
+      Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * Gint(Display.Disp.Visible_Cols), 
+                               BDF_Font.Decoded.Char_Height * Gint(Display.Disp.Visible_Lines));
       -- Tube.Disp := Disp;
       Tube.Zoom := Zoom;
       -- C.DA.On_Draw (Draw_CB'Access);
@@ -47,7 +48,7 @@ package body Crt is
       -- C.Timeout_ID := Glib.Main.Timeout_Add (1, Glib.Main.G_Source_Func (C.Draw));
 
       -- return C;
-   end Create;
+   end Init;
 
 
    procedure Clear_Surface is
@@ -91,8 +92,8 @@ package body Crt is
    begin
       Cr := Cairo.Create (surface);
 
-      for Line in 1 .. Display.Disp.Visible_Lines loop
-         for Col in 1 .. Display.Disp.Visible_Cols loop
+      for Line in 0 .. Display.Disp.Visible_Lines-1 loop
+         for Col in 0 .. Display.Disp.Visible_Cols-1 loop
             -- TODO Blinking
             Char_Ix := Character'Pos (Display.Disp.Cells(Line, Col).Char_Value);
             if Char_Ix > 31 and Char_Ix < 128 then

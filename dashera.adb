@@ -141,31 +141,15 @@ begin
       Arg_Ix := Arg_Ix + 1;
    end loop;
 
-   -- App := Gtk.Application.Gtk_Application_New ("Fred", Glib.Application.G_Application_Flags_None);
    Gdk.Threads.G_Init;
    Gdk.Threads.Init;
-   -- Gtk.Main.Set_Locale;
    Gtk.Main.Init;
-
-   -- --  Load glade file
-   -- Gtk.Builder.Initialize_From_File (Builder, Glade_Filename);
-   -- -- Gtk_New (Builder);
-   -- -- if Add_From_File (Builder, Glade_Filename, Error'Access) = 0 then
-   -- --    Ada.Text_IO.Put_Line ("ERROR: " & Get_Message (Error));
-   -- --    Error_Free (Error);
-   -- --    return;
-   -- -- end if;
-   -- Ada.Text_IO.Put_Line ( "DEBUG: Finished loading GLADE resources" );
-
-   -- GUI.Init_Gtk (Builder);
 
    Local_Listener.Start;
 
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
    Main_Window := Gui.Create_Window;
-         Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
-      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
    Keyboard.Key_Handler.Start (Terminal.Disconnected);
    Main_Window.On_Key_Press_Event (Handle_Key_Event_CB'Unrestricted_Access);
    Main_Window.On_Key_Release_Event (Handle_Key_Event_CB'Unrestricted_Access);

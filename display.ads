@@ -27,7 +27,7 @@ package Display is
    Total_Lines : constant Natural := 96;
    Total_Cols  : constant Natural := 208;
 
-   type Cell_Array is array(1..Total_Lines,1..Total_Cols) of Cell.Cell_T;
+   type Cell_Array is array(0..Total_Lines-1,0..Total_Cols-1) of Cell.Cell_T;
 
    type Display_T is record
       Cells : Cell_Array;

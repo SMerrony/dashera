@@ -41,7 +41,7 @@ package Crt is
 
    Tube : Crt_T;
 
-   procedure Create (Zoom : in BDF_Font.Zoom_T);
+   procedure Init (Zoom : in BDF_Font.Zoom_T);
 
    function Configure_Event_CB
      (Self  : access Gtk.Widget.Gtk_Widget_Record'Class;

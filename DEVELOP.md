@@ -35,6 +35,13 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
 * Terminal - implements the Dasher behaviour
 
 
+## Build and Clean
+* gprbuild
+* gprclean
+
+## Run with Fatal Warnings...
+`./obj/dashera --gtk-fatal-warnings --g-fatal--warnings`
+
 ## Terminal setting on Linux host:
 
 `export TERM=d210-dg`
