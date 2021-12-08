@@ -22,23 +22,34 @@ package Terminal is
    type Emulation_T is (D200, D210);
    type Connection_T is (Disconnected, Serial, Telnet);
 
-   type Terminal_T is record
+   type Byte is mod 2**8;
+   type Byte_Arr is array (Positive range <>) of Byte;
+
+   type Terminal_T is tagged record
       Emulation : Emulation_T;
       Connection : Connection_T;
       Cursor_X, Cursor_Y : Natural;
       Roll_Enabled, Blink_Enabled, Protection_Enabled : Boolean;
       Blink_State : Boolean;
       Holding, Logging, Scrolled_Back : Boolean;
+      Skip_Byte : Boolean;
       Expecting : Boolean;
       Raw_Mode : Boolean; -- in rawMode all host data is passed straight through to rawChan
       -- Selection_Region...
       -- Log_File : File;
       -- Display : Display_Acc_T;
+      Blinking, Dimmed, Reversed, Underscored, Protectd : Boolean;
       Updated : Boolean;
    end record;
 
    type Terminal_Acc_T is access all Terminal_T;
 
+   Dasher_NL : constant Byte := 10;
+   Dasher_CR : constant Byte := 13;
+
    function Create (Emul : in Emulation_T) return Terminal_Acc_T;
+   procedure Self_Test (T : in out Terminal_T);
+   procedure Process (T : in out Terminal_T; BA : in Byte_Arr);
+   procedure Scroll_Up (T : in out Terminal_T; Lines : in Integer);
 
 end Terminal;

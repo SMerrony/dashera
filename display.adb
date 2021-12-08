@@ -42,4 +42,18 @@ package body Display is
       This.Cells(Line, Col).Clear_To_Space;
    end Clear_Cell;
 
+   procedure Clear_Line (This : in out Display_T; Line : in Integer) is
+   begin
+      for Col in 0 .. Total_Cols - 1 loop
+         This.Cells(Line, Col).Clear_To_Space;
+      end loop;
+   end Clear_Line;
+
+   procedure Copy_Line (This : in out Display_T; Src, Dest : Integer) is
+   begin
+      for Col in 0 .. Total_Cols - 1 loop
+         This.Cells(Dest,Col).Copy_From (Display.Disp.Cells(Src,Col));
+      end loop;
+   end Copy_Line;
+
 end Display;

@@ -38,4 +38,15 @@ package body Cell is
       This.Underscore := false;
       This.Protect    := false;
    end Clear_To_Space;
+
+   procedure Copy_From (C : in out Cell_T; Src : in Cell_T) is
+   begin
+      C.Char_Value := Src.Char_Value;
+      C.Blink := Src.Blink;
+      C.Dim := Src.Dim;
+      C.Rev := Src.Rev;
+      C.Underscore := Src.Underscore;
+      C.Protect := Src.Protect;
+   end Copy_From;
+
 end Cell;

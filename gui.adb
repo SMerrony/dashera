@@ -19,9 +19,11 @@
 
 with Ada.Text_IO;
 
+with Gtk.About_Dialog;        use Gtk.About_Dialog;
 with Gtk.Action;
 with Gtk.Adjustment;
 with Gtk.Button;
+with Gtk.Dialog;              use Gtk.Dialog;
 with Gtk.Drawing_Area;
 with Gtk.Enums;
 with Gtk.Frame;
@@ -41,6 +43,7 @@ with Gtk.Window; use Gtk.Window;
 with BDF_Font;
 with Crt;
 with Display;
+-- with Terminal;
 
 package body GUI is  
 
@@ -57,6 +60,32 @@ package body GUI is
       Gtk.Main.Main_Quit;
    end Quit_CB;
 
+   procedure About_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Dialog : Gtk_About_Dialog;
+   begin
+      Gtk_New (Dialog);
+      Dialog.Set_Destroy_With_Parent (True);
+      Dialog.Set_Modal (True);
+      -- TODO: Dialog.Set_Logo
+      Dialog.Set_Authors ((1 => new String'(App_Author)));
+      Dialog.Set_Copyright (App_Copyright);
+      Dialog.Set_Comments (App_Comment);
+      Dialog.Set_Program_Name (App_Title);
+      Dialog.Set_Version (App_SemVer);
+      Dialog.Set_Website (App_Website);
+      if Dialog.Run  /= Gtk_Response_Close then
+         null;
+      end if;
+      Dialog.Destroy;
+   end About_CB;
+
+   procedure Self_Test_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      Term.Self_Test;
+   end Self_Test_CB;
+
    function Create_Menu_Bar return Gtk.Menu_Bar.Gtk_Menu_Bar is
       Menu_Bar : Gtk.Menu_Bar.Gtk_Menu_Bar;
       Sep_Item : Gtk.Separator_Menu_Item.Gtk_Separator_Menu_Item;
@@ -64,11 +93,15 @@ package body GUI is
       Help_Menu : Gtk.Menu.Gtk_Menu;
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
       Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rcv_Item,
+      Self_Test_Item,
       Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
-      Paste_Item : Gtk.Menu_Item.Gtk_Menu_Item;
+      Paste_Item,
+      About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Menu_Bar");
       Gtk_New (Menu_Bar);
+
+      -- File
       
       Gtk_New (Menu_Item, "File");
       Menu_Bar.Append(Menu_Item);
@@ -103,6 +136,8 @@ package body GUI is
       File_Menu.Append (Quit_Item);
       Quit_Item.On_Activate (Quit_CB'Access);
 
+      -- Edit
+
       Gtk_New (Menu_Item, "Edit");
       Menu_Bar.Append(Menu_Item);
       Gtk_New (Edit_Menu);
@@ -110,6 +145,7 @@ package body GUI is
       Gtk_New (Paste_Item, "Paste");
       Edit_Menu.Append (Paste_Item);
 
+      -- Emulation
 
       Gtk_New (Menu_Item, "Emulation");
       Menu_Bar.Append(Menu_Item);
@@ -119,23 +155,35 @@ package body GUI is
       Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
 
-      Gtk_New (Menu_Item, "Self-Test");
-      Emulation_Menu.Append (Menu_Item);
+      Gtk_New (Self_Test_Item, "Self-Test");
+      Emulation_Menu.Append (Self_Test_Item);
+      Self_Test_Item.On_Activate (Self_Test_CB'Access);
+
+      -- Serial
 
       Gtk_New (Menu_Item, "Serial");
       Menu_Bar.Append(Menu_Item);
       Gtk_New (Serial_Menu);
       Menu_Item.Set_Submenu (Serial_Menu);
 
+      -- Network
+
       Gtk_New (Menu_Item, "Network");
       Menu_Bar.Append(Menu_Item);
       Gtk_New (Network_Menu);
       Menu_Item.Set_Submenu (Network_Menu);
 
+      -- Help
+
       Gtk_New (Menu_Item, "Help");
       Menu_Bar.Append(Menu_Item);    
       Gtk_New (Help_Menu);
       Menu_Item.Set_Submenu (Help_Menu);
+
+      Gtk_New (About_Item, "About");
+      Help_Menu.Append (About_Item);
+      About_Item.On_Activate (About_CB'Access);
+
 
       return Menu_Bar;
    end Create_Menu_Bar;

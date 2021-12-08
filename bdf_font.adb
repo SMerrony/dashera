@@ -99,7 +99,7 @@ package body BDF_Font is
 
       loop
          Get_Line (Font_File, Font_Line, Font_Line_Length);
-         Put_Line ("DEBUG: " & Font_Line (1 .. Font_Line_Length));
+         -- Put_Line ("DEBUG: " & Font_Line (1 .. Font_Line_Length));
          exit when Font_Line (1 .. Font_Line_Length) = "ENDPROPERTIES";
       end loop;
       Get_Line (Font_File, Font_Line, Font_Line_Length);
@@ -122,7 +122,7 @@ package body BDF_Font is
       Fill (Black_Pix_Buf, 16#000000ff#);
 
       for CC in 0 .. Char_Count - 1 loop
-         Put_Line ("DEBUG: Loading char No. " & Integer'Image(CC));
+         -- Put_Line ("DEBUG: Loading char No. " & Integer'Image(CC));
 
          loop
             Get_Line (Font_File, Font_Line, Font_Line_Length);
@@ -134,7 +134,7 @@ package body BDF_Font is
            raise BDF_DECODE with "ERROR: BDF_Font - ENCODING line not found";
          end if;
          ASCII_Code := Natural'Value (Font_Line (10 .. Font_Line_Length));
-         Put_Line ("DEBUG: ... ASCII Code: " & ASCII_Code'Image);
+         -- Put_Line ("DEBUG: ... ASCII Code: " & ASCII_Code'Image);
 
          -- skip 2 lines
          Get_Line (Font_File, Font_Line, Font_Line_Length);

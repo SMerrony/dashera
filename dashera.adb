@@ -41,8 +41,6 @@ with Terminal;
 
 procedure Dashera is
 
-   Semantic_Version : constant String := "v0.11.0x";  -- TODO Update Version each release!
-
    -- Glade_Filename : constant String := "resources/dashera.glade";  
 
    -- GUI stuff
@@ -125,7 +123,7 @@ begin
 
    while Arg_Ix <= Argument_Count loop
       if Argument (Arg_Ix) = "-version" then
-         Ada.Text_IO.Put_Line ("dashera version " & Semantic_Version);
+         Ada.Text_IO.Put_Line ("dashera version " & GUI.App_SemVer);
          return;
       elsif Argument (Arg_Ix) = "-host" then
          Host_Arg := To_Unbounded_String (Argument (Arg_Ix + 1));

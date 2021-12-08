@@ -90,6 +90,7 @@ package body Crt is
       Char_Ix : Natural;
       use Glib;
    begin
+      Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt called");
       Cr := Cairo.Create (surface);
 
       for Line in 0 .. Display.Disp.Visible_Lines-1 loop
@@ -97,8 +98,8 @@ package body Crt is
             -- TODO Blinking
             Char_Ix := Character'Pos (Display.Disp.Cells(Line, Col).Char_Value);
             if Char_Ix > 31 and Char_Ix < 128 then
-               Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt @ Line: " & Line'Image & ", Col: " & Col'Image & 
-               " char is: " &  Display.Disp.Cells(Line, Col).Char_Value & " char index is: " & Char_Ix'Image);
+               -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt @ Line: " & Line'Image & ", Col: " & Col'Image & 
+               -- " char is: " &  Display.Disp.Cells(Line, Col).Char_Value & " char index is: " & Char_Ix'Image);
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                             Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
                                             Pixbuf_X => Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width), 

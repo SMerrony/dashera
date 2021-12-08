@@ -40,5 +40,11 @@ package Display is
    -- function Create return Display_Acc_T;
    procedure Init;
    procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer);
+   procedure Clear_Line (This : in out Display_T; Line : in Integer);
+   -- procedure Set_Cell (This : in out Display_T;
+   --                     Line, Col : in Integer;
+   --                     Char : in Character;
+   --                     Blink, Dim, Rev, Under, Prot : in Boolean);
+   procedure Copy_Line (This : in out Display_T; Src, Dest : Integer);
 
 end Display;

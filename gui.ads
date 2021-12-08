@@ -29,11 +29,13 @@ with Terminal;
 package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
    
+   App_SemVer       : constant String := "v0.11.0x";  -- TODO Update Version each release!
    App_Title        : constant String := "DasherA";
    App_Comment      : constant String := "A Data General DASHER terminal emulator";
+   App_Author       : constant String := "Stephen Merrony";
    App_Copyright    : constant String := "Copyright ©2021 S.Merrony";
    App_Icon         : constant String := "DGlogoOrange.ico";
-   App_Website      : constant String := "https://github.com/SMerrony/DasherG"; -- FIXME
+   App_Website      : constant String := "https://github.com/SMerrony/DasherA"; -- FIXME
 
    History_Lines    :  constant Natural := 1000;
       

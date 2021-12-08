@@ -19,12 +19,17 @@
 
 package Cell is
 
-  type Cell_T is tagged record
-      Char_Value : Character;
+   type Cell_T is tagged record
+      Char_Value                           : Character;
       Blink, Dim, Rev, Underscore, Protect : Boolean;
    end record;
 
-   procedure Set (This : in out Cell_T; Value : in Character; Blnk, Dm, Rv, Under, Prot : in Boolean);
+   procedure Set
+     (This                      : in out Cell_T; Value : in Character;
+      Blnk, Dm, Rv, Under, Prot : in     Boolean);
    procedure Clear_To_Space (This : in out Cell_T);
+
+   procedure Copy_From (C : in out Cell_T; Src : in Cell_T);
+
 
 end Cell;
