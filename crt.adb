@@ -55,7 +55,7 @@ package body Crt is
       Cr : Cairo.Cairo_Context;
    begin
       Cr := Cairo.Create (surface);
-      Cairo.Set_Source_Rgb (Cr, 0.1, 0.5, 0.1);
+      Cairo.Set_Source_Rgb (Cr, 0.0, 0.0, 0.0);
       Cairo.Paint (Cr);
       Cairo.Destroy (Cr);
    end Clear_Surface;
@@ -86,8 +86,9 @@ package body Crt is
 
    -- Draw_Crt is called from within a Callback - so it's safe to use PixBufs etc.
    procedure Draw_Crt is
-      Cr : Cairo.Cairo_Context;
-      Char_Ix : Natural;
+      Cr             : Cairo.Cairo_Context;
+      Char_Ix        : Natural;
+      Char_X, Char_Y, Char_UL : Gdouble;
       use Glib;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt called");
@@ -95,25 +96,34 @@ package body Crt is
 
       for Line in 0 .. Display.Disp.Visible_Lines-1 loop
          for Col in 0 .. Display.Disp.Visible_Cols-1 loop
+            Char_X  := Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width);
+            Char_Y  := Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height);
+            Char_UL := (Gdouble(Gint(Line + 1) * BDF_Font.Decoded.Char_Height)) - 1.0;
             -- TODO Blinking
             Char_Ix := Character'Pos (Display.Disp.Cells(Line, Col).Char_Value);
             if Char_Ix > 31 and Char_Ix < 128 then
                -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt @ Line: " & Line'Image & ", Col: " & Col'Image & 
                -- " char is: " &  Display.Disp.Cells(Line, Col).Char_Value & " char index is: " & Char_Ix'Image);
-               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                            Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
-                                            Pixbuf_X => Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width), 
-                                            Pixbuf_Y => Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height));
+               if Display.Disp.Cells(Line, Col).Dim then
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                               Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Dim_Pix_Buf, 
+                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+               elsif Display.Disp.Cells(Line, Col).Rev then
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                               Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf,
+                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
+               else
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                               Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
+                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+               end if;
                Cairo.Paint (Cr);
-            end if;
-            -- TESTING...
-            if Line = 20 then
-               Char_Ix := 32 + Col;
-               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                              Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
-                              Pixbuf_X => Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width), 
-                              Pixbuf_Y => Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height));
-               Cairo.Paint (Cr);
+               -- Underlined?
+               if Display.Disp.Cells(Line, Col).Underscore then
+                  Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
+                  Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(BDF_Font.Decoded.Char_Width), 1.0);
+                  Cairo.Fill (Cr);
+               end if;
             end if;
          end loop;
       end loop;

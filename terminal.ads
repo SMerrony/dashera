@@ -44,8 +44,14 @@ package Terminal is
 
    type Terminal_Acc_T is access all Terminal_T;
 
-   Dasher_NL : constant Byte := 10;
-   Dasher_CR : constant Byte := 13;
+   Dasher_Rev_Off   : constant Byte := 2; -- from D210 onwards
+   Dasher_NL        : constant Byte := 10;
+   Dasher_CR        : constant Byte := 13;
+   Dasher_Underline : constant Byte := 20;
+   Dasher_Normal    : constant Byte := 21; -- cancels Underline
+   Dasher_Rev_On    : constant Byte := 22; -- from D210 onwards
+   Dasher_Dim_On    : constant Byte := 28;
+   Dasher_Dim_Off   : constant Byte := 29;
 
    function Create (Emul : in Emulation_T) return Terminal_Acc_T;
    procedure Self_Test (T : in out Terminal_T);

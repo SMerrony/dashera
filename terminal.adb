@@ -41,10 +41,14 @@ package body Terminal is
       T.Scrolled_Back := False;
       T.Expecting := False;
       T.Raw_Mode := False;
+      T.Blinking := False;
+      T.Dimmed := False;
+      T.Reversed := False;
+      T.Underscored := False;
+      T.Protectd := False;
 
       T.Updated := True;
       
-
       return T;
    end Create;
 
@@ -62,11 +66,45 @@ package body Terminal is
       HRule2 : constant String := "         1         2         3         4         5         6         7         8         9         10        11        12        13    ";
       Chars  : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!""$%^&*";
       NLine  : constant String := "3 Normal : ";
+      DLine  : constant String := "4 Dim    : ";
+      BLine  : constant String := "5 Blink  : ";
+      RLine  : constant String := "6 Reverse: ";
+      ULine  : constant String := "7 Under  : ";
+      NL, Op : Byte_Arr (1..1);
    begin
+      NL(1) := Dasher_NL;
+
       T.Process (Str_To_BA (HRule1(1..Display.Disp.Visible_Cols)));
       T.Process (Str_To_BA (HRule2(1..Display.Disp.Visible_Cols)));
+
       T.Process (Str_To_BA (NLine));
       T.Process (Str_To_BA (Chars));
+
+      T.Process (Str_To_BA (DLine));
+      Op(1) := Dasher_Dim_On;
+      T.Process (Op);
+      T.Process (Str_To_BA (Chars));
+      Op(1) := Dasher_Dim_Off;
+      T.Process (Op);
+
+      T.Process (Str_To_BA (BLine));
+      T.Process (NL);
+
+      T.Process (Str_To_BA (RLine));
+      Op(1) := Dasher_Rev_On;
+      T.Process (Op);
+      T.Process (Str_To_BA (Chars));
+      Op(1) := Dasher_Rev_Off;
+      T.Process (Op);
+
+      T.Process (Str_To_BA (ULine));
+      Op(1) := Dasher_Underline;
+      T.Process (Op);
+      T.Process (Str_To_BA (Chars));
+      Op(1) := Dasher_Normal;
+      T.Process (Op);   
+
+      T.Process (NL);      
    end Self_Test;
 
    -- Process is to be called with a Byte_Arr whenever there is any data for 
@@ -81,9 +119,7 @@ package body Terminal is
          B := BA(Ix);
          B_Int := Integer(B);
 
-         if T.Skip_Byte then
-            goto Continue;
-         end if;
+         T.Skip_Byte := False;
 
          -- wrap due to hitting margin or new line?
          if T.Cursor_X = Display.Disp.Visible_Cols or B = Dasher_NL then
@@ -104,10 +140,34 @@ package body Terminal is
             T.Cursor_X := 0;
          end if;
 
+         if B = Dasher_Dim_On then
+            T.Dimmed := True;
+            T.Skip_Byte := True;
+         elsif B = Dasher_Dim_Off then
+            T.Dimmed := False;
+            T.Skip_Byte := True;
+         elsif B = Dasher_Rev_On then
+            T.Reversed := True;
+            T.Skip_Byte := True;
+         elsif B = Dasher_Rev_Off then
+            T.Reversed := False;
+            T.Skip_Byte := True;
+         elsif B = Dasher_Underline then
+            T.Underscored := True;
+            T.Skip_Byte := True;
+         elsif B = Dasher_Normal then
+            T.Underscored := False;
+            T.Skip_Byte := True;            
+         end if;
+
          -- CR or NL?
          if B = Dasher_CR or B = Dasher_NL then
             T.Cursor_X := 0;
             -- TODO handle Expect case
+            goto Continue;
+         end if;
+
+         if T.Skip_Byte then
             goto Continue;
          end if;
 

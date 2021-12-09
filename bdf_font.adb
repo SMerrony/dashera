@@ -169,10 +169,9 @@ package body BDF_Font is
             end loop;
          end loop;
 
-         Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
-         --Decoded.Font(ASCII_Code).Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Pix_Buf);
-         Decoded.Font(ASCII_Code).Dim_Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Dim_Pix_Buf);
-         Decoded.Font(ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Copy (Tmp_Reverse_Pix_Buf);
+         Decoded.Font(ASCII_Code).Pix_Buf         := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
+         Decoded.Font(ASCII_Code).Dim_Pix_Buf     := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Dim_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
+         Decoded.Font(ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Reverse_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
          Decoded.Font(ASCII_Code).Loaded  := true;
 
       end loop;
