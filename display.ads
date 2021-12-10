@@ -32,6 +32,7 @@ package Display is
    type Display_T is record
       Cells : Cell_Array;
       Visible_Lines, Visible_Cols : Integer;
+      Blink_Enabled : Boolean;
       Dirty : Boolean;
    end record;
 

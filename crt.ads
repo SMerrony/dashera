@@ -19,7 +19,8 @@
 
 with Cairo;
 with Gdk.Event;
-with Glib.Main;
+with Glib;        use Glib;
+with Glib.Main;   use Glib.Main;
 with Gtk.Drawing_Area;
 with Gtk.Widget;
 
@@ -28,12 +29,16 @@ with BDF_Font;
 
 package Crt is
 
+   package Blink_Timeout is new Glib.Main.Generic_Sources (Gtk.Drawing_Area.Gtk_Drawing_Area);
+
    Font_Filename  : constant String := "D410-b-12.bdf";
+   Blink_Period_MS : constant Guint := 500;
 
    type Crt_T is record
       DA         : Gtk.Drawing_Area.Gtk_Drawing_Area;
       -- Disp       : Display.Display_Acc_T;
       Zoom       : BDF_Font.Zoom_T;
+      Blink_State : Boolean;
       Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
 

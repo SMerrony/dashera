@@ -35,6 +35,7 @@ package body Display is
       Disp.Visible_Cols := Default_Cols;
       Disp.Cells(12,39).Char_Value := 'O';
       Disp.Cells(12,40).Char_Value := 'K';
+      Disp.Blink_Enabled := True;
    end Init;
 
    procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer) is

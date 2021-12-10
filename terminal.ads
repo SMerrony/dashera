@@ -29,8 +29,7 @@ package Terminal is
       Emulation : Emulation_T;
       Connection : Connection_T;
       Cursor_X, Cursor_Y : Natural;
-      Roll_Enabled, Blink_Enabled, Protection_Enabled : Boolean;
-      Blink_State : Boolean;
+      Roll_Enabled, Protection_Enabled : Boolean;
       Holding, Logging, Scrolled_Back : Boolean;
       Skip_Byte : Boolean;
       Expecting : Boolean;
@@ -45,8 +44,12 @@ package Terminal is
    type Terminal_Acc_T is access all Terminal_T;
 
    Dasher_Rev_Off   : constant Byte := 2; -- from D210 onwards
+   Dasher_Blink_Enable  : constant Byte := 3; -- for the whole screen
+   Dasher_Blink_Disable : constant Byte := 4; -- for the whole screen
    Dasher_NL        : constant Byte := 10;
    Dasher_CR        : constant Byte := 13;
+   Dasher_Blink_On  : constant Byte := 14;
+   Dasher_Blink_Off : constant Byte := 15;
    Dasher_Underline : constant Byte := 20;
    Dasher_Normal    : constant Byte := 21; -- cancels Underline
    Dasher_Rev_On    : constant Byte := 22; -- from D210 onwards

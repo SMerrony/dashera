@@ -106,7 +106,7 @@ package body BDF_Font is
       if Font_Line (1 .. 5) /= "CHARS" then
          raise BDF_DECODE with "ERROR: BDF_Font - CHARS line not found";
       end if;
-      Put_Line ("DEBUG: " & Font_Line (1 .. Font_Line_Length));
+      Put_Line ("DEBUG: BDF Font " & Font_Line (1 .. Font_Line_Length));
 
       Char_Count := Positive'Value (Font_Line (7 .. Font_Line_Length));
 

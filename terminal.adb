@@ -17,6 +17,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Strings.Fixed;
 
 with BDF_Font;
 with Crt;
@@ -25,16 +26,14 @@ with Display;
 package body Terminal is
 
    function Create (Emul : in Emulation_T) return Terminal_Acc_T is
-      T : aliased Terminal_Acc_T := new Terminal_T;
+      T : aliased constant Terminal_Acc_T := new Terminal_T;
    begin
       T.Emulation := Emul;
       T.Connection := Disconnected;
       T.Cursor_X := 0;
       T.Cursor_Y := 0;
       T.Roll_Enabled := True;
-      T.Blink_Enabled := True;
       T.Protection_Enabled := True;
-      T.Blink_State := False;
       T.Skip_Byte := False;
       T.Holding := False;
       T.Logging := False;
@@ -88,7 +87,11 @@ package body Terminal is
       T.Process (Op);
 
       T.Process (Str_To_BA (BLine));
-      T.Process (NL);
+      Op(1) := Dasher_Blink_On;
+      T.Process (Op);
+      T.Process (Str_To_BA (Chars));
+      Op(1) := Dasher_Blink_Off;
+      T.Process (Op);
 
       T.Process (Str_To_BA (RLine));
       Op(1) := Dasher_Rev_On;
@@ -104,7 +107,13 @@ package body Terminal is
       Op(1) := Dasher_Normal;
       T.Process (Op);   
 
-      T.Process (NL);      
+      for L in 8 .. Display.Disp.Visible_Lines loop
+         if L > 8  then
+            T.Process (NL);
+         end if;
+         T.Process (Str_To_BA (Ada.Strings.Fixed.Trim (L'Image, Ada.Strings.Left)));
+      end loop;
+   
    end Self_Test;
 
    -- Process is to be called with a Byte_Arr whenever there is any data for 
@@ -140,7 +149,19 @@ package body Terminal is
             T.Cursor_X := 0;
          end if;
 
-         if B = Dasher_Dim_On then
+         if B = Dasher_Blink_On then
+            T.Blinking := True;
+            T.Skip_Byte := True;
+         elsif B = Dasher_Blink_Off then
+            T.Blinking := False;
+            T.Skip_Byte := True;  
+         elsif B = Dasher_Blink_Enable then
+            Display.Disp.Blink_Enabled := True;  -- Modifies Display
+            T.Skip_Byte := True;
+         elsif B = Dasher_Blink_Disable then
+            Display.Disp.Blink_Enabled := False; -- Modifies Display
+            T.Skip_Byte := True;
+         elsif B = Dasher_Dim_On then
             T.Dimmed := True;
             T.Skip_Byte := True;
          elsif B = Dasher_Dim_Off then

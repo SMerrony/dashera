@@ -23,14 +23,21 @@ with Cairo;               use Cairo;
 
 with Gdk.Cairo;
 with Gdk.Window;
-with Glib; use Glib;
 
 with Display;
 
 package body Crt is
 
    surface : Cairo.Cairo_Surface;
+   Timeout : Glib.Main.G_Source_ID;
    use type Cairo.Cairo_Surface;
+
+   function Blink_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
+   begin
+      Tube.Blink_State := not Tube.Blink_State;
+      DA.Queue_Draw;
+      return True;
+   end Blink_Timeout_CB;
 
    procedure Init (Zoom : in BDF_Font.Zoom_T) is
       -- C : aliased Crt_Acc_T := new Crt_T;
@@ -43,13 +50,17 @@ package body Crt is
                                BDF_Font.Decoded.Char_Height * Gint(Display.Disp.Visible_Lines));
       -- Tube.Disp := Disp;
       Tube.Zoom := Zoom;
+
+      if Timeout = 0 then
+         Timeout := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, Tube.DA);
+      end if;
+
       -- C.DA.On_Draw (Draw_CB'Access);
       -- C.Timeout_ID := Glib.Main.Timeout_Add (1000, Draw2'Access); -- Draw2'Access
       -- C.Timeout_ID := Glib.Main.Timeout_Add (1, Glib.Main.G_Source_Func (C.Draw));
 
       -- return C;
    end Init;
-
 
    procedure Clear_Surface is
       Cr : Cairo.Cairo_Context;
@@ -99,12 +110,15 @@ package body Crt is
             Char_X  := Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width);
             Char_Y  := Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height);
             Char_UL := (Gdouble(Gint(Line + 1) * BDF_Font.Decoded.Char_Height)) - 1.0;
-            -- TODO Blinking
             Char_Ix := Character'Pos (Display.Disp.Cells(Line, Col).Char_Value);
             if Char_Ix > 31 and Char_Ix < 128 then
                -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt @ Line: " & Line'Image & ", Col: " & Col'Image & 
                -- " char is: " &  Display.Disp.Cells(Line, Col).Char_Value & " char index is: " & Char_Ix'Image);
-               if Display.Disp.Cells(Line, Col).Dim then
+               if Display.Disp.Blink_Enabled and Tube.Blink_State and Display.Disp.Cells(Line, Col).Blink then
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                               Pixbuf => BDF_Font.Decoded.Font(32).Dim_Pix_Buf, 
+                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+               elsif Display.Disp.Cells(Line, Col).Dim then
                   Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                                Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Dim_Pix_Buf, 
                                                Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
