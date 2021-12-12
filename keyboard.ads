@@ -17,17 +17,22 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Gdk.Types;
+with Gdk.Types; use Gdk.Types;
 
-with Terminal;
+with Terminal; use Terminal;
 
 package Keyboard is
 
-   task Key_Handler is
-      entry Start (Dest : in Terminal.Connection_T);
-      entry Stop;
-      entry Press (Key : in Gdk.Types.Gdk_Key_Type);
-      entry Release (Key : in Gdk.Types.Gdk_Key_Type);
-   end Key_Handler;
+   Destination : Connection_T := Disconnected;
+   Term_Acc    : Terminal_Acc_T;
+   Ctrl_Pressed, Shift_Pressed : Boolean := False;
+
+   procedure Init               (Term : in Terminal_Acc_T);
+   procedure Set_Destination    (Dest : in Connection_T);
+   procedure Handle_Key_Press   (Key  : in Gdk_Key_Type);
+   procedure Handle_Key_Release (Key  : in Gdk_Key_Type);
+
+private  
+   procedure Route_Key (Byt : in Byte);
 
 end Keyboard;

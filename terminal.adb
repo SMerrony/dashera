@@ -217,6 +217,7 @@ package body Terminal is
          -- TODO History
          for R in 1 .. Display.Disp.Visible_Lines loop
             Display.Copy_Line (This => Display.Disp, Src => R, Dest => R - 1);
+            Display.Clear_Line (Display.Disp, R);
          end loop;
          Display.Clear_Line (Display.Disp, Display.Disp.Visible_Lines - 1);
       end loop;

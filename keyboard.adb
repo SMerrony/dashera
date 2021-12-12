@@ -17,42 +17,68 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+-- See include/gtkada/gtkada.relocatable/gtkada/gdk-types-keysyms.ads for key symbol definitions
+
 with Ada.Text_IO;
 
-with Interfaces; use Interfaces;
+with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
+
+-- TODO Why is this a task?  Is there really any need?
 
 package body Keyboard is
 
-   task body Key_Handler is
-      Destination : Terminal.Connection_T;
-      Key_Byte    : Unsigned_8;
-      Stopping    : Boolean := False;
+   procedure Init (Term : in Terminal_Acc_T) is
    begin
-      accept Start (Dest : in Terminal.Connection_T) do
-         Destination := Dest;
-      end Start;
-      loop
-         select 
-            accept Stop do
-               Stopping := True;
-            end Stop;
-         or
-            accept Press (Key : in Gdk.Types.Gdk_Key_Type) do
-               Ada.Text_IO.Put_Line ("DEBUG: Key_Handler got key press for:" & Key'Image); 
-            end Press;
-         or
-            accept Release (Key : in Gdk.Types.Gdk_Key_Type) do
-               Ada.Text_IO.Put_Line ("DEBUG: Key_Handler got key release for:" & Key'Image); 
-               case Key is
-                  when others =>
-                     Key_Byte := Unsigned_8 (Key);
-               end case;
-            end Release;
-         or 
-            terminate;
-         end select;
-         exit when Stopping;
-      end loop;
-   end Key_Handler;
+      Term_Acc := Term;
+   end Init;
+
+   procedure Set_Destination (Dest : in Connection_T) is
+   begin
+      Destination := Dest;
+   end Set_Destination;
+
+   procedure Handle_Key_Press (Key  : in Gdk_Key_Type) is
+   begin
+      case Key is 
+         when GDK_Control_L | GDK_Control_R => Ctrl_Pressed := True;
+         when GDK_Shift_L | GDK_Shift_R     => Shift_Pressed := True;
+         when others => null;
+      end case;
+   end Handle_Key_Press;
+
+   procedure Route_Key (Byt : in Byte) is 
+      BA          : Byte_Arr(1..1);
+   begin
+      case Destination is
+         when Disconnected =>
+            BA(1) := Byt;
+            Term_Acc.Process (BA);
+         when Serial => -- TODO
+            null; 
+         when Telnet => -- TODO
+            null;
+      end case;
+   end Route_Key;
+
+   procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is
+      Char_Byte : Byte;
+   begin
+      Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image); 
+      case Key is
+         when GDK_Control_L | GDK_Control_R => Ctrl_Pressed := False;
+         when GDK_Shift_L | GDK_Shift_R => Shift_Pressed := False;
+
+         when GDK_Return => Route_Key (Dasher_NL); -- convert PC-style Return to DG NL
+         when GDK_Down   => Route_Key (Dasher_Cursor_Down);
+         when GDK_Up     => Route_Key (Dasher_Cursor_Up);
+         when GDK_Left   => Route_Key (Dasher_Cursor_Left);
+         when GDK_Right  => Route_Key (Dasher_Cursor_Right);
+         when others =>
+            if Key < 256 then
+               Char_Byte := Byte(Key);
+               Route_Key (Char_Byte);
+            end if;
+      end case;
+   end Handle_Key_Release;
 
 end Keyboard;

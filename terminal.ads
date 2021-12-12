@@ -53,6 +53,10 @@ package Terminal is
    Dasher_Underline : constant Byte := 20;
    Dasher_Normal    : constant Byte := 21; -- cancels Underline
    Dasher_Rev_On    : constant Byte := 22; -- from D210 onwards
+   Dasher_Cursor_Up : constant Byte := 23;
+   Dasher_Cursor_Right : constant Byte := 24;
+   Dasher_Cursor_Left : constant Byte := 25;
+   Dasher_Cursor_Down : constant Byte := 26;
    Dasher_Dim_On    : constant Byte := 28;
    Dasher_Dim_Off   : constant Byte := 29;
 

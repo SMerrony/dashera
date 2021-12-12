@@ -51,15 +51,11 @@ package body Crt is
       -- Tube.Disp := Disp;
       Tube.Zoom := Zoom;
 
+      -- Blink timer
       if Timeout = 0 then
          Timeout := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, Tube.DA);
       end if;
 
-      -- C.DA.On_Draw (Draw_CB'Access);
-      -- C.Timeout_ID := Glib.Main.Timeout_Add (1000, Draw2'Access); -- Draw2'Access
-      -- C.Timeout_ID := Glib.Main.Timeout_Add (1, Glib.Main.G_Source_Func (C.Draw));
-
-      -- return C;
    end Init;
 
    procedure Clear_Surface is
@@ -102,7 +98,7 @@ package body Crt is
       Char_X, Char_Y, Char_UL : Gdouble;
       use Glib;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt called");
+      -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt called");
       Cr := Cairo.Create (surface);
 
       for Line in 0 .. Display.Disp.Visible_Lines-1 loop

@@ -19,6 +19,8 @@
 
 with Ada.Text_IO;
 
+with Gdk.Event;               use Gdk.Event;
+
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
 with Gtk.Action;
 with Gtk.Adjustment;
@@ -43,6 +45,7 @@ with Gtk.Window; use Gtk.Window;
 with BDF_Font;
 with Crt;
 with Display;
+with Keyboard;
 -- with Terminal;
 
 package body GUI is  
@@ -85,6 +88,20 @@ package body GUI is
    begin
       Term.Self_Test;
    end Self_Test_CB;
+
+   function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
+      return Boolean  is
+   begin
+      Keyboard.Handle_Key_Release (Event.Keyval);
+      return True;
+   end Handle_Key_Release_Event_CB;
+
+   function Handle_Key_Press_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
+      return Boolean is
+   begin
+      Keyboard.Handle_Key_Press (Event.Keyval);
+      return True;
+   end Handle_Key_Press_Event_CB;
 
    function Create_Menu_Bar return Gtk.Menu_Bar.Gtk_Menu_Bar is
       Menu_Bar : Gtk.Menu_Bar.Gtk_Menu_Bar;
@@ -248,6 +265,13 @@ package body GUI is
 
       Main_Window.Add (Vbox);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
+
+      -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
+      Keyboard.Init (Term);
+      Keyboard.Set_Destination (Terminal.Disconnected);
+      Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
+      Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
+
       Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");
 
       return Main_Window;
