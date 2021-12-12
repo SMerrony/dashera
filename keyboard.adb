@@ -23,8 +23,6 @@ with Ada.Text_IO;
 
 with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
 
--- TODO Why is this a task?  Is there really any need?
-
 package body Keyboard is
 
    procedure Init (Term : in Terminal_Acc_T) is
@@ -76,6 +74,9 @@ package body Keyboard is
          when others =>
             if Key < 256 then
                Char_Byte := Byte(Key);
+               if Ctrl_Pressed then
+                  Char_Byte := Char_Byte mod 32;
+               end if;
                Route_Key (Char_Byte);
             end if;
       end case;
