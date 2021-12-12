@@ -16,7 +16,8 @@
 -- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
-
+with Ada.Text_IO; 
+with Ada.Characters.Latin_1;
 with Ada.Strings.Fixed;
 
 with BDF_Font;
@@ -149,36 +150,100 @@ package body Terminal is
             T.Cursor_X := 0;
          end if;
 
-         if B = Dasher_Blink_On then
-            T.Blinking := True;
-            T.Skip_Byte := True;
-         elsif B = Dasher_Blink_Off then
-            T.Blinking := False;
-            T.Skip_Byte := True;  
-         elsif B = Dasher_Blink_Enable then
-            Display.Disp.Blink_Enabled := True;  -- Modifies Display
-            T.Skip_Byte := True;
-         elsif B = Dasher_Blink_Disable then
-            Display.Disp.Blink_Enabled := False; -- Modifies Display
-            T.Skip_Byte := True;
-         elsif B = Dasher_Dim_On then
-            T.Dimmed := True;
-            T.Skip_Byte := True;
-         elsif B = Dasher_Dim_Off then
-            T.Dimmed := False;
-            T.Skip_Byte := True;
-         elsif B = Dasher_Rev_On then
-            T.Reversed := True;
-            T.Skip_Byte := True;
-         elsif B = Dasher_Rev_Off then
-            T.Reversed := False;
-            T.Skip_Byte := True;
-         elsif B = Dasher_Underline then
-            T.Underscored := True;
-            T.Skip_Byte := True;
-         elsif B = Dasher_Normal then
-            T.Underscored := False;
-            T.Skip_Byte := True;            
+         case B is
+            when 0 =>
+            T  .Skip_Byte := True;
+            when Dasher_Bell =>
+               Ada.Text_IO.Put (Ada.Characters.Latin_1.BEL); -- on running terminal...
+               T.Skip_Byte := True;
+            when Dasher_Blink_On =>
+               T.Blinking := True;
+               T.Skip_Byte := True;
+            when Dasher_Blink_Off =>
+               T.Blinking := False;
+               T.Skip_Byte := True;  
+            when Dasher_Blink_Enable =>
+               Display.Disp.Blink_Enabled := True;  -- Modifies Display
+               T.Skip_Byte := True;
+            when Dasher_Blink_Disable =>
+               Display.Disp.Blink_Enabled := False; -- Modifies Display
+               T.Skip_Byte := True;
+            when Dasher_Cursor_Down =>
+               if T.Cursor_Y < Display.Disp.Visible_Lines - 1 then
+                  T.Cursor_Y := T.Cursor_Y + 1;
+               else
+                  T.Cursor_Y := 0;
+               end if;
+               T.Skip_Byte := True;
+            when Dasher_Cursor_Left =>
+               if T.Cursor_X > 0 then
+                  T.Cursor_X := T.Cursor_X - 1;
+               else  
+                  T.Cursor_X := Display.Disp.Visible_Cols - 1;
+                  if T.Cursor_Y > 0 then
+                     T.Cursor_Y := T.Cursor_Y - 1;
+                  else
+                     T.Cursor_Y := Display.Disp.Visible_Lines - 1;
+                  end if;
+               end if;
+               T.Skip_Byte := True;
+            when Dasher_Cursor_Right =>
+               if T.Cursor_X < Display.Disp.Visible_Cols - 1 then
+                  T.Cursor_X := T.Cursor_X + 1;
+               else  
+                  T.Cursor_X := 0;
+                  if T.Cursor_Y < Display.Disp.Visible_Lines - 1 then
+                     T.Cursor_Y := T.Cursor_Y + 1;
+                  else
+                     T.Cursor_Y := 0;
+                  end if;
+               end if;
+               T.Skip_Byte := True;   
+            when Dasher_Cursor_Up =>
+               if T.Cursor_Y > 0 then
+                  T.Cursor_Y := T.Cursor_Y - 1;
+               else
+                  T.Cursor_Y := Display.Disp.Visible_Lines - 1;
+               end if;
+               T.Skip_Byte := True;
+            when Dasher_Dim_On =>
+               T.Dimmed := True;
+               T.Skip_Byte := True;
+            when Dasher_Dim_Off =>
+               T.Dimmed := False;
+               T.Skip_Byte := True;
+            when Dasher_Erase_EOL =>
+               for Col in T.Cursor_X .. Display.Disp.Visible_Cols - 1 loop
+                  Display.Disp.Cells(T.Cursor_Y,col).Clear_To_Space;
+               end loop;
+               T.Skip_Byte := True;
+            when Dasher_Erase_Page =>
+               T.Scroll_Up (Display.Disp.Visible_Lines);
+               T.Cursor_X := 0;
+               T.Cursor_Y := 0;
+               T.Skip_Byte := True;
+            when Dasher_Home =>
+               T.Cursor_X := 0;
+               T.Cursor_Y := 0;
+               T.Skip_Byte := True;
+            when Dasher_Rev_On =>
+               T.Reversed := True;
+               T.Skip_Byte := True;
+            when Dasher_Rev_Off =>
+               T.Reversed := False;
+               T.Skip_Byte := True;
+            when Dasher_Underline =>
+               T.Underscored := True;
+               T.Skip_Byte := True;
+            when Dasher_Normal =>
+               T.Underscored := False;
+               T.Skip_Byte := True;    
+            when others =>
+               null;        
+         end case;
+
+         if T.Skip_Byte then
+            goto Continue;
          end if;
 
          -- CR or NL?
