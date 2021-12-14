@@ -21,12 +21,15 @@ with Ada.Text_IO;
 
 with Gdk.Event;               use Gdk.Event;
 
+with Glib;                    use Glib;
+
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
 with Gtk.Action;
 with Gtk.Adjustment;
 with Gtk.Button;
 with Gtk.Dialog;              use Gtk.Dialog;
 with Gtk.Drawing_Area;
+with Gtk.GEntry;
 with Gtk.Enums;
 with Gtk.Frame;
 with Gtk.Label;
@@ -41,6 +44,8 @@ with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 -- with Gtk.Table;
 with Gtk.Widget; use Gtk.Widget;
 with Gtk.Window; use Gtk.Window;
+
+with Gtkada.Dialogs;
 
 with BDF_Font;
 with Crt;
@@ -89,6 +94,50 @@ package body GUI is
       Term.Self_Test;
    end Self_Test_CB;
 
+   procedure Telnet_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Dialog : Gtk_Dialog;
+      Vbox   : Gtk.Box.Gtk_Vbox;
+      Host_Label, Port_Label : Gtk.Label.Gtk_Label;
+      Host_Entry, Port_Entry : Gtk.GEntry.Gtk_Entry;
+      Cancel, Connect : Gtk.Widget.Gtk_Widget;
+      MDB : Gtkada.Dialogs.Message_Dialog_Buttons;
+   begin
+      Gtk_New (Dialog);
+      Dialog.Set_Destroy_With_Parent (True);
+      Dialog.Set_Modal (True);
+      -- TODO: Dialog.Set_Logo
+      Dialog.Set_Title (App_Title & " - Telnet Host");
+      Vbox := Dialog.Get_Content_Area;
+      -- Set_Size_Request (Widget => Dialog, Width => 500, Height => 300);
+      Gtk.Label.Gtk_New (Host_Label, "Host:");
+      Vbox.Pack_Start (Child => Host_Label, Expand => True, Fill => True, Padding => 5);
+      Gtk.GEntry.Gtk_New (The_Entry => Host_Entry);
+      Vbox.Pack_Start (Child => Host_Entry, Expand => True, Fill => True, Padding => 5);
+      Gtk.Label.Gtk_New (Port_Label, "Port:");
+      Vbox.Pack_Start (Child => Port_Label, Expand => True, Fill => True, Padding => 5);
+      Gtk.GEntry.Gtk_New (The_Entry => Port_Entry);
+      Vbox.Pack_Start (Child => Port_Entry, Expand => True, Fill => True, Padding => 5);
+      Cancel := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
+      Connect := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
+      Dialog.Show_All;
+
+      if Dialog.Run = Gtk_Response_Accept then     
+         if Host_Entry.Get_Text_Length = 0 or Port_Entry.Get_Text_Length = 0 then
+            MDB := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter Host and Port", 
+                                                  Title => "DasherA Error");
+         else
+            declare
+               Host_Str : Glib.UTF8_String := Host_Entry.Get_Text;
+               Port_Str : Glib.UTF8_String := Port_Entry.Get_Text;
+            begin
+               Ada.Text_IO.Put_Line ("DEBUG: TODO - Call Telnet-connect...");
+            end;
+         end if;
+      end if;
+      Dialog.Destroy;
+   end Telnet_Connect_CB;
+
    function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
       return Boolean  is
    begin
@@ -112,6 +161,7 @@ package body GUI is
       Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rcv_Item,
       Self_Test_Item,
       Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
+      Net_Connect_Item, Net_Disconnect_Item,
       Paste_Item,
       About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
    begin
@@ -189,6 +239,12 @@ package body GUI is
       Menu_Bar.Append(Menu_Item);
       Gtk_New (Network_Menu);
       Menu_Item.Set_Submenu (Network_Menu);
+      Gtk_New (Net_Connect_Item, "Connect");
+      Network_Menu.Append (Net_Connect_Item);
+      Net_Connect_Item.On_Activate (Telnet_Connect_CB'Access);
+
+      Gtk_New (Net_Disconnect_Item, "Disconnect");
+      Network_Menu.Append (Net_Disconnect_Item);
 
       -- Help
 
