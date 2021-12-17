@@ -17,23 +17,34 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Gdk.Types; use Gdk.Types;
+with Ada.Text_IO;
+with GNAT.Sockets;
 
-with Dasher_Codes; use Dasher_Codes;
-with Terminal;     use Terminal;
+package body Telnet is
 
-package Keyboard is
+	function New_Connection (Host_Str : in String; 
+                            Port_Num : in Integer;  
+                            Term : in Terminal.Terminal_Acc_T) return Session_Acc_T is
+      Sess : aliased constant Session_Acc_T := new Session_T;
+      Address : GNAT.Sockets.Sock_Addr_Type;
+   begin
+      GNAT.Sockets.Create_Socket (Sess.Conn);
+      Ada.Text_IO.Put_Line ("DEBUG: Host: " & Host_Str & ", Port: " & Port_Num'Image);
+      Address.Addr := GNAT.Sockets.Addresses (GNAT.Sockets.Get_Host_By_Name (Host_Str), 1);
+      Address.Port := GNAT.Sockets.Port_Type (Port_Num);
+      GNAT.Sockets.Connect_Socket (Sess.Conn, Address);
+      Sess.Term := Term;
+      return Sess;
+   end New_Connection;
 
-   Destination : Connection_T := Disconnected;
-   Term_Acc    : Terminal_Acc_T;
-   Ctrl_Pressed, Shift_Pressed : Boolean := False;
+   procedure Send (Sess : in out Session_T; BA : in Byte_Arr) is
+   begin
+null;
+   end Send;
 
-   procedure Init               (Term : in Terminal_Acc_T);
-   procedure Set_Destination    (Dest : in Connection_T);
-   procedure Handle_Key_Press   (Key  : in Gdk_Key_Type);
-   procedure Handle_Key_Release (Key  : in Gdk_Key_Type);
+	procedure Close_Connection (Sess : in out Session_T) is
+   begin
+      GNAT.Sockets.Close_Socket (Sess.Conn);
+   end Close_Connection;
 
-private  
-   procedure Route_Key (Byt : in Byte);
-
-end Keyboard;
+end Telnet;

@@ -24,6 +24,7 @@ with Gtk.Handlers;
 with Gtk.Widget;
 with Gtk.Window; 
 
+with Telnet;
 with Terminal;
 
 package GUI is
@@ -45,7 +46,9 @@ package GUI is
 
    Main_Window : Gtk.Window.Gtk_Window;
    Vbox : Gtk.Box.Gtk_Vbox;
-   Term : Terminal.Terminal_Acc_T;
+
+   Telnet_Sess : Telnet.Session_Acc_T;
+   Term        : Terminal.Terminal_Acc_T;
 
    function Create_Window return Gtk.Window.Gtk_Window;
 

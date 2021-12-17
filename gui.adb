@@ -51,7 +51,8 @@ with BDF_Font;
 with Crt;
 with Display;
 with Keyboard;
--- with Terminal;
+-- with Serial;
+with Telnet;
 
 package body GUI is  
 
@@ -71,6 +72,7 @@ package body GUI is
    procedure About_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       Dialog : Gtk_About_Dialog;
+      Dummy_Response : Gtk_Response_Type;
    begin
       Gtk_New (Dialog);
       Dialog.Set_Destroy_With_Parent (True);
@@ -82,9 +84,7 @@ package body GUI is
       Dialog.Set_Program_Name (App_Title);
       Dialog.Set_Version (App_SemVer);
       Dialog.Set_Website (App_Website);
-      if Dialog.Run  /= Gtk_Response_Close then
-         null;
-      end if;
+      Dummy_Response := Dialog.Run;
       Dialog.Destroy;
    end About_CB;
 
@@ -100,8 +100,8 @@ package body GUI is
       Vbox   : Gtk.Box.Gtk_Vbox;
       Host_Label, Port_Label : Gtk.Label.Gtk_Label;
       Host_Entry, Port_Entry : Gtk.GEntry.Gtk_Entry;
-      Cancel, Connect : Gtk.Widget.Gtk_Widget;
-      MDB : Gtkada.Dialogs.Message_Dialog_Buttons;
+      Cancel_Unused, Connect_Unused : Gtk.Widget.Gtk_Widget;
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Gtk_New (Dialog);
       Dialog.Set_Destroy_With_Parent (True);
@@ -109,7 +109,6 @@ package body GUI is
       -- TODO: Dialog.Set_Logo
       Dialog.Set_Title (App_Title & " - Telnet Host");
       Vbox := Dialog.Get_Content_Area;
-      -- Set_Size_Request (Widget => Dialog, Width => 500, Height => 300);
       Gtk.Label.Gtk_New (Host_Label, "Host:");
       Vbox.Pack_Start (Child => Host_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Host_Entry);
@@ -118,35 +117,40 @@ package body GUI is
       Vbox.Pack_Start (Child => Port_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Port_Entry);
       Vbox.Pack_Start (Child => Port_Entry, Expand => True, Fill => True, Padding => 5);
-      Cancel := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
-      Connect := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
+      Cancel_Unused := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
+      Connect_Unused := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
       Dialog.Show_All;
-
       if Dialog.Run = Gtk_Response_Accept then     
          if Host_Entry.Get_Text_Length = 0 or Port_Entry.Get_Text_Length = 0 then
-            MDB := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter Host and Port", 
-                                                  Title => "DasherA Error");
+            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter both Host and Port", 
+                                                             Title => "DasherA - Error");
          else
             declare
                Host_Str : Glib.UTF8_String := Host_Entry.Get_Text;
-               Port_Str : Glib.UTF8_String := Port_Entry.Get_Text;
+               Port_Num : Integer;
             begin
+               Port_Num := Integer'Value (Port_Entry.Get_Text);
                Ada.Text_IO.Put_Line ("DEBUG: TODO - Call Telnet-connect...");
+               Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num, Term);
+               -- TODO handle exceptions
+               Keyboard.Set_Destination (Terminal.Telnet);
             end;
          end if;
       end if;
       Dialog.Destroy;
    end Telnet_Connect_CB;
 
-   function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
+   function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key) 
       return Boolean  is
+      pragma Unreferenced (Self);
    begin
       Keyboard.Handle_Key_Release (Event.Keyval);
       return True;
    end Handle_Key_Release_Event_CB;
 
    function Handle_Key_Press_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
-      return Boolean is
+      return Boolean  is
+      pragma Unreferenced (Self);
    begin
       Keyboard.Handle_Key_Press (Event.Keyval);
       return True;

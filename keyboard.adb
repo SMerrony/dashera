@@ -23,6 +23,8 @@ with Ada.Text_IO;
 
 with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
 
+with Gui;
+
 package body Keyboard is
 
    procedure Init (Term : in Terminal_Acc_T) is
@@ -53,8 +55,8 @@ package body Keyboard is
             Term_Acc.Process (BA);
          when Serial => -- TODO
             null; 
-         when Telnet => -- TODO
-            null;
+         when Telnet => 
+            Gui.Telnet_Sess.Send (BA);
       end case;
    end Route_Key;
 
