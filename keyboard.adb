@@ -24,6 +24,7 @@ with Ada.Text_IO;
 with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
 
 with Gui;
+with Telnet;
 
 package body Keyboard is
 
@@ -49,14 +50,15 @@ package body Keyboard is
    procedure Route_Key (Byt : in Byte) is 
       BA          : Byte_Arr(1..1);
    begin
+      BA(1) := Byt;
       case Destination is
-         when Disconnected =>
-            BA(1) := Byt;
+         when Local =>
             Term_Acc.Process (BA);
-         when Serial => -- TODO
+         when Async => -- TODO
             null; 
-         when Telnet => 
-            Gui.Telnet_Sess.Send (BA);
+         when Network => 
+            -- Gui.Telnet_Sess.Send (BA);
+            Telnet.Send (Gui.Telnet_Sess, BA);
       end case;
    end Route_Key;
 
@@ -68,7 +70,6 @@ package body Keyboard is
       return MB;
    end Modify;
 
-   -- Handle_Key_Release maps PC-style keys to DASHER ones.
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is
       Char_Byte : Byte;
    begin
@@ -77,7 +78,8 @@ package body Keyboard is
          when GDK_Control_L | GDK_Control_R => Ctrl_Pressed := False;
          when GDK_Shift_L | GDK_Shift_R => Shift_Pressed := False;
 
-         when GDK_Return => Route_Key (Dasher_NL); -- convert PC-style Return to DG NL
+         when GDK_Return   => Route_Key (Dasher_NL); -- convert PC-style Return to DG NL
+         when GDK_KP_Enter => Route_Key (Dasher_CR); -- convert PC Keypad Enter to DG CR
 
          when GDK_Tab    => Route_Key (Dasher_Tab);
          when GDK_Down   => Route_Key (Dasher_Cursor_Down);
