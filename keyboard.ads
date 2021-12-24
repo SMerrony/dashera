@@ -24,16 +24,22 @@ with Terminal;     use Terminal;
 
 package Keyboard is
 
-   Destination : Connection_T := Disconnected;
+   Destination : Connection_T := Local;
    Term_Acc    : Terminal_Acc_T;
    Ctrl_Pressed, Shift_Pressed : Boolean := False;
 
    procedure Init               (Term : in Terminal_Acc_T);
+   
    procedure Set_Destination    (Dest : in Connection_T);
+
    procedure Handle_Key_Press   (Key  : in Gdk_Key_Type);
+
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type);
+   -- Handle_Key_Release maps PC-style keys to DASHER ones.
 
 private  
    procedure Route_Key (Byt : in Byte);
+   -- Route_Key forwards the result of the keypress to either
+   -- the local (echo), serial, or telnet destination as appropriate.
 
 end Keyboard;

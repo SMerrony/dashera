@@ -147,7 +147,7 @@ package body Crt is
    is
       pragma Unreferenced (Self);
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Entering Draw_CB");
+      -- Ada.Text_IO.Put_Line ("DEBUG: Entering Draw_CB");
       Draw_Crt;
       Cairo.Set_Source_Surface (Cr, surface, 0.0, 0.0);
       Cairo.Paint (Cr);

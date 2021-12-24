@@ -17,30 +17,31 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Glib;				use Glib;
-with GNAT.Sockets;
+with GNAT.Sockets;	use GNAT.Sockets;
 
 with Dasher_Codes;   use Dasher_Codes;
 with Terminal;
 
 package Telnet is
 
-   Telnet_Cmd_SE   : constant Byte := 240;
-	Telnet_Cmd_NOP  : constant Byte := 241;
-	Telnet_Cmd_DM   : constant Byte := 242;
-	Telnet_Cmd_BRK  : constant Byte := 243;
-	Telnet_Cmd_IP   : constant Byte := 244;
-	Telnet_Cmd_AO   : constant Byte := 245;
-	Telnet_Cmd_AYT  : constant Byte := 246;
-	Telnet_Cmd_EC   : constant Byte := 247;
-	Telnet_Cmd_EL   : constant Byte := 248;
-	Telnet_Cmd_GA   : constant Byte := 249;
-	Telnet_Cmd_SB   : constant Byte := 250;
-	Telnet_Cmd_WILL : constant Byte := 251;
-	Telnet_Cmd_WONT : constant Byte := 252;
-	Telnet_Cmd_DO   : constant Byte := 253;
-	Telnet_Cmd_DONT : constant Byte := 254;
-	Telnet_Cmd_IAC  : constant Byte := 255;
+   Cmd_SE   : constant Byte := 240;
+	Cmd_NOP  : constant Byte := 241;
+	Cmd_DM   : constant Byte := 242;
+	Cmd_BRK  : constant Byte := 243;
+	Cmd_IP   : constant Byte := 244;
+	Cmd_AO   : constant Byte := 245;
+	Cmd_AYT  : constant Byte := 246;
+	Cmd_EC   : constant Byte := 247;
+	Cmd_EL   : constant Byte := 248;
+	Cmd_GA   : constant Byte := 249;
+	Cmd_SB   : constant Byte := 250;
+	Cmd_WILL : constant Byte := 251;
+	Cmd_WONT : constant Byte := 252;
+	Cmd_DO   : constant Byte := 253;
+	Cmd_DONT : constant Byte := 254;
+	Cmd_IAC  : constant Byte := 255;
+
+	type Message is new String;
 
    type Session_T is tagged record
       Conn : GNAT.Sockets.Socket_Type;
@@ -56,8 +57,12 @@ package Telnet is
 	-- Data from the remote host will be directed to the supplied Terminal.
 	-- To send data, call the Send procedure
 
-	procedure Send (Sess : in out Session_T; BA : in Byte_Arr);
+	procedure Send (Sess : in out Session_Acc_T; BA : in Byte_Arr);
 
 	procedure Close_Connection (Sess : in out Session_T);
+
+	task Receiver is
+		entry Start (Sess : in Session_Acc_T);
+	end Receiver;
 
 end Telnet;

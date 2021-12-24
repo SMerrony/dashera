@@ -30,7 +30,7 @@ package body Terminal is
       T : aliased constant Terminal_Acc_T := new Terminal_T;
    begin
       T.Emulation := Emul;
-      T.Connection := Disconnected;
+      T.Connection := Local;
       T.Cursor_X := 0;
       T.Cursor_Y := 0;
       T.Roll_Enabled := True;
@@ -129,6 +129,8 @@ package body Terminal is
          B := BA(Ix);
          B_Int := Integer(B);
 
+         Ada.Text_IO.Put_Line ("DEBUG: Terminal.Process got: " & B'Image);
+
          T.Skip_Byte := False;
 
          -- wrap due to hitting margin or new line?
@@ -152,7 +154,7 @@ package body Terminal is
 
          case B is
             when 0 =>
-            T  .Skip_Byte := True;
+               T.Skip_Byte := True;
             when Dasher_Bell =>
                Ada.Text_IO.Put (Ada.Characters.Latin_1.BEL); -- on running terminal...
                T.Skip_Byte := True;
@@ -237,7 +239,17 @@ package body Terminal is
                T.Skip_Byte := True;
             when Dasher_Normal =>
                T.Underscored := False;
-               T.Skip_Byte := True;    
+               T.Skip_Byte := True;   
+            when Dasher_Tab =>
+               T.Cursor_X := T.Cursor_X + 1; -- always at least 1 column
+               while (T.Cursor_X + 1) mod 8 /= 0 loop
+                  if T.Cursor_X >= Display.Disp.Visible_Cols - 1 then
+                     T.Cursor_X := 0; -- TODO What about Cursor_Y ???
+                  else
+                     T.Cursor_X := T.Cursor_X + 1;
+                  end if;
+               end loop; 
+               T.Skip_Byte := True;
             when others =>
                null;        
          end case;

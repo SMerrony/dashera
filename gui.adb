@@ -133,7 +133,7 @@ package body GUI is
                Ada.Text_IO.Put_Line ("DEBUG: TODO - Call Telnet-connect...");
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num, Term);
                -- TODO handle exceptions
-               Keyboard.Set_Destination (Terminal.Telnet);
+               Keyboard.Set_Destination (Terminal.Network);
             end;
          end if;
       end if;
@@ -328,7 +328,7 @@ package body GUI is
 
       -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
       Keyboard.Init (Term);
-      Keyboard.Set_Destination (Terminal.Disconnected);
+      Keyboard.Set_Destination (Terminal.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 
