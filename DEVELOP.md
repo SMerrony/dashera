@@ -1,22 +1,3 @@
-<!--
- Copyright (C) 2021 Stephen Merrony
- 
- This file is part of dashera.
- 
- dashera is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
- 
- dashera is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License
- along with dashera.  If not, see <http://www.gnu.org/licenses/>.
--->
-
 # Developer's Notes for DasherA
 
 ## November 2021...
@@ -32,12 +13,25 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
 * Crt - handle the drawing of a Display in the application
 * Dashera - the main entry point
 * Display - holds a matrix of ASCII characters (Cells)
+* GUI - the bulk of the Gtk interface
+* Keyboard - guess what?!?
+* Telnet - handle the Telnet protocol
 * Terminal - implements the Dasher behaviour
 
 
 ## Build and Clean
-* gprbuild
-* gprclean
+
+Make sure you have all the Ada and GtkAda stuff available.
+
+On my Linux dev box, where I installed GtkAda from source I need to do...
+```
+GPR_PROJECT_PATH=/usr/local/lib/gnat
+export GPR_PROJECT_PATH
+```
+Then...
+
+* `gprbuild`
+* `gprclean`
 
 ## Run with Fatal Warnings...
 `./obj/dashera --gtk-fatal-warnings --g-fatal--warnings`

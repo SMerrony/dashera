@@ -53,6 +53,8 @@ package Dasher_Codes is
    Dasher_Dim_Off          : constant Byte := 29;
    Dasher_Command          : constant Byte := 30;
 
+   Dasher_Space            : constant Byte := 32;
+
    Dasher_Delete           : constant Byte := 127;
 
 end Dasher_Codes;

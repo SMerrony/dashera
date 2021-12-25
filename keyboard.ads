@@ -37,7 +37,6 @@ package Keyboard is
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type);
    -- Handle_Key_Release maps PC-style keys to DASHER ones.
 
-private  
    procedure Route_Key (Byt : in Byte);
    -- Route_Key forwards the result of the keypress to either
    -- the local (echo), serial, or telnet destination as appropriate.
