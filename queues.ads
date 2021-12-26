@@ -17,23 +17,29 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Gdk.Types; use Gdk.Types;
+with Ada.Containers.Indefinite_Holders;
+with Ada.Containers.Synchronized_Queue_Interfaces;
+with Ada.Containers.Unbounded_Synchronized_Queues;
 
-with Terminal;     use Terminal;
+with Dasher_Codes; use Dasher_Codes;
 
-package Keyboard is
+package Queues is
 
-   Destination : Connection_T := Local;
-   Term_Acc    : Terminal_Acc_T;
-   Ctrl_Pressed, Shift_Pressed : Boolean := False;
+   package Byte_Arrs is
+      new Ada.Containers.Indefinite_Holders (Byte_Arr);
 
-   procedure Init               (Term : in Terminal_Acc_T);
-   
-   procedure Set_Destination    (Dest : in Connection_T);
+   package Byte_Arrs_Queue_Interfaces is 
+      new Ada.Containers.Synchronized_Queue_Interfaces (Element_Type => Byte_Arrs.Holder);
 
-   procedure Handle_Key_Press   (Key  : in Gdk_Key_Type);
+   package Byte_Arr_Queues is
+      new Ada.Containers.Unbounded_Synchronized_Queues
+            (Queue_Interfaces => Byte_Arrs_Queue_Interfaces);
 
-   procedure Handle_Key_Release (Key  : in Gdk_Key_Type);
-   -- Handle_Key_Release maps PC-style keys to DASHER ones.
+   Keyboard_Q  : Byte_Arr_Queues.Queue;
 
-end Keyboard;
+   procedure Keyboard_Enqueue (BA : in Byte_Arr);
+   function  Keyboard_Dequeue return Byte_Arr;
+   function  Keyboard_Data_Waiting return Boolean;
+
+end Queues;
+

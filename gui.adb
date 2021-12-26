@@ -51,8 +51,6 @@ with BDF_Font;
 with Crt;
 with Display;
 with Keyboard;
--- with Serial;
-with Telnet;
 
 package body GUI is  
 
@@ -61,12 +59,14 @@ package body GUI is
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
       Gtk.Main.Main_Quit;
+      -- Term.Connection := Terminal.Quitting;
    end Window_Close_CB;
 
    procedure Quit_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
    begin
       Gtk.Main.Main_Quit;
+      -- Term.Connection := Terminal.Quitting;
    end Quit_CB;
 
    procedure About_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
@@ -126,7 +126,7 @@ package body GUI is
                                                              Title => "DasherA - Error");
          else
             declare
-               Host_Str : Glib.UTF8_String := Host_Entry.Get_Text;
+               Host_Str : constant Glib.UTF8_String := Host_Entry.Get_Text;
                Port_Num : Integer;
             begin
                Port_Num := Integer'Value (Port_Entry.Get_Text);
@@ -134,6 +134,7 @@ package body GUI is
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num, Term);
                -- TODO handle exceptions
                Keyboard.Set_Destination (Terminal.Network);
+               Term.Connection := Terminal.Network;
             end;
          end if;
       end if;
@@ -327,6 +328,7 @@ package body GUI is
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
       -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
+      Terminal.Processor.Start (Term);
       Keyboard.Init (Term);
       Keyboard.Set_Destination (Terminal.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);

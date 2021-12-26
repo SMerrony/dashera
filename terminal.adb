@@ -23,6 +23,7 @@ with Ada.Strings.Fixed;
 with BDF_Font;
 with Crt;
 with Display;
+with Queues;
 
 package body Terminal is
 
@@ -116,6 +117,28 @@ package body Terminal is
       end loop;
    
    end Self_Test;
+
+   task body Processor is
+      Term : Terminal_Acc_T;
+   begin
+      accept Start (T : in Terminal_Acc_T) do
+         Term := T;
+      end Start;
+      loop
+         select
+         delay 0.05;
+            if Term.Connection = Local then
+               if Queues.Keyboard_Data_Waiting then
+                  Term.Process (Queues.Keyboard_Dequeue);
+               end if;
+            end if;
+         or
+            accept Stop;
+            exit;
+         end select;
+
+      end loop;
+   end Processor;
 
    -- Process is to be called with a Byte_Arr whenever there is any data for 
    -- the terminal to display or otherwise handle.
@@ -270,10 +293,11 @@ package body Terminal is
          end if;
 
          -- Finally! Put the character in the displayable matrix
-         if B_Int > 0 and B_Int < BDF_Font.Max_Chars and BDF_Font.Decoded.Font(B_Int).Loaded then
-            C := Character'Val(B_Int);
-         else
-            C := Character'Val(127); -- the 'unknown character' character
+         C := Character'Val(127); -- the 'unknown character' character
+         if B >= Dasher_Space and B_Int < BDF_Font.Max_Chars then
+            if BDF_Font.Decoded.Font(B_Int).Loaded then
+               C := Character'Val(B_Int);
+            end if;
          end if;
          Display.Disp.Cells(T.Cursor_Y, T.Cursor_X).Set (Value => C, Blnk => T.Blinking, Dm => T.Dimmed, 
                                                          Rv => T.Reversed, Under => T.Underscored, Prot => T.Protectd);

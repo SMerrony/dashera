@@ -47,4 +47,9 @@ package Terminal is
    procedure Process (T : in out Terminal_T; BA : in Byte_Arr);
    procedure Scroll_Up (T : in out Terminal_T; Lines : in Integer);
 
+   task Processor is
+      entry Start (T : in Terminal_Acc_T);
+      entry Stop;
+   end Processor;
+
 end Terminal;

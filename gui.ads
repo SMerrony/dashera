@@ -24,6 +24,8 @@ with Gtk.Handlers;
 with Gtk.Widget;
 with Gtk.Window; 
 
+-- with Dasher_Codes; use Dasher_Codes;
+with Queues;
 with Telnet;
 with Terminal;
 

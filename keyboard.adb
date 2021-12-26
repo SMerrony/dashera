@@ -23,8 +23,8 @@ with Ada.Text_IO;
 
 with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
 
-with Gui;
-with Telnet;
+with Dasher_Codes; use Dasher_Codes;
+with Queues;
 
 package body Keyboard is
 
@@ -47,20 +47,13 @@ package body Keyboard is
       end case;
    end Handle_Key_Press;
 
-   procedure Route_Key (Byt : in Byte) is 
+   procedure Enqueue_Key (Byt : in Byte) is 
       BA          : Byte_Arr(1..1);
    begin
       BA(1) := Byt;
-      case Destination is
-         when Local =>
-            Term_Acc.Process (BA);
-         when Async => -- TODO
-            null; 
-         when Network => 
-            -- Gui.Telnet_Sess.Send (BA);
-            Telnet.Send (Gui.Telnet_Sess, BA);
-      end case;
-   end Route_Key;
+      Queues.Keyboard_Enqueue (BA);
+   end Enqueue_Key;
+
 
    function Modify (B : in Byte) return Byte is
       MB : byte := B;
@@ -78,36 +71,36 @@ package body Keyboard is
          when GDK_Control_L | GDK_Control_R => Ctrl_Pressed := False;
          when GDK_Shift_L | GDK_Shift_R => Shift_Pressed := False;
 
-         when GDK_Return   => Route_Key (Dasher_NL); -- convert PC-style Return to DG NL
-         when GDK_KP_Enter => Route_Key (Dasher_CR); -- convert PC Keypad Enter to DG CR
+         when GDK_Return   => Enqueue_Key (Dasher_NL); -- convert PC-style Return to DG NL
+         when GDK_KP_Enter => Enqueue_Key (Dasher_CR); -- convert PC Keypad Enter to DG CR
 
-         when GDK_Tab    => Route_Key (Dasher_Tab);
-         when GDK_Down   => Route_Key (Dasher_Cursor_Down);
-         when GDK_Up     => Route_Key (Dasher_Cursor_Up);
-         when GDK_Left   => Route_Key (Dasher_Cursor_Left);
-         when GDK_Right  => Route_Key (Dasher_Cursor_Right);
-         when GDK_Home   => Route_Key (Dasher_Home);
+         when GDK_Tab    => Enqueue_Key (Dasher_Tab);
+         when GDK_Down   => Enqueue_Key (Dasher_Cursor_Down);
+         when GDK_Up     => Enqueue_Key (Dasher_Cursor_Up);
+         when GDK_Left   => Enqueue_Key (Dasher_Cursor_Left);
+         when GDK_Right  => Enqueue_Key (Dasher_Cursor_Right);
+         when GDK_Home   => Enqueue_Key (Dasher_Home);
 
          -- The DEL key must map to 127 which is the DASHER DEL code
-         when GDK_Delete => Route_Key (Dasher_Delete); 
+         when GDK_Delete => Enqueue_Key (Dasher_Delete); 
 
-         when GDK_Escape => Route_Key (Dasher_Escape);
+         when GDK_Escape => Enqueue_Key (Dasher_Escape);
 
-         when GDK_F1  => Route_Key (Dasher_Command); Route_Key (Modify (113));
-         when GDK_F2  => Route_Key (Dasher_Command); Route_Key (Modify (114));
-         when GDK_F3  => Route_Key (Dasher_Command); Route_Key (Modify (115));
-         when GDK_F4  => Route_Key (Dasher_Command); Route_Key (Modify (116));
-         when GDK_F5  => Route_Key (Dasher_Command); Route_Key (Modify (117));
-         when GDK_F6  => Route_Key (Dasher_Command); Route_Key (Modify (118));
-         when GDK_F7  => Route_Key (Dasher_Command); Route_Key (Modify (119));
-         when GDK_F8  => Route_Key (Dasher_Command); Route_Key (Modify (120));
-         when GDK_F9  => Route_Key (Dasher_Command); Route_Key (Modify (121));
-         when GDK_F10 => Route_Key (Dasher_Command); Route_Key (Modify (133));
-         when GDK_F11 => Route_Key (Dasher_Command); Route_Key (Modify (123));
-         when GDK_F12 => Route_Key (Dasher_Command); Route_Key (Modify (124));
-         when GDK_F13 => Route_Key (Dasher_Command); Route_Key (Modify (125));
-         when GDK_F14 => Route_Key (Dasher_Command); Route_Key (Modify (126));
-         when GDK_F15 => Route_Key (Dasher_Command); Route_Key (Modify (112));
+         when GDK_F1  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (113));
+         when GDK_F2  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (114));
+         when GDK_F3  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (115));
+         when GDK_F4  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (116));
+         when GDK_F5  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (117));
+         when GDK_F6  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (118));
+         when GDK_F7  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (119));
+         when GDK_F8  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (120));
+         when GDK_F9  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (121));
+         when GDK_F10 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (133));
+         when GDK_F11 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (123));
+         when GDK_F12 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (124));
+         when GDK_F13 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (125));
+         when GDK_F14 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (126));
+         when GDK_F15 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (112));
 
          when others =>
             if Key < 256 then
@@ -115,7 +108,7 @@ package body Keyboard is
                if Ctrl_Pressed then
                   Char_Byte := Char_Byte mod 32;
                end if;
-               Route_Key (Char_Byte);
+               Enqueue_Key (Char_Byte);
             end if;
       end case;
    end Handle_Key_Release;

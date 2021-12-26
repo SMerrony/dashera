@@ -20,7 +20,7 @@
 with GNAT.Sockets;	use GNAT.Sockets;
 
 with Dasher_Codes;   use Dasher_Codes;
-with Terminal;
+with Terminal;			use Terminal;
 
 package Telnet is
 
@@ -64,5 +64,10 @@ package Telnet is
 	task Receiver is
 		entry Start (Sess : in Session_Acc_T);
 	end Receiver;
+
+	task Keyboard_Sender is
+      entry Start (S : in Session_Acc_T);
+      entry Stop;
+   end Keyboard_Sender;
 
 end Telnet;

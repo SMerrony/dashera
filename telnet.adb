@@ -21,6 +21,8 @@ with Ada.Streams;	use Ada.Streams;
 with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
+with Queues;
+
 package body Telnet is
 
 	function New_Connection (Host_Str : in String; 
@@ -37,10 +39,33 @@ package body Telnet is
       -- GNAT.Sockets.Set_Socket_Option (Socket => Sess.Conn, Option => (No_Delay, True));
       Sess.Term := Term;
       Receiver.Start (Sess);
+      Keyboard_Sender.Start (Sess);
       return Sess;
    end New_Connection;
 
    -- function Byte_To_Char is new Ada.Unchecked_Conversion(Byte, Character);
+
+   task body Keyboard_Sender is
+      Sess : Session_Acc_T;
+   begin
+      accept Start (S : in Session_Acc_T) do
+         Sess := S;
+      end Start;
+      loop
+         select
+         delay 0.05;
+            if Sess.Term.Connection = Terminal.Network then
+               if Queues.Keyboard_Data_Waiting then
+                  Send (Sess, Queues.Keyboard_Dequeue);
+               end if;
+            end if;
+         or
+            accept Stop;
+            exit;
+         end select;
+
+      end loop;
+   end Keyboard_Sender;
 
    procedure Send (Sess : in out Session_Acc_T; BA : in Byte_Arr) is
       SEA : Ada.Streams.Stream_Element_Array (1..BA'Length);
