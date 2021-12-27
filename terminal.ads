@@ -28,6 +28,9 @@ package Terminal is
       Emulation                        : Emulation_T;
       Connection                       : Connection_T;
       Cursor_X, Cursor_Y               : Natural;
+      In_Command, In_Extended_Command  : Boolean;
+      Reading_X_Addr, Reading_Y_Addr   : Boolean;
+      New_X_Addr, New_Y_Addr           : Natural;
       Roll_Enabled, Protection_Enabled : Boolean;
       Holding, Logging, Scrolled_Back  : Boolean;
       Skip_Byte                        : Boolean;

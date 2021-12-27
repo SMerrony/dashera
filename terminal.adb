@@ -34,6 +34,10 @@ package body Terminal is
       T.Connection := Local;
       T.Cursor_X := 0;
       T.Cursor_Y := 0;
+      T.In_Command := False;
+      T.In_Extended_Command := False;
+      T.Reading_X_Addr := False;
+      T.Reading_Y_Addr := False;
       T.Roll_Enabled := True;
       T.Protection_Enabled := True;
       T.Skip_Byte := False;
@@ -74,7 +78,10 @@ package body Terminal is
       NL, Op : Byte_Arr (1..1);
    begin
       NL(1) := Dasher_NL;
-
+      
+      Op(1) := Dasher_Erase_Page;
+      T.Process (Op);
+      
       T.Process (Str_To_BA (HRule1(1..Display.Disp.Visible_Cols)));
       T.Process (Str_To_BA (HRule2(1..Display.Disp.Visible_Cols)));
 
@@ -156,23 +163,54 @@ package body Terminal is
 
          T.Skip_Byte := False;
 
-         -- wrap due to hitting margin or new line?
-         if T.Cursor_X = Display.Disp.Visible_Cols or B = Dasher_NL then
-            -- hit bottom of screen?
-            if T.Cursor_Y = Display.Disp.Visible_Lines - 1 then
-               if T.Roll_Enabled then
-                  T.Scroll_Up (1);
-               else
-                  T.Cursor_Y := 0;
-                  Display.Clear_Line (Display.Disp, T.Cursor_Y);
-               end if;
-            else
-               T.Cursor_Y := T.Cursor_Y + 1;
-               if not T.Roll_Enabled then
-                  Display.Clear_Line (Display.Disp, T.Cursor_Y);
-               end if;
+         if T.Reading_X_Addr then -- host is setting cursor address
+            T.New_X_Addr := Natural(B_Int mod 127);
+            if T.New_X_Addr >= Display.Disp.Visible_Cols then
+               T.New_X_Addr := T.New_X_Addr - Display.Disp.Visible_Cols;
             end if;
-            T.Cursor_X := 0;
+            if T.New_X_Addr = 127 then 
+               -- special case - x stays the same - see D410 User Manual p.3-25
+               T.New_X_Addr := T.Cursor_X;
+            end if;
+            T.Reading_X_Addr := False;
+            T.Reading_Y_Addr := True;
+            goto Continue;
+         end if;
+
+         if T.Reading_Y_Addr then
+            T.New_Y_Addr := Natural(B_Int mod 127);
+            T.Cursor_X := T.New_X_Addr;
+            if T.New_Y_Addr = 127 then
+               T.New_Y_Addr := T.Cursor_Y;
+            else
+               T.Cursor_Y := T.New_Y_Addr;
+            end if;
+            if T.Cursor_Y >= Display.Disp.Visible_Lines then
+               -- see end of p.3-24 in D410 User Manual
+               if T.Roll_Enabled then
+                  T.Scroll_Up (T.Cursor_Y - (Display.Disp.Visible_Lines - 1));
+               end if;
+               T.Cursor_Y := T.Cursor_Y - Display.Disp.Visible_Lines;
+            end if;
+            T.Reading_Y_Addr := False;
+            goto Continue;
+         end if;
+
+         -- short DASHER commands
+         if T.In_Command then
+            case B is
+               -- when 'C' => -- TODO
+               when 68 => -- "D"
+                  T.Reversed := True;
+               when 69 => -- "E"
+                  T.Reversed := False;
+               when 70 => -- "F"
+                  T.In_Extended_Command := True;
+               when others =>
+                  Ada.Text_IO.Put_Line ("WARNING: Unrecognised Break-CMD code:" & B_Int'Image);
+            end case;
+            T.In_Command := False;
+            goto Continue;
          end if;
 
          case B is
@@ -192,6 +230,9 @@ package body Terminal is
                T.Skip_Byte := True;
             when Dasher_Blink_Disable =>
                Display.Disp.Blink_Enabled := False; -- Modifies Display
+               T.Skip_Byte := True;
+            when Dasher_Command =>
+               T.In_Command := True; -- next char will form (part of) a command
                T.Skip_Byte := True;
             when Dasher_Cursor_Down =>
                if T.Cursor_Y < Display.Disp.Visible_Lines - 1 then
@@ -273,12 +314,34 @@ package body Terminal is
                   end if;
                end loop; 
                T.Skip_Byte := True;
+            when Dasher_Write_Window_Addr =>
+               T.Reading_X_Addr := True;
+               T.Skip_Byte := True;
             when others =>
                null;        
          end case;
 
          if T.Skip_Byte then
             goto Continue;
+         end if;
+
+         -- wrap due to hitting margin or new line?
+         if T.Cursor_X = Display.Disp.Visible_Cols or B = Dasher_NL then
+            -- hit bottom of screen?
+            if T.Cursor_Y = Display.Disp.Visible_Lines - 1 then
+               if T.Roll_Enabled then
+                  T.Scroll_Up (1);
+               else
+                  T.Cursor_Y := 0;
+                  Display.Clear_Line (Display.Disp, T.Cursor_Y);
+               end if;
+            else
+               T.Cursor_Y := T.Cursor_Y + 1;
+               if not T.Roll_Enabled then
+                  Display.Clear_Line (Display.Disp, T.Cursor_Y);
+               end if;
+            end if;
+            T.Cursor_X := 0;
          end if;
 
          -- CR or NL?

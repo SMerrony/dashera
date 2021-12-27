@@ -30,7 +30,6 @@ with Gtk.Main;
 with Gtk.Window;  use Gtk.Window;
 
 with GUI;
-with Terminal;
 
 procedure Dashera is
 
@@ -38,16 +37,6 @@ procedure Dashera is
 
    -- GUI stuff
    Main_Window : Gtk_Window;
-
-   task type Local_Listener_Type is
-      entry Start;
-      entry Echo (C : in Character);
-      entry Stop;
-   end Local_Listener_Type;
-
-   Local_Listener : Local_Listener_Type;
-
-   Listening_Locally : Boolean := True;
 
    -- program args etc.
    Arg_Ix : Natural := 1;
@@ -66,33 +55,6 @@ procedure Dashera is
       Ada.Text_IO.Put_Line ("  -tracexmodem  Show details of XMODEM file transfers on STDOUT");
       Ada.Text_IO.Put_Line ("  -version          show the version number of dashera and exit");
    end Print_Help;
-
-
-
-   task body Local_Listener_Type is
-      One_Char : Character;
-   begin
-      accept Start do
-         Ada.Text_IO.Put_Line ("INFO: Local_Listener starting");
-      end Start;
-
-      loop
-         select
-            accept Echo (C : in Character) do
-               One_Char := 'x';
-            end Echo;
-            -- TODO Debugging - should foward the char on
-            Ada.Text_IO.Put_Line ("Echo " & One_Char);
-         or
-            accept Stop do
-               return;
-            end Stop;
-         or 
-            terminate;
-         end select;
-      end loop;
-
-   end Local_Listener_Type;
 
 begin
 
@@ -117,9 +79,6 @@ begin
    Gdk.Threads.G_Init;
    Gdk.Threads.Init;
    Gtk.Main.Init;
-
-   Local_Listener.Start;
-
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
    Main_Window := Gui.Create_Window;
