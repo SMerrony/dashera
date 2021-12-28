@@ -133,17 +133,16 @@ package body Terminal is
       end Start;
       loop
          select
-         delay 0.05;
-            if Term.Connection = Local then
-               if Queues.Keyboard_Data_Waiting then
-                  Term.Process (Queues.Keyboard_Dequeue);
+            delay 0.05; -- 20Hz
+               if Term.Connection = Local then
+                  if Queues.Keyboard_Data_Waiting then
+                     Term.Process (Queues.Keyboard_Dequeue);
+                  end if;
                end if;
-            end if;
          or
             accept Stop;
-            exit;
+               exit;
          end select;
-
       end loop;
    end Processor;
 
@@ -159,7 +158,7 @@ package body Terminal is
          B := BA(Ix);
          B_Int := Integer(B);
 
-         Ada.Text_IO.Put_Line ("DEBUG: Terminal.Process got: " & B'Image);
+         -- Ada.Text_IO.Put_Line ("DEBUG: Terminal.Process got: " & B'Image);
 
          T.Skip_Byte := False;
 
@@ -297,6 +296,12 @@ package body Terminal is
                T.Skip_Byte := True;
             when Dasher_Rev_Off =>
                T.Reversed := False;
+               T.Skip_Byte := True;
+            when Dasher_Roll_Disable =>
+               T.Roll_Enabled := False;
+               T.Skip_Byte := True;
+            when Dasher_Roll_Enable =>
+               T.Roll_Enabled := True;
                T.Skip_Byte := True;
             when Dasher_Underline =>
                T.Underscored := True;
