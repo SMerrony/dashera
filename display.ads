@@ -32,6 +32,7 @@ package Display is
    type Display_T is record
       Cells : Cell_Array;
       Visible_Lines, Visible_Cols : Integer;
+      Cursor_X, Cursor_Y : Natural;
       Blink_Enabled : Boolean;
       Dirty : Boolean;
    end record;
@@ -47,5 +48,6 @@ package Display is
    --                     Char : in Character;
    --                     Blink, Dim, Rev, Under, Prot : in Boolean);
    procedure Copy_Line (This : in out Display_T; Src, Dest : Integer);
+   procedure Set_Cursor (X, Y : in Natural);
 
 end Display;

@@ -137,6 +137,27 @@ package body Crt is
             end if;
          end loop;
       end loop;
+
+      -- Draw the cursor if it's on-screen
+      if Display.Disp.Cursor_X < Display.Disp.Visible_Cols and Display.Disp.Cursor_Y < Display.Disp.Visible_Lines then
+         Char_Ix := Character'Pos (Display.Disp.Cells(Display.Disp.Cursor_Y, Display.Disp.Cursor_X).Char_Value);
+         if Char_Ix = 0 then
+            Char_Ix := 32;
+         end if;
+         if Display.Disp.Cells(Display.Disp.Cursor_Y, Display.Disp.Cursor_X).Rev then
+            Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                         Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
+                                         Pixbuf_X => Gdouble(Gint(Display.Disp.Cursor_X) * BDF_Font.Decoded.Char_Width),
+                                         Pixbuf_Y => Gdouble(Gint(Display.Disp.Cursor_Y) * BDF_Font.Decoded.Char_Height));
+         else
+            Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                         Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf, 
+                                         Pixbuf_X => Gdouble(Gint(Display.Disp.Cursor_X) * BDF_Font.Decoded.Char_Width),
+                                         Pixbuf_Y => Gdouble(Gint(Display.Disp.Cursor_Y) * BDF_Font.Decoded.Char_Height));
+         end if;
+         Cairo.Paint (Cr);
+      end if;
+
       Cairo.Destroy (Cr);
    end Draw_Crt;
 

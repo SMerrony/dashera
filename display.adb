@@ -57,4 +57,10 @@ package body Display is
       end loop;
    end Copy_Line;
 
+   procedure Set_Cursor (X, Y : in Natural) is
+   begin
+      Disp.Cursor_X := X;
+      Disp.Cursor_Y := Y;
+   end Set_Cursor;
+
 end Display;

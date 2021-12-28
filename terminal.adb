@@ -146,6 +146,12 @@ package body Terminal is
       end loop;
    end Processor;
 
+   procedure Set_Cursor (T : in out Terminal_T; X, Y : in Natural) is
+   begin
+      T.Cursor_X := X;
+      T.Cursor_Y := Y;
+   end Set_Cursor;
+
    -- Process is to be called with a Byte_Arr whenever there is any data for 
    -- the terminal to display or otherwise handle.
    procedure Process (T : in out Terminal_T; BA : in Byte_Arr) is
@@ -284,12 +290,10 @@ package body Terminal is
                T.Skip_Byte := True;
             when Dasher_Erase_Page =>
                T.Scroll_Up (Display.Disp.Visible_Lines);
-               T.Cursor_X := 0;
-               T.Cursor_Y := 0;
+               T.Set_Cursor (0, 0);
                T.Skip_Byte := True;
             when Dasher_Home =>
-               T.Cursor_X := 0;
-               T.Cursor_Y := 0;
+               T.Set_Cursor (0, 0);
                T.Skip_Byte := True;
             when Dasher_Rev_On =>
                T.Reversed := True;
@@ -372,12 +376,11 @@ package body Terminal is
          T.Cursor_X := T.Cursor_X + 1;
          -- TODO handle Expect case
 
-         --- DasherG sends an update signal here
-        Crt.Tube.DA.Queue_Draw;
+      <<Continue>>
+         Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);
 
-         <<Continue>>
+         Crt.Tube.DA.Queue_Draw;
       end loop;
-
    end Process;
 
    procedure Scroll_Up (T : in out Terminal_T; Lines : in Integer) is
