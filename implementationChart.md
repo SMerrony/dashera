@@ -22,7 +22,7 @@
 | Print Form                           | 001         | Ctrl-A or Shift-Local Print | -   | -    | TODO            |
 | Print Screen/Window                  | 021         | Ctrl-Q or Local Print      | N    | N    | Local Print button works    |
 | Read Model ID                        | 036 103     | Cmd-Brk C                  |     |     |                 |
-| Read Cursor/Window Address           | 005         | Ctrl-E                     |     |     |                 |
+| Read Cursor/Window Address           | 005         | Ctrl-E                     | Y    | Y    |                 |
 | Remote Test Enter                    | 036 101     |                            | N    | N    | *Will not implement in emulator* |
 | Remote Test Exit                     | 036 102     |                            | N    | N    | *Will not implement in emulator* |
 | Reverse Video Off                    | 036 105     | Cmd-Brk E                  | Y    | Y    | Inverse Chars off |

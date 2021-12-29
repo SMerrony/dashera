@@ -103,9 +103,9 @@ package body Telnet is
          Ada.Text_IO.Put_Line ("DEBUG: Telnet Receiver Started");
       end Start;
       loop
-         Ada.Text_IO.Put_Line ("DEBUG: Telnet Receive waiting for data...");
+         -- Ada.Text_IO.Put_Line ("DEBUG: Telnet Receive waiting for data...");
          GNAT.Sockets.Receive_Socket (Session.Conn, Block, Offset);
-         Ada.Text_IO.Put_Line ("DEBUG: ...Telnet Receiver got data from host - No. Bytes:" & Offset'Image);
+         -- Ada.Text_IO.Put_Line ("DEBUG: ...Telnet Receiver got data from host - No. Bytes:" & Offset'Image);
          if Offset = 0 then
             Ada.Text_IO.Put_Line ("WARNING: Telnet Receiver Stopping due to empty message from host");
             goto Halt;

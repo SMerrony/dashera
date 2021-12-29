@@ -33,6 +33,11 @@ package body Display is
    begin
       Disp.Visible_Lines := Default_Lines;
       Disp.Visible_Cols := Default_Cols;
+      for Line in 0 .. Total_Lines - 1 loop
+         for Col in 0 .. Total_Cols - 1 loop
+            Disp.Cells(Line, Col).Clear_To_Space;
+         end loop;
+      end loop;
       Disp.Cells(12,39).Char_Value := 'O';
       Disp.Cells(12,40).Char_Value := 'K';
       Disp.Blink_Enabled := True;

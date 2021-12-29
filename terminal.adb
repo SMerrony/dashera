@@ -36,8 +36,8 @@ package body Terminal is
       T.Cursor_Y := 0;
       T.In_Command := False;
       T.In_Extended_Command := False;
-      T.Reading_X_Addr := False;
-      T.Reading_Y_Addr := False;
+      T.Getting_X_Addr := False;
+      T.Getting_Y_Addr := False;
       T.Roll_Enabled := True;
       T.Protection_Enabled := True;
       T.Skip_Byte := False;
@@ -133,7 +133,7 @@ package body Terminal is
       end Start;
       loop
          select
-            delay 0.05; -- 20Hz
+            delay 0.1; --0.05; -- 20Hz
                if Term.Connection = Local then
                   if Queues.Keyboard_Data_Waiting then
                      Term.Process (Queues.Keyboard_Dequeue);
@@ -168,37 +168,33 @@ package body Terminal is
 
          T.Skip_Byte := False;
 
-         if T.Reading_X_Addr then -- host is setting cursor address
+         if T.Getting_X_Addr then -- host is setting cursor address
             T.New_X_Addr := Natural(B_Int mod 127);
-            if T.New_X_Addr >= Display.Disp.Visible_Cols then
-               T.New_X_Addr := T.New_X_Addr - Display.Disp.Visible_Cols;
-            end if;
             if T.New_X_Addr = 127 then 
                -- special case - x stays the same - see D410 User Manual p.3-25
                T.New_X_Addr := T.Cursor_X;
+            elsif T.New_X_Addr >= Display.Disp.Visible_Cols then
+               T.New_X_Addr := T.New_X_Addr - Display.Disp.Visible_Cols;
             end if;
-            T.Reading_X_Addr := False;
-            T.Reading_Y_Addr := True;
-            goto Continue;
+            T.Getting_X_Addr := False;
+            T.Getting_Y_Addr := True;
+            goto Redraw_Tube;
          end if;
 
-         if T.Reading_Y_Addr then
+         if T.Getting_Y_Addr then
             T.New_Y_Addr := Natural(B_Int mod 127);
-            T.Cursor_X := T.New_X_Addr;
             if T.New_Y_Addr = 127 then
                T.New_Y_Addr := T.Cursor_Y;
-            else
-               T.Cursor_Y := T.New_Y_Addr;
-            end if;
-            if T.Cursor_Y >= Display.Disp.Visible_Lines then
+            elsif T.New_Y_Addr >= Display.Disp.Visible_Lines then
                -- see end of p.3-24 in D410 User Manual
                if T.Roll_Enabled then
-                  T.Scroll_Up (T.Cursor_Y - (Display.Disp.Visible_Lines - 1));
+                  T.Scroll_Up (T.New_Y_Addr - (Display.Disp.Visible_Lines - 1));
                end if;
-               T.Cursor_Y := T.Cursor_Y - Display.Disp.Visible_Lines;
+               T.New_Y_Addr := T.Cursor_Y - Display.Disp.Visible_Lines;
             end if;
-            T.Reading_Y_Addr := False;
-            goto Continue;
+            T.Set_Cursor (T.New_X_Addr, T.New_Y_Addr);
+            T.Getting_Y_Addr := False;
+            goto Redraw_Tube;
          end if;
 
          -- short DASHER commands
@@ -215,7 +211,7 @@ package body Terminal is
                   Ada.Text_IO.Put_Line ("WARNING: Unrecognised Break-CMD code:" & B_Int'Image);
             end case;
             T.In_Command := False;
-            goto Continue;
+            goto Redraw_Tube;
          end if;
 
          case B is
@@ -295,6 +291,16 @@ package body Terminal is
             when Dasher_Home =>
                T.Set_Cursor (0, 0);
                T.Skip_Byte := True;
+            when Dasher_Read_Window_Addr => -- REQUIRES RESPONSE - see D410 User Manual p.3-18
+               declare
+                  B3_Arr : Byte_Arr(1..3);
+               begin
+                  B3_Arr(1) := 31;
+                  B3_Arr(2) := Byte(T.Cursor_X);
+                  B3_Arr(3) := Byte(T.Cursor_Y);
+                  Queues.Keyboard_Enqueue (B3_Arr);
+               end;
+               T.Skip_Byte := True;
             when Dasher_Rev_On =>
                T.Reversed := True;
                T.Skip_Byte := True;
@@ -324,14 +330,14 @@ package body Terminal is
                end loop; 
                T.Skip_Byte := True;
             when Dasher_Write_Window_Addr =>
-               T.Reading_X_Addr := True;
+               T.Getting_X_Addr := True;
                T.Skip_Byte := True;
             when others =>
                null;        
          end case;
 
          if T.Skip_Byte then
-            goto Continue;
+            goto Redraw_Tube;
          end if;
 
          -- wrap due to hitting margin or new line?
@@ -357,11 +363,11 @@ package body Terminal is
          if B = Dasher_CR or B = Dasher_NL then
             T.Cursor_X := 0;
             -- TODO handle Expect case
-            goto Continue;
+            goto Redraw_Tube;
          end if;
 
          if T.Skip_Byte then
-            goto Continue;
+            goto Redraw_Tube;
          end if;
 
          -- Finally! Put the character in the displayable matrix
@@ -376,9 +382,8 @@ package body Terminal is
          T.Cursor_X := T.Cursor_X + 1;
          -- TODO handle Expect case
 
-      <<Continue>>
+      <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);
-
          Crt.Tube.DA.Queue_Draw;
       end loop;
    end Process;

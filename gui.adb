@@ -135,6 +135,7 @@ package body GUI is
                -- TODO handle exceptions
                Keyboard.Set_Destination (Terminal.Network);
                Term.Connection := Terminal.Network;
+               -- Terminal.Processor.Stop;
             end;
          end if;
       end if;
