@@ -19,8 +19,11 @@
 
 -- with Gtkada.Builder; use Gtkada.Builder;
 
+with Glib.Main;
+
 with Gtk.Box;
 with Gtk.Handlers;
+with Gtk.Label;
 with Gtk.Widget;
 with Gtk.Window; 
 
@@ -31,7 +34,8 @@ with Terminal;
 
 package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
-   
+   package SB_Timeout_P is new Glib.Main.Generic_Sources (Gtk.Box.Gtk_Hbox);
+
    App_SemVer       : constant String := "v0.11.0x";  -- TODO Update Version each release!
    App_Title        : constant String := "DasherA";
    App_Comment      : constant String := "A Data General DASHER terminal emulator";
@@ -51,6 +55,8 @@ package GUI is
 
    Telnet_Sess : Telnet.Session_Acc_T;
    Term        : Terminal.Terminal_Acc_T;
+   Online_Label, Host_Label, Logging_Label, Emul_Label : Gtk.Label.Gtk_Label;
+   SB_Timeout  : Glib.Main.G_Source_ID := 0;
 
    function Create_Window return Gtk.Window.Gtk_Window;
 

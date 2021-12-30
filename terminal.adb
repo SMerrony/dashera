@@ -302,11 +302,15 @@ package body Terminal is
                end;
                T.Skip_Byte := True;
             when Dasher_Rev_On =>
-               T.Reversed := True;
-               T.Skip_Byte := True;
+               if T.Emulation /= D200 then -- only for D210 and later models
+                  T.Reversed := True;
+                  T.Skip_Byte := True;
+               end if;
             when Dasher_Rev_Off =>
-               T.Reversed := False;
-               T.Skip_Byte := True;
+               if T.Emulation /= D200 then
+                  T.Reversed := False;
+                  T.Skip_Byte := True;
+               end if;
             when Dasher_Roll_Disable =>
                T.Roll_Enabled := False;
                T.Skip_Byte := True;

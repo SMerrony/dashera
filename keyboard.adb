@@ -95,7 +95,7 @@ package body Keyboard is
          when GDK_F7  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (119));
          when GDK_F8  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (120));
          when GDK_F9  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (121));
-         when GDK_F10 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (133));
+         when GDK_F10 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (122));
          when GDK_F11 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (123));
          when GDK_F12 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (124));
          when GDK_F13 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (125));

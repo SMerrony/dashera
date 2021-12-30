@@ -32,7 +32,6 @@ with Gtk.Drawing_Area;
 with Gtk.GEntry;
 with Gtk.Enums;
 with Gtk.Frame;
-with Gtk.Label;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
@@ -87,6 +86,18 @@ package body GUI is
       Dummy_Response := Dialog.Run;
       Dialog.Destroy;
    end About_CB;
+
+   procedure D200_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      Term.Emulation := Terminal.D200;
+   end D200_CB;
+
+   procedure D210_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      Term.Emulation := Terminal.D210;
+   end D210_CB;
 
    procedure Self_Test_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
@@ -165,7 +176,7 @@ package body GUI is
       Help_Menu : Gtk.Menu.Gtk_Menu;
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
       Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rcv_Item,
-      Self_Test_Item,
+      D200_Item, D210_Item, Self_Test_Item,
       Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
       Net_Connect_Item, Net_Disconnect_Item,
       Paste_Item,
@@ -224,6 +235,12 @@ package body GUI is
       Menu_Bar.Append(Menu_Item);
       Gtk_New (Emulation_Menu);
       Menu_Item.Set_Submenu (Emulation_Menu);
+      Gtk_New (D200_Item, "D200");
+      Emulation_Menu.Append (D200_Item);
+      D200_Item.On_Activate (D200_CB'Access);
+      Gtk_New (D210_Item, "D210");
+      Emulation_Menu.Append (D210_Item);
+      D210_Item.On_Activate (D210_CB'Access);
 
       Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
@@ -267,10 +284,24 @@ package body GUI is
       return Menu_Bar;
    end Create_Menu_Bar;
 
+  function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Hbox) return Boolean is
+   begin
+      case Term.Connection is
+         when Terminal.Local =>   Online_Label.Set_Text ("Local (Disconnected)");
+         when Terminal.Async =>   Online_Label.Set_Text ("Online (Serial)");
+         when Terminal.Network => Online_Label.Set_Text ("Online (Telnet): ");
+      end case;
+      case Term.Emulation is
+         when Terminal.D200 => Emul_Label.Set_Text ("D200");
+         when Terminal.D210 => Emul_Label.Set_Text ("D210");
+      end case;
+      SB.Queue_Draw;
+      return True;
+   end Update_Status_Box_CB;
+
    function Create_Status_Box return Gtk.Box.Gtk_Hbox is
       Status_Box : Gtk.Box.Gtk_Hbox;
       Online_Frame, Host_Frame, Logging_Frame, Emul_Frame : Gtk.Frame.Gtk_Frame;
-      Online_Label, Host_Label, Logging_Label, Emul_Label : Gtk.Label.Gtk_Label;
    begin
       Gtk.Box.Gtk_New_Hbox (Status_Box, True, 2);
       Gtk.Frame.Gtk_New (Online_Frame);
@@ -289,9 +320,11 @@ package body GUI is
       Status_Box.Pack_Start (Logging_Frame);
 
       Gtk.Frame.Gtk_New (Emul_Frame);
-      Gtk.Label.Gtk_New (Emul_Label, "D210");
+      Gtk.Label.Gtk_New (Emul_Label, "D100");
       Emul_Frame.Add (Emul_Label);
       Status_Box.Pack_Start (Emul_Frame);
+
+      SB_Timeout := SB_Timeout_P.Timeout_Add (1000, Update_Status_Box_CB'Access, Status_Box);
 
       return Status_Box;
    end Create_Status_Box;
