@@ -3,6 +3,9 @@ DasherA is a free terminal emulator for Data General DASHER series character-bas
 
 ## Key Features
 
+(This will be updated as features from DasherG are ported across...)
+
+* DASHER D200 & D210 Emulation
 * Network Interface (Telnet) support
 * Reverse video, blinking, dim and underlined characters
 * Pixel-for-pixel copy of D410 character set
