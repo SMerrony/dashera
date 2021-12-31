@@ -63,6 +63,14 @@ package body Keyboard is
       return MB;
    end Modify;
 
+   procedure Enqueue_Pair (B1, B2 : in Byte) is
+      BA : Byte_Arr(1..2);
+   begin
+      BA(1) := B1;
+      BA(2) := B2;
+      Queues.Keyboard_Enqueue (BA);
+   end Enqueue_Pair;
+
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is
       Char_Byte : Byte;
    begin
@@ -86,21 +94,21 @@ package body Keyboard is
 
          when GDK_Escape => Enqueue_Key (Dasher_Escape);
 
-         when GDK_F1  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (113));
-         when GDK_F2  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (114));
-         when GDK_F3  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (115));
-         when GDK_F4  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (116));
-         when GDK_F5  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (117));
-         when GDK_F6  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (118));
-         when GDK_F7  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (119));
-         when GDK_F8  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (120));
-         when GDK_F9  => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (121));
-         when GDK_F10 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (122));
-         when GDK_F11 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (123));
-         when GDK_F12 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (124));
-         when GDK_F13 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (125));
-         when GDK_F14 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (126));
-         when GDK_F15 => Enqueue_Key (Dasher_Command); Enqueue_Key (Modify (112));
+         when GDK_F1  => Enqueue_Pair (Dasher_Command, Modify (113));
+         when GDK_F2  => Enqueue_Pair (Dasher_Command, Modify (114));
+         when GDK_F3  => Enqueue_Pair (Dasher_Command, Modify (115));
+         when GDK_F4  => Enqueue_Pair (Dasher_Command, Modify (116));
+         when GDK_F5  => Enqueue_Pair (Dasher_Command, Modify (117));
+         when GDK_F6  => Enqueue_Pair (Dasher_Command, Modify (118));
+         when GDK_F7  => Enqueue_Pair (Dasher_Command, Modify (119));
+         when GDK_F8  => Enqueue_Pair (Dasher_Command, Modify (120));
+         when GDK_F9  => Enqueue_Pair (Dasher_Command, Modify (121));
+         when GDK_F10 => Enqueue_Pair (Dasher_Command, Modify (122));
+         when GDK_F11 => Enqueue_Pair (Dasher_Command, Modify (123));
+         when GDK_F12 => Enqueue_Pair (Dasher_Command, Modify (124));
+         when GDK_F13 => Enqueue_Pair (Dasher_Command, Modify (125));
+         when GDK_F14 => Enqueue_Pair (Dasher_Command, Modify (126));
+         when GDK_F15 => Enqueue_Pair (Dasher_Command, Modify (112));
 
          when others =>
             if Key < 256 then

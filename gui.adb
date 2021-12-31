@@ -17,9 +17,12 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
 with Gdk.Event;               use Gdk.Event;
+with Gdk.Threads;
+with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
 
 with Glib;                    use Glib;
 
@@ -284,8 +287,108 @@ package body GUI is
       return Menu_Bar;
    end Create_Menu_Bar;
 
-  function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Hbox) return Boolean is
+   function Create_Keys_Box return Gtk.Box.Gtk_Hbox is
+      Keys_Box :  Gtk.Box.Gtk_Hbox;
+      Break_Btn, Er_Pg_Btn, Loc_Pr_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
    begin
+      Gtk.Box.Gtk_New_Hbox (Keys_Box, True, 2);
+      Gtk.Button.Gtk_New (Break_Btn, "Break");
+      Keys_Box.Add (Break_Btn);
+
+      Gtk.Button.Gtk_New (Er_Pg_Btn, "Er.Pg");
+      Keys_Box.Add (Er_Pg_Btn);
+
+      Gtk.Button.Gtk_New (Loc_Pr_Btn, "Loc. Pr");
+      Keys_Box.Add (Loc_Pr_Btn);
+
+      Gtk.Button.Gtk_New (Er_EOL_Btn, "Er.EOL");
+      Keys_Box.Add (Er_EOL_Btn);
+
+      Gtk.Button.Gtk_New (CR_Btn, "CR");
+      Keys_Box.Add (CR_Btn);
+
+      Gtk.Button.Gtk_New (Hold_Btn, "Hold");
+      Keys_Box.Add (Hold_Btn);
+
+      return Keys_Box;
+   end Create_Keys_Box;
+
+   procedure Handle_FKey_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
+      Lab : constant String := Btn.Get_Label;
+   begin
+      Ada.Text_IO.Put_Line ("DEBUG: Handle_FKey_Btn_CB called for " & Lab);
+      -- case Btn.Get_Label is
+      --    when "F1" => Keyboard.Handle_Key_Release (GDK_F1);
+      --    when others => null;
+      -- end case;
+      if Lab = "F1" then
+         Keyboard.Handle_Key_Release (GDK_F1);
+      elsif Lab = "F1" then
+         Keyboard.Handle_Key_Release (GDK_F1);
+      elsif Lab = "F2" then
+         Keyboard.Handle_Key_Release (GDK_F2);
+      elsif Lab = "F3" then
+         Keyboard.Handle_Key_Release (GDK_F3);
+      elsif Lab = "F4" then
+         Keyboard.Handle_Key_Release (GDK_F4);
+      elsif Lab = "F5" then
+         Keyboard.Handle_Key_Release (GDK_F5);
+      elsif Lab = "F6" then
+         Keyboard.Handle_Key_Release (GDK_F6);
+      elsif Lab = "F7" then
+         Keyboard.Handle_Key_Release (GDK_F7);
+      elsif Lab = "F8" then
+         Keyboard.Handle_Key_Release (GDK_F8);
+      elsif Lab = "F9" then
+         Keyboard.Handle_Key_Release (GDK_F9);
+      elsif Lab = "F10" then
+         Keyboard.Handle_Key_Release (GDK_F10);
+      elsif Lab = "F11" then
+         Keyboard.Handle_Key_Release (GDK_F11);
+      elsif Lab = "F12" then
+         Keyboard.Handle_Key_Release (GDK_F12);
+      elsif Lab = "F13" then
+         Keyboard.Handle_Key_Release (GDK_F13);
+      elsif Lab = "F14" then
+         Keyboard.Handle_Key_Release (GDK_F14);  
+      elsif Lab = "F5" then
+         Keyboard.Handle_Key_Release (GDK_F15);                                                                                                                            
+      end if;
+   end Handle_FKey_Btn_CB;
+
+   function Create_FKeys_Box return Gtk.Box.Gtk_Hbox is
+      FKeys_Box :  Gtk.Box.Gtk_Hbox;
+      FKeys : array(1 .. 15) of Gtk.Button.Gtk_Button;
+   begin
+      Gtk.Box.Gtk_New_Hbox (FKeys_Box, True, 2);  
+      for N in FKeys'Range loop
+         declare
+            Lab : constant String := N'Image;
+         begin
+            Gtk.Button.Gtk_New(FKeys(N), "F" & Ada.Strings.Fixed.Trim (Lab, Ada.Strings.Both));
+            FKeys(N).On_Clicked (Handle_FKey_Btn_CB'Access);
+         end;
+      end loop; 
+      -- we want labels between the groups of 5 f-key buttons
+      for F in 1 .. 5 loop
+         FKeys_Box.Add (FKeys(F));
+      end loop;
+      Gtk.Label.Gtk_New (L_FKeys_Label, " ");
+      FKeys_Box.Add (L_FKeys_Label);
+      for F in 6 .. 10 loop
+         FKeys_Box.Add (FKeys(F));
+      end loop;
+      Gtk.Label.Gtk_New (R_FKeys_Label, " ");
+      FKeys_Box.Add (R_FKeys_Label);
+      for F in 11 .. 15 loop
+         FKeys_Box.Add (FKeys(F));
+      end loop;
+      return FKeys_Box;
+   end Create_FKeys_Box;  
+
+   function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Hbox) return Boolean is
+   begin
+      Gdk.Threads.Enter;
       case Term.Connection is
          when Terminal.Local =>   Online_Label.Set_Text ("Local (Disconnected)");
          when Terminal.Async =>   Online_Label.Set_Text ("Online (Serial)");
@@ -295,6 +398,7 @@ package body GUI is
          when Terminal.D200 => Emul_Label.Set_Text ("D200");
          when Terminal.D210 => Emul_Label.Set_Text ("D210");
       end case;
+      Gdk.Threads.Leave;
       SB.Queue_Draw;
       return True;
    end Update_Status_Box_CB;
@@ -345,7 +449,10 @@ package body GUI is
       -- Menu
       VBox.Pack_Start (Create_Menu_Bar);
 
-      -- Virtual Function Keys and Template
+      -- Virtual Keys, Function Keys and Template
+      VBox.Pack_Start (Create_Keys_Box);
+      -- TODO All the labels
+      VBox.Pack_Start (Create_FKeys_Box);
 
       -- CRT area
       Display.Init;
