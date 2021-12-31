@@ -56,7 +56,8 @@ package GUI is
 
    Telnet_Sess : Telnet.Session_Acc_T;
    Term        : Terminal.Terminal_Acc_T;
-   Online_Label, Host_Label, Logging_Label, Emul_Label : Gtk.Label.Gtk_Label;
+   Online_Label, Host_Label, Logging_Label, 
+   Emul_Label, Hold_Label : Gtk.Label.Gtk_Label;
    SB_Timeout  : Glib.Main.G_Source_ID := 0;
 
    function Create_Window return Gtk.Window.Gtk_Window;

@@ -94,6 +94,8 @@ package body Keyboard is
 
          when GDK_Escape => Enqueue_Key (Dasher_Escape);
 
+         -- N.B. At least on Debian with $TERM set to "d210-dg", the host
+         -- expects both bytes to arrive in the same packet...
          when GDK_F1  => Enqueue_Pair (Dasher_Command, Modify (113));
          when GDK_F2  => Enqueue_Pair (Dasher_Command, Modify (114));
          when GDK_F3  => Enqueue_Pair (Dasher_Command, Modify (115));
@@ -109,6 +111,10 @@ package body Keyboard is
          when GDK_F13 => Enqueue_Pair (Dasher_Command, Modify (125));
          when GDK_F14 => Enqueue_Pair (Dasher_Command, Modify (126));
          when GDK_F15 => Enqueue_Pair (Dasher_Command, Modify (112));
+
+         -- Special codes from the virtual key buttons on the GUI
+         when GDK_3270_EraseEOF => Enqueue_Key (Dasher_Erase_Page);
+         when GDK_3270_EraseInput => Enqueue_Key (Dasher_Erase_EOL);      
 
          when others =>
             if Key < 256 then

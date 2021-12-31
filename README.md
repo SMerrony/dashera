@@ -15,3 +15,9 @@ Here is the full [Implementation Chart](implementationChart.md) for DasherA.
 ## Download
 DasherA is [hosted on GitHub](https://github.com/SMerrony/dashera).
 
+## Operational Notes
+* The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the
+numeric keypad enter key (if present).
+* The DASHER 'Hold' key is available from both the GUI 'Hold' button and the PC-style 'Pause'
+button (if present).
+

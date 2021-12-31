@@ -287,27 +287,52 @@ package body GUI is
       return Menu_Bar;
    end Create_Menu_Bar;
 
+   procedure Handle_Key_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
+      Lab : constant String := Btn.Get_Label;
+   begin
+      if Lab = "Break" then
+         Keyboard.Handle_Key_Release (GDK_Break); -- TODO Serial BREAK handling
+      elsif Lab = "Er.Page" then
+         Keyboard.Handle_Key_Release (GDK_3270_EraseEOF);
+      elsif Lab = "Loc.Print" then
+         Keyboard.Handle_Key_Release (GDK_3270_PrintScreen);  -- TODO Local Print
+      elsif Lab = "Er.EOL" then
+         Keyboard.Handle_Key_Release (GDK_3270_EraseInput);   
+      elsif Lab = "CR" then
+         Keyboard.Handle_Key_Release (GDK_KP_Enter);
+      elsif Lab = "Hold" then
+         Term.Holding := not Term.Holding;
+      end if; 
+   end Handle_Key_Btn_CB;
+
    function Create_Keys_Box return Gtk.Box.Gtk_Hbox is
       Keys_Box :  Gtk.Box.Gtk_Hbox;
       Break_Btn, Er_Pg_Btn, Loc_Pr_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
    begin
       Gtk.Box.Gtk_New_Hbox (Keys_Box, True, 2);
       Gtk.Button.Gtk_New (Break_Btn, "Break");
+      Break_Btn.Set_Tooltip_Text ("Send BREAK signal on Serial Connection");
+      Break_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Break_Btn);
 
-      Gtk.Button.Gtk_New (Er_Pg_Btn, "Er.Pg");
+      Gtk.Button.Gtk_New (Er_Pg_Btn, "Er.Page");
+      Er_Pg_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Er_Pg_Btn);
 
-      Gtk.Button.Gtk_New (Loc_Pr_Btn, "Loc. Pr");
+      Gtk.Button.Gtk_New (Loc_Pr_Btn, "Loc.Print");
+      Loc_Pr_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Loc_Pr_Btn);
 
       Gtk.Button.Gtk_New (Er_EOL_Btn, "Er.EOL");
+      Er_EOL_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Er_EOL_Btn);
 
       Gtk.Button.Gtk_New (CR_Btn, "CR");
+      CR_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (CR_Btn);
 
       Gtk.Button.Gtk_New (Hold_Btn, "Hold");
+      Hold_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Hold_Btn);
 
       return Keys_Box;
@@ -317,10 +342,6 @@ package body GUI is
       Lab : constant String := Btn.Get_Label;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Handle_FKey_Btn_CB called for " & Lab);
-      -- case Btn.Get_Label is
-      --    when "F1" => Keyboard.Handle_Key_Release (GDK_F1);
-      --    when others => null;
-      -- end case;
       if Lab = "F1" then
          Keyboard.Handle_Key_Release (GDK_F1);
       elsif Lab = "F1" then
@@ -392,12 +413,17 @@ package body GUI is
       case Term.Connection is
          when Terminal.Local =>   Online_Label.Set_Text ("Local (Disconnected)");
          when Terminal.Async =>   Online_Label.Set_Text ("Online (Serial)");
-         when Terminal.Network => Online_Label.Set_Text ("Online (Telnet): ");
+         when Terminal.Network => Online_Label.Set_Text ("Online (Telnet)");
       end case;
       case Term.Emulation is
          when Terminal.D200 => Emul_Label.Set_Text ("D200");
          when Terminal.D210 => Emul_Label.Set_Text ("D210");
       end case;
+      if Term.Holding then
+         Hold_Label.Set_Text ("HOLD");
+      else
+         Hold_Label.Set_Text ("");
+      end if;
       Gdk.Threads.Leave;
       SB.Queue_Draw;
       return True;
@@ -405,7 +431,7 @@ package body GUI is
 
    function Create_Status_Box return Gtk.Box.Gtk_Hbox is
       Status_Box : Gtk.Box.Gtk_Hbox;
-      Online_Frame, Host_Frame, Logging_Frame, Emul_Frame : Gtk.Frame.Gtk_Frame;
+      Online_Frame, Host_Frame, Logging_Frame, Emul_Frame, Hold_Frame : Gtk.Frame.Gtk_Frame;
    begin
       Gtk.Box.Gtk_New_Hbox (Status_Box, True, 2);
       Gtk.Frame.Gtk_New (Online_Frame);
@@ -427,6 +453,11 @@ package body GUI is
       Gtk.Label.Gtk_New (Emul_Label, "D100");
       Emul_Frame.Add (Emul_Label);
       Status_Box.Pack_Start (Emul_Frame);
+
+      Gtk.Frame.Gtk_New (Hold_Frame);
+      Gtk.Label.Gtk_New (Hold_Label, "");
+      Hold_Frame.Add (Hold_Label);
+      Status_Box.Pack_Start (Hold_Frame);
 
       SB_Timeout := SB_Timeout_P.Timeout_Add (1000, Update_Status_Box_CB'Access, Status_Box);
 
