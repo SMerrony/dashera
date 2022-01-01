@@ -18,6 +18,18 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
 * Telnet - handle the Telnet protocol
 * Terminal - implements the Dasher behaviour
 
+### Hierarchy
+```
+                               Dashera
+                                  |
+                                 GUI
+                                  |
+             ----------------------------------------------
+             |        |           |          |             |
+            Crt    Display    Keyboard    Telnet       Terminal   
+             |        |
+         BDF_Font   Cell
+```
 
 ## Build and Clean
 

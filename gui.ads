@@ -21,6 +21,7 @@
 
 with Glib.Main;
 
+with Gtk.Adjustment;   
 with Gtk.Box;
 with Gtk.Handlers;
 with Gtk.Label;
@@ -53,6 +54,7 @@ package GUI is
    Main_Window : Gtk.Window.Gtk_Window;
    Vbox : Gtk.Box.Gtk_Vbox;
    Hbox : Gtk.Box.Gtk_Hbox;
+   Adj : Gtk.Adjustment.Gtk_Adjustment;
    L_FKeys_Label, R_FKeys_Label : Gtk.Label.Gtk_Label;
 
    Telnet_Sess : Telnet.Session_Acc_T;

@@ -43,7 +43,6 @@ package body Terminal is
       T.Skip_Byte := False;
       T.Holding := False;
       T.Logging := False;
-      T.Scrolled_Back := False;
       T.Expecting := False;
       T.Raw_Mode := False;
       T.Blinking := False;

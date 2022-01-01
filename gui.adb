@@ -28,7 +28,6 @@ with Glib;                    use Glib;
 
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
 -- with Gtk.Action;
-with Gtk.Adjustment;          -- use Gtk.Adjustment;
 with Gtk.Button;
 with Gtk.Dialog;              use Gtk.Dialog;
 with Gtk.Drawing_Area;
@@ -430,18 +429,28 @@ package body GUI is
       return True;
    end Update_Status_Box_CB;
 
+   procedure Adj_Changed_CB (Self : access Gtk.Adjustment.Gtk_Adjustment_Record'Class) is
+      Posn : constant Natural := Natural(Self.Get_Value);
+   begin
+      Ada.Text_IO.Put_Line ("DEBUG: Adj changed to " & Posn'Image);
+      if Posn = Display.History_Lines then
+         Display.Cancel_Scroll_Back;
+      else
+         Display.Scroll_Back (Display.History_Lines - Posn);
+      end if;
+   end Adj_Changed_CB;
+
    function Create_Scrollbar return Gtk.Scrollbar.Gtk_Vscrollbar is
-      Adj : Gtk.Adjustment.Gtk_Adjustment;
       SB  : Gtk.Scrollbar.Gtk_Vscrollbar;
    begin
       Gtk.Adjustment.Gtk_New (Adjustment => Adj, 
-                              Value => 0.0, 
+                              Value => Gdouble(History_Lines), 
                               Lower => 0.0, 
                               Upper => Gdouble(History_Lines), 
                               Step_Increment => 1.0, 
-                              Page_Increment => 1.0, 
-                              Page_Size => 1.0);
+                              Page_Increment => 24.0);
       SB := Gtk.Scrollbar.Gtk_Vscrollbar_New (Adj);
+      Adj.On_Value_Changed (Adj_Changed_CB'Access, False);
       return SB;
    end Create_Scrollbar;
 

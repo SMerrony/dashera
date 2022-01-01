@@ -45,9 +45,10 @@ package Display is
       First, Last : Natural;
    end record;
 
-   Disp    : Display_T;
-   History : History_T;
+   Disp, Saved_Disp   : Display_T;
+   History            : History_T;
    Empty_History_Line : History_Line;
+   Scrolled_Back : Boolean;
 
    procedure Init;
    procedure Clear_Cell (Line, Col : in Integer);
@@ -66,5 +67,6 @@ package Display is
 
    function Get_Nth_History_Line (N : in Natural) return History_Line;
 
-
+   procedure Scroll_Back (Start_Line : in Natural);
+   procedure Cancel_Scroll_Back;
 end Display;

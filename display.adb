@@ -46,6 +46,7 @@ package body Display is
       for C in Empty_History_Line'Range loop
          Empty_History_Line(C).Clear_To_Space;
       end loop;
+      Scrolled_Back := False;
    end Init;
 
    procedure Clear_Cell (Line, Col : in Integer) is
@@ -99,6 +100,14 @@ package body Display is
       Add_To_History (HL);
    end Copy_Line_To_History;
 
+   procedure Copy_Line_From_History (Src, Dest : in Natural) is
+      HL : constant History_Line := Get_Nth_History_Line (Src);
+   begin
+      for Col in 0 .. Total_Cols - 1 loop
+         Disp.Cells(Dest,Col).Copy_From (HL(Col));
+      end loop;
+   end Copy_Line_From_History;
+
    function Get_Nth_History_Line (N : in Natural) return History_Line is
       HL : History_Line;
       Ix : Integer;
@@ -114,5 +123,41 @@ package body Display is
       end if;
       return HL;
    end Get_Nth_History_Line;
+
+   procedure Scroll_Back (Start_Line : in Natural) is
+   begin
+      if not Scrolled_Back then
+         Saved_Disp := Disp;
+         Scrolled_Back := True;
+      end if;
+	   -- there are two cases: we are already scrolled back beyond the 'live' screen, 
+      -- or we are partially showing it
+	   if Start_Line < Disp.Visible_Lines then
+         declare
+            On_Screen_Line, Live_Line : Natural := 0;
+         begin
+            for HL in reverse 0 .. Start_Line loop
+               Copy_Line_From_History (HL, On_Screen_Line);
+               On_Screen_Line := On_Screen_Line + 1;
+            end loop;
+            while On_Screen_Line < Disp.Visible_Lines loop
+               Copy_Line_From_History (Live_Line, On_Screen_Line);
+               Live_Line := Live_Line + 1;
+               On_Screen_Line := On_Screen_Line + 1;
+            end loop;
+         end;
+      else
+         -- all 'history' - easier
+         for L in 0 .. Disp.Visible_Lines loop
+            Copy_Line_From_History (Start_Line - L, L);
+         end loop;
+      end if;
+   end Scroll_Back;
+
+   procedure Cancel_Scroll_Back is
+   begin 
+      Disp := Saved_Disp;
+      Scrolled_Back := False;
+   end Cancel_Scroll_Back;
 
 end Display;

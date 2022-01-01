@@ -32,7 +32,7 @@ package Terminal is
       Getting_X_Addr, Getting_Y_Addr   : Boolean;
       New_X_Addr, New_Y_Addr           : Natural;
       Roll_Enabled, Protection_Enabled : Boolean;
-      Holding, Logging, Scrolled_Back  : Boolean;
+      Holding, Logging                 : Boolean;
       Skip_Byte                        : Boolean;
       Expecting                        : Boolean;
       Raw_Mode : Boolean; -- in rawMode all host data is passed straight through to rawChan
