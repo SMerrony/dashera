@@ -352,12 +352,12 @@ package body Terminal is
                   T.Scroll_Up (1);
                else
                   T.Cursor_Y := 0;
-                  Display.Clear_Line (Display.Disp, T.Cursor_Y);
+                  Display.Clear_Line (T.Cursor_Y);
                end if;
             else
                T.Cursor_Y := T.Cursor_Y + 1;
                if not T.Roll_Enabled then
-                  Display.Clear_Line (Display.Disp, T.Cursor_Y);
+                  Display.Clear_Line (T.Cursor_Y);
                end if;
             end if;
             T.Cursor_X := 0;
@@ -395,12 +395,12 @@ package body Terminal is
    procedure Scroll_Up (T : in out Terminal_T; Lines : in Integer) is
    begin
       for L in 1 .. Lines loop
-         -- TODO History
+         Display.Copy_Line_To_History ( 0);
          for R in 1 .. Display.Disp.Visible_Lines loop
-            Display.Copy_Line (This => Display.Disp, Src => R, Dest => R - 1);
-            Display.Clear_Line (Display.Disp, R);
+            Display.Copy_Line (Src => R, Dest => R - 1);
+            Display.Clear_Line (R);
          end loop;
-         Display.Clear_Line (Display.Disp, Display.Disp.Visible_Lines - 1);
+         Display.Clear_Line (Display.Disp.Visible_Lines - 1);
       end loop;
    end Scroll_Up;
 

@@ -41,24 +41,29 @@ package body Display is
       Disp.Cells(12,39).Char_Value := 'O';
       Disp.Cells(12,40).Char_Value := 'K';
       Disp.Blink_Enabled := True;
+      History.First := 0;
+      History.Last  := 0;
+      for C in Empty_History_Line'Range loop
+         Empty_History_Line(C).Clear_To_Space;
+      end loop;
    end Init;
 
-   procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer) is
+   procedure Clear_Cell (Line, Col : in Integer) is
    begin
-      This.Cells(Line, Col).Clear_To_Space;
+      Disp.Cells(Line, Col).Clear_To_Space;
    end Clear_Cell;
 
-   procedure Clear_Line (This : in out Display_T; Line : in Integer) is
+   procedure Clear_Line (Line : in Integer) is
    begin
       for Col in 0 .. Total_Cols - 1 loop
-         This.Cells(Line, Col).Clear_To_Space;
+         Disp.Cells(Line, Col).Clear_To_Space;
       end loop;
    end Clear_Line;
 
-   procedure Copy_Line (This : in out Display_T; Src, Dest : Integer) is
+   procedure Copy_Line (Src, Dest : in Integer) is
    begin
       for Col in 0 .. Total_Cols - 1 loop
-         This.Cells(Dest,Col).Copy_From (Display.Disp.Cells(Src,Col));
+         Disp.Cells(Dest,Col).Copy_From (Disp.Cells(Src,Col));
       end loop;
    end Copy_Line;
 
@@ -67,5 +72,47 @@ package body Display is
       Disp.Cursor_X := X;
       Disp.Cursor_Y := Y;
    end Set_Cursor;
+
+   procedure Add_To_History (HL : in History_Line) is
+   begin
+      History.Last := History.Last + 1;
+      if History.Last = History_Lines then
+         -- wrap-around
+         History.Last := 0;
+      end if;
+      -- has the tail hit the head?
+      if History.Last = History.First then
+         History.First := History.First + 1;
+         if History.First = History_Lines then
+            History.First := 0;
+         end if;
+      end if;
+      History.Lines(History.Last) := HL;
+   end Add_To_History;
+
+   procedure Copy_Line_To_History (Src : in Integer) is
+      HL : History_Line;
+   begin
+      for Col in 0 .. Total_Cols - 1 loop
+         HL(Col).Copy_From (Disp.Cells(Src,Col));
+      end loop;
+      Add_To_History (HL);
+   end Copy_Line_To_History;
+
+   function Get_Nth_History_Line (N : in Natural) return History_Line is
+      HL : History_Line;
+      Ix : Integer;
+   begin
+      if History.First = History.Last then -- no history yet
+         HL := Empty_History_Line;
+      else
+         Ix := History.Last - N;
+         if Ix < 0 then
+            Ix := Ix + History_Lines;
+         end if;
+         HL := History.Lines(Ix);
+      end if;
+      return HL;
+   end Get_Nth_History_Line;
 
 end Display;

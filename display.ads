@@ -24,10 +24,13 @@ package Display is
    Default_Lines : constant Natural := 24;
    Default_Cols  : constant Natural := 80;
 
-   Total_Lines : constant Natural := 96;
-   Total_Cols  : constant Natural := 208;
+   Total_Lines   : constant Natural := 96;
+   Total_Cols    : constant Natural := 208;
+   History_Lines : constant Natural := 1000;
 
-   type Cell_Array is array(0..Total_Lines-1,0..Total_Cols-1) of Cell.Cell_T;
+   type Cell_Array    is array(0..Total_Lines-1, 0..Total_Cols-1) of Cell.Cell_T;
+   type History_Line  is array(0..Total_Cols-1)    of Cell.Cell_T;
+   type History_Array is array(0..History_Lines-1) of History_Line;
 
    type Display_T is record
       Cells : Cell_Array;
@@ -37,17 +40,31 @@ package Display is
       Dirty : Boolean;
    end record;
 
-   Disp : Display_T;
+   type History_T is record
+      Lines       : History_Array;
+      First, Last : Natural;
+   end record;
 
-   -- function Create return Display_Acc_T;
+   Disp    : Display_T;
+   History : History_T;
+   Empty_History_Line : History_Line;
+
    procedure Init;
-   procedure Clear_Cell (This : in out Display_T; Line, Col : in Integer);
-   procedure Clear_Line (This : in out Display_T; Line : in Integer);
+   procedure Clear_Cell (Line, Col : in Integer);
+   procedure Clear_Line (Line : in Integer);
    -- procedure Set_Cell (This : in out Display_T;
    --                     Line, Col : in Integer;
    --                     Char : in Character;
    --                     Blink, Dim, Rev, Under, Prot : in Boolean);
-   procedure Copy_Line (This : in out Display_T; Src, Dest : Integer);
+   procedure Copy_Line (Src, Dest : in Integer);
    procedure Set_Cursor (X, Y : in Natural);
+
+   procedure Add_To_History (HL : in History_Line);
+   -- Inserts a line into the circular history buffer
+
+   procedure Copy_Line_To_History (Src : in Integer);
+
+   function Get_Nth_History_Line (N : in Natural) return History_Line;
+
 
 end Display;

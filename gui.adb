@@ -20,15 +20,15 @@
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
-with Gdk.Event;               use Gdk.Event;
+with Gdk.Event;               -- use Gdk.Event;
 with Gdk.Threads;
 with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
 
 with Glib;                    use Glib;
 
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
-with Gtk.Action;
-with Gtk.Adjustment;
+-- with Gtk.Action;
+with Gtk.Adjustment;          -- use Gtk.Adjustment;
 with Gtk.Button;
 with Gtk.Dialog;              use Gtk.Dialog;
 with Gtk.Drawing_Area;
@@ -38,9 +38,10 @@ with Gtk.Frame;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
-with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
+-- with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
 with Gtk.Menu_Item;           use Gtk.Menu_Item;
 with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
+with Gtk.Scrollbar;           use Gtk.Scrollbar;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 -- with Gtk.Scrollbar;
 -- with Gtk.Table;
@@ -429,6 +430,21 @@ package body GUI is
       return True;
    end Update_Status_Box_CB;
 
+   function Create_Scrollbar return Gtk.Scrollbar.Gtk_Vscrollbar is
+      Adj : Gtk.Adjustment.Gtk_Adjustment;
+      SB  : Gtk.Scrollbar.Gtk_Vscrollbar;
+   begin
+      Gtk.Adjustment.Gtk_New (Adjustment => Adj, 
+                              Value => 0.0, 
+                              Lower => 0.0, 
+                              Upper => Gdouble(History_Lines), 
+                              Step_Increment => 1.0, 
+                              Page_Increment => 1.0, 
+                              Page_Size => 1.0);
+      SB := Gtk.Scrollbar.Gtk_Vscrollbar_New (Adj);
+      return SB;
+   end Create_Scrollbar;
+
    function Create_Status_Box return Gtk.Box.Gtk_Hbox is
       Status_Box : Gtk.Box.Gtk_Hbox;
       Online_Frame, Host_Frame, Logging_Frame, Emul_Frame, Hold_Frame : Gtk.Frame.Gtk_Frame;
@@ -475,7 +491,7 @@ package body GUI is
       Main_Window.On_Destroy (Window_Close_CB'Access);
 
       -- Everything is in a Vbox...
-      Gtk.Box.Gtk_New_Vbox (Vbox, Homogeneous => False, Spacing => 1);
+      Gtk.Box.Gtk_New_Vbox (Box => Vbox, Homogeneous => False, Spacing => 2);
 
       -- Menu
       VBox.Pack_Start (Create_Menu_Bar);
@@ -491,8 +507,13 @@ package body GUI is
       Crt.Init (Zoom => BDF_Font.Normal);
       Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
       Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-      VBox.Pack_Start (Crt.Tube.DA);
+      -- VBox.Pack_Start (Crt.Tube.DA);
 
+      Gtk.Box.Gtk_New_Hbox (Box => Hbox, Homogeneous => False, Spacing => 1);
+      Hbox.Pack_Start (Crt.Tube.DA);
+      Hbox.Pack_End (Create_Scrollbar);
+      VBox.Pack_Start (Hbox);
+      
       -- Status Bar
       VBox.Pack_End (Create_Status_Box);
 
