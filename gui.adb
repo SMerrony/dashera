@@ -432,7 +432,7 @@ package body GUI is
    procedure Adj_Changed_CB (Self : access Gtk.Adjustment.Gtk_Adjustment_Record'Class) is
       Posn : constant Natural := Natural(Self.Get_Value);
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Adj changed to " & Posn'Image);
+      -- Ada.Text_IO.Put_Line ("DEBUG: Adj changed to " & Posn'Image);
       if Posn = Display.History_Lines then
          Display.Cancel_Scroll_Back;
       else

@@ -20,6 +20,8 @@
 with "gtkada";
 
 project Dashera is
+   type Mode_Type is ("debug", "profile", "release"); -- all possible values
+   Mode : Mode_Type := external ("mode", "debug"); -- default
 
    for Languages use ("Ada");
    for Main use ("dashera.adb");
@@ -28,9 +30,16 @@ project Dashera is
    for Exec_Dir use "obj/";
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-O0", "-gnatwa", "-p", "-fstack-check");
-      --   & External_As_List ("ADAFLAGS", " ");
+      case Mode is
+         when "debug" =>
+            for Switches ("Ada") use ("-g", "-O0", "-gnatwa", "-p", "-fstack-check");
+         when "profile" =>
+            for Switches ("Ada") use ("-g", "-pg");
+         when "release" =>
+            for Switches ("Ada") use ("-O0");
+      end case;
    end Compiler;
+
    -- package Linker is
    --    for Leading_Switches ("Ada") use External_As_List("LDFLAGS", " ");
    -- end Linker;

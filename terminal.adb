@@ -23,7 +23,6 @@ with Ada.Strings.Fixed;
 with BDF_Font;
 with Crt;
 with Display;
-with Queues;
 
 package body Terminal is
 
@@ -132,15 +131,14 @@ package body Terminal is
       end Start;
       loop
          select
-            delay 0.1; --0.05; -- 20Hz
-               if Term.Connection = Local then
-                  if Queues.Keyboard_Data_Waiting then
-                     Term.Process (Queues.Keyboard_Dequeue);
-                  end if;
-               end if;
+            accept Accept_Data (BA : in Byte_Arr) do
+               Term.Process (BA);
+            end Accept_Data;
          or
             accept Stop;
                exit;
+         or 
+            terminate;
          end select;
       end loop;
    end Processor;
@@ -297,7 +295,7 @@ package body Terminal is
                   B3_Arr(1) := 31;
                   B3_Arr(2) := Byte(T.Cursor_X);
                   B3_Arr(3) := Byte(T.Cursor_Y);
-                  Queues.Keyboard_Enqueue (B3_Arr);
+                  -- FIXME Queues.Keyboard_Enqueue (B3_Arr);
                end;
                T.Skip_Byte := True;
             when Dasher_Rev_On =>

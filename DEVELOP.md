@@ -45,6 +45,8 @@ Then...
 * `gprbuild`
 * `gprclean`
 
+Default build is with debugging and without optimisation.  Append `-Xmode=release` for optimised build.
+
 ## Run with Fatal Warnings...
 `./obj/dashera --gtk-fatal-warnings --g-fatal--warnings`
 

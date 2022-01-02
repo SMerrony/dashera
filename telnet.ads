@@ -67,6 +67,7 @@ package Telnet is
 
 	task Keyboard_Sender is
       entry Start (S : in Session_Acc_T);
+		entry Accept_Data (BA : in Byte_Arr);
       entry Stop;
    end Keyboard_Sender;
 

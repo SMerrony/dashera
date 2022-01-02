@@ -21,8 +21,6 @@ with Ada.Streams;	use Ada.Streams;
 with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
-with Queues;
-
 package body Telnet is
 
 	function New_Connection (Host_Str : in String; 
@@ -53,15 +51,14 @@ package body Telnet is
       end Start;
       loop
          select
-         delay 0.05;
-            if Sess.Term.Connection = Terminal.Network then
-               if Queues.Keyboard_Data_Waiting then
-                  Send (Sess, Queues.Keyboard_Dequeue);
-               end if;
-            end if;
+            accept Accept_Data (BA : in Byte_Arr) do
+               Send (Sess, BA);
+            end Accept_Data;
          or
             accept Stop;
-            exit;
+               exit;
+         or 
+            terminate;
          end select;
 
       end loop;

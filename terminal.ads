@@ -52,6 +52,7 @@ package Terminal is
 
    task Processor is
       entry Start (T : in Terminal_Acc_T);
+      entry Accept_Data (BA : in Byte_Arr);
       entry Stop;
    end Processor;
 
