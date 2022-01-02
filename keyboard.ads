@@ -29,8 +29,6 @@ package Keyboard is
 
    procedure Init               (Term : in Terminal_Acc_T);
    
-   procedure Set_Destination    (Dest : in Connection_T);
-
    procedure Handle_Key_Press   (Key  : in Gdk_Key_Type);
 
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type);

@@ -23,6 +23,7 @@ with Ada.Strings.Fixed;
 with BDF_Font;
 with Crt;
 with Display;
+with Redirector;
 
 package body Terminal is
 
@@ -295,7 +296,7 @@ package body Terminal is
                   B3_Arr(1) := 31;
                   B3_Arr(2) := Byte(T.Cursor_X);
                   B3_Arr(3) := Byte(T.Cursor_Y);
-                  -- FIXME Queues.Keyboard_Enqueue (B3_Arr);
+                  Redirector.Send_Data (B3_Arr);
                end;
                T.Skip_Byte := True;
             when Dasher_Rev_On =>

@@ -17,21 +17,18 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-package Cell is
+with Dasher_Codes; use Dasher_Codes;
+with Terminal;     use Terminal;
+
+package Redirector is
 
    pragma Elaborate_Body;
 
-   type Cell_T is tagged record
-      Char_Value                           : Character;
-      Blink, Dim, Rev, Underscore, Protect : Boolean;
-   end record;
+   procedure Set_Destination (Dest : in Connection_T);
 
-   procedure Set
-     (This                      : in out Cell_T; Value : in Character;
-      Blnk, Dm, Rv, Under, Prot : in     Boolean);
-   procedure Clear_To_Space (This : in out Cell_T);
+   procedure Send_Data (BA : in Byte_Arr);
+   procedure Handle_Data (BA : in Byte_Arr);
 
-   procedure Copy_From (C : in out Cell_T; Src : in Cell_T);
+   Destination : Connection_T;
 
-
-end Cell;
+end Redirector;

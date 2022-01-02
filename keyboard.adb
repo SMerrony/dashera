@@ -24,7 +24,7 @@ with Ada.Text_IO;
 with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
 
 with Dasher_Codes; use Dasher_Codes;
-with Telnet;
+with Redirector;   
 
 package body Keyboard is
 
@@ -32,11 +32,6 @@ package body Keyboard is
    begin
       Term_Acc := Term;
    end Init;
-
-   procedure Set_Destination (Dest : in Connection_T) is
-   begin
-      Destination := Dest;
-   end Set_Destination;
 
    procedure Handle_Key_Press (Key  : in Gdk_Key_Type) is
    begin
@@ -47,21 +42,12 @@ package body Keyboard is
       end case;
    end Handle_Key_Press;
 
-   procedure Send_Data (BA : in Byte_Arr) is
-   begin
-      case Destination is
-         when Local => Terminal.Processor.Accept_Data (BA);
-         when Async => null;
-         when Network => Telnet.Keyboard_Sender.Accept_Data (BA);
-      end case;
-   end Send_Data;
-
    procedure Enqueue_Key (Byt : in Byte) is 
       BA          : Byte_Arr(1..1);
    begin
       BA(1) := Byt;
       -- Queues.Keyboard_Enqueue (BA);
-      Send_Data (BA);
+      Redirector.Send_Data (BA);
    end Enqueue_Key;
 
 
@@ -79,7 +65,7 @@ package body Keyboard is
       BA(1) := B1;
       BA(2) := B2;
       -- Queues.Keyboard_Enqueue (BA);
-      Send_Data (BA);
+      Redirector.Send_Data (BA);
    end Enqueue_Pair;
 
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is

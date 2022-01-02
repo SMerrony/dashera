@@ -40,7 +40,7 @@ with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
 -- with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
 with Gtk.Menu_Item;           use Gtk.Menu_Item;
 with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
-with Gtk.Scrollbar;           use Gtk.Scrollbar;
+with Gtk.Scrollbar;           -- use Gtk.Scrollbar;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 -- with Gtk.Scrollbar;
 -- with Gtk.Table;
@@ -53,6 +53,7 @@ with BDF_Font;
 with Crt;
 with Display;
 with Keyboard;
+with Redirector;
 
 package body GUI is  
 
@@ -147,7 +148,7 @@ package body GUI is
                Ada.Text_IO.Put_Line ("DEBUG: TODO - Call Telnet-connect...");
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num, Term);
                -- TODO handle exceptions
-               Keyboard.Set_Destination (Terminal.Network);
+               Redirector.Set_Destination (Terminal.Network);
                Term.Connection := Terminal.Network;
                -- Terminal.Processor.Stop;
             end;
@@ -532,7 +533,7 @@ package body GUI is
       -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
       Terminal.Processor.Start (Term);
       Keyboard.Init (Term);
-      Keyboard.Set_Destination (Terminal.Local);
+      Redirector.Set_Destination (Terminal.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 

@@ -47,6 +47,8 @@ Then...
 
 Default build is with debugging and without optimisation.  Append `-Xmode=release` for optimised build.
 
+TODO - why do we need `-gnatJ` switch to resolve problem with Redirector?
+
 ## Run with Fatal Warnings...
 `./obj/dashera --gtk-fatal-warnings --g-fatal--warnings`
 

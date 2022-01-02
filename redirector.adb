@@ -17,21 +17,27 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-package Cell is
+with Telnet;
 
-   pragma Elaborate_Body;
+package body Redirector is
 
-   type Cell_T is tagged record
-      Char_Value                           : Character;
-      Blink, Dim, Rev, Underscore, Protect : Boolean;
-   end record;
+   procedure Set_Destination (Dest : in Connection_T) is
+   begin
+      Destination := Dest;
+   end Set_Destination;
 
-   procedure Set
-     (This                      : in out Cell_T; Value : in Character;
-      Blnk, Dm, Rv, Under, Prot : in     Boolean);
-   procedure Clear_To_Space (This : in out Cell_T);
+   procedure Send_Data (BA : in Byte_Arr) is
+   begin
+      case Destination is
+         when Local => Terminal.Processor.Accept_Data (BA);
+         when Async => null;
+         when Network => Telnet.Keyboard_Sender.Accept_Data (BA);
+      end case;
+   end Send_Data;
 
-   procedure Copy_From (C : in out Cell_T; Src : in Cell_T);
+   procedure Handle_Data (BA : in Byte_Arr) is
+   begin
+      Terminal.Processor.Accept_Data (BA);
+   end Handle_Data;
 
-
-end Cell;
+end Redirector;

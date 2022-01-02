@@ -20,7 +20,7 @@
 with Dasher_Codes;   use Dasher_Codes;
 
 package Terminal is
-
+   
    type Emulation_T is (D200, D210);
    type Connection_T is (Local, Async, Network);
 
