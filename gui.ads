@@ -25,6 +25,7 @@ with Gtk.Adjustment;
 with Gtk.Box;
 with Gtk.Handlers;
 with Gtk.Label;
+with Gtk.Revealer;
 with Gtk.Widget;
 with Gtk.Window; 
 
@@ -56,6 +57,8 @@ package GUI is
    Hbox : Gtk.Box.Gtk_Hbox;
    Adj : Gtk.Adjustment.Gtk_Adjustment;
    L_FKeys_Label, R_FKeys_Label : Gtk.Label.Gtk_Label;
+   Template_Revealer : Gtk.Revealer.Gtk_Revealer;
+   Template_Labels   : array(1..4,1..17) of Gtk.Label.Gtk_Label;
 
    Telnet_Sess : Telnet.Session_Acc_T;
    Term        : Terminal.Terminal_Acc_T;

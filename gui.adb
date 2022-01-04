@@ -34,6 +34,7 @@ with Gtk.Drawing_Area;
 with Gtk.GEntry;
 with Gtk.Enums;
 with Gtk.Frame;
+with Gtk.Grid;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
@@ -378,6 +379,31 @@ package body GUI is
       end if;
    end Handle_FKey_Btn_CB;
 
+   function Create_Template_Labels_Revealer return Gtk.Revealer.Gtk_Revealer is 
+      Template_Rev : Gtk.Revealer.Gtk_Revealer;
+      Template_Grid : Gtk.Grid.Gtk_Grid;
+   begin
+      Gtk.Revealer.Gtk_New (Template_Rev);
+      Gtk.Grid.Gtk_New (Template_Grid);
+      for row in 1 .. 4 loop
+         for col in 1 .. 17 loop
+            Gtk.Label.Gtk_New (Template_Labels(row, col));
+            -- Template_Labels(row, col).Set_Markup ("<small><small>small</small></small>"); -- FIXME debugging
+            Template_Labels(row, col).Set_Size_Request (Width => 54, Height => 30);
+            Template_Grid.Attach (Child => Template_Labels(row, col), Left => Gint(col) - 1, Top => Gint(row) - 1 , Width => 1, Height => 1);
+         end loop;
+      end loop;
+      Template_Labels(1, 6).Set_Markup ("<small><small><b>Ctrl-Shift</b></small></small>");
+      Template_Labels(2, 6).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
+      Template_Labels(3, 6).Set_Markup ("<small><small><b>Shift</b></small></small>");
+      Template_Labels(1, 12).Set_Markup ("<small><small><b>Ctrl-Shift</b></small></small>");
+      Template_Labels(2, 12).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
+      Template_Labels(3, 12).Set_Markup ("<small><small><b>Shift</b></small></small>");
+      Template_Rev.Add (Template_Grid);
+      Template_Rev.Set_Reveal_Child (True); -- FIXME DEBUGGING
+      return Template_Rev;
+   end Create_Template_Labels_Revealer;
+
    function Create_FKeys_Box return Gtk.Box.Gtk_Hbox is
       FKeys_Box :  Gtk.Box.Gtk_Hbox;
       FKeys : array(1 .. 15) of Gtk.Button.Gtk_Button;
@@ -388,6 +414,7 @@ package body GUI is
             Lab : constant String := N'Image;
          begin
             Gtk.Button.Gtk_New(FKeys(N), "F" & Ada.Strings.Fixed.Trim (Lab, Ada.Strings.Both));
+            FKeys(N).Set_Size_Request (Width => 50, Height => 30);
             FKeys(N).On_Clicked (Handle_FKey_Btn_CB'Access);
          end;
       end loop; 
@@ -509,6 +536,8 @@ package body GUI is
       -- Virtual Keys, Function Keys and Template
       VBox.Pack_Start (Create_Keys_Box);
       -- TODO All the labels
+      Template_Revealer := Create_Template_Labels_Revealer;
+      VBox.Pack_Start (Template_Revealer);
       VBox.Pack_Start (Create_FKeys_Box);
 
       -- CRT area
