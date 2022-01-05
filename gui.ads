@@ -23,20 +23,19 @@ with Glib.Main;
 
 with Gtk.Adjustment;   
 with Gtk.Box;
+with Gtk.Grid;
 with Gtk.Handlers;
 with Gtk.Label;
 with Gtk.Revealer;
 with Gtk.Widget;
 with Gtk.Window; 
 
--- with Dasher_Codes; use Dasher_Codes;
--- with Queues;
 with Telnet;
 with Terminal;
 
 package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
-   package SB_Timeout_P is new Glib.Main.Generic_Sources (Gtk.Box.Gtk_Hbox);
+   package SB_Timeout_P is new Glib.Main.Generic_Sources (Gtk.Box.Gtk_Box);
 
    App_SemVer       : constant String := "v0.11.0x";  -- TODO Update Version each release!
    App_Title        : constant String := "DasherA";
@@ -46,15 +45,10 @@ package GUI is
    App_Icon         : constant String := "DGlogoOrange.ico";
    App_Website      : constant String := "https://github.com/SMerrony/DasherA"; -- FIXME
 
-   History_Lines    :  constant Natural := 1000;
+   History_Lines    : constant Natural := 1000;
       
-   -- procedure Init_Gtk (Builder : Gtkada_Builder);
-
-   -- Disp_Acc : Display.Display_Acc_T;
-
    Main_Window : Gtk.Window.Gtk_Window;
-   Vbox : Gtk.Box.Gtk_Vbox;
-   Hbox : Gtk.Box.Gtk_Hbox;
+   Main_Grid   : Gtk.Grid.Gtk_Grid;
    Adj : Gtk.Adjustment.Gtk_Adjustment;
    L_FKeys_Label, R_FKeys_Label : Gtk.Label.Gtk_Label;
    Template_Revealer : Gtk.Revealer.Gtk_Revealer;

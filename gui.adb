@@ -25,16 +25,17 @@ with Gdk.Threads;
 with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
 
 with Glib;                    use Glib;
+with Glib.Error;
 
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
--- with Gtk.Action;
 with Gtk.Button;
+with Gtk.Container;
+with Gtk.Css_Provider;        use Gtk.Css_Provider;
 with Gtk.Dialog;              use Gtk.Dialog;
 with Gtk.Drawing_Area;
 with Gtk.GEntry;
 with Gtk.Enums;
 with Gtk.Frame;
-with Gtk.Grid;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
@@ -44,6 +45,8 @@ with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
 with Gtk.Scrollbar;           -- use Gtk.Scrollbar;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 -- with Gtk.Scrollbar;
+with Gtk.Style_Context;
+with Gtk.Style_Provider;
 -- with Gtk.Table;
 with Gtk.Widget; use Gtk.Widget;
 with Gtk.Window; use Gtk.Window;
@@ -404,38 +407,73 @@ package body GUI is
       return Template_Rev;
    end Create_Template_Labels_Revealer;
 
-   function Create_FKeys_Box return Gtk.Box.Gtk_Hbox is
-      FKeys_Box :  Gtk.Box.Gtk_Hbox;
+   function Create_FKeys_Box return Gtk.Box.Gtk_Box is
+      FKeys_Box :  Gtk.Box.Gtk_Box;
       FKeys : array(1 .. 15) of Gtk.Button.Gtk_Button;
+      Error : aliased Glib.Error.GError;
+      FProvider : constant Gtk.Css_Provider.Gtk_Css_Provider := Gtk.Css_Provider.Gtk_Css_Provider_New;
+      Dummy    : Boolean;
+ 
+      package FA is new Gtk.Container.Forall_User_Data (Gtk.Style_Provider.Gtk_Style_Provider);
+
+      procedure Apply_Css (Widget   : not null access Gtk.Widget.Gtk_Widget_Record'Class;
+                           Provider : Gtk.Style_Provider.Gtk_Style_Provider) is
+      begin
+         Gtk.Style_Context.Get_Style_Context (Widget).Add_Provider (Provider, Glib.Guint'Last);
+
+         if Widget.all in Gtk.Container.Gtk_Container_Record'Class then
+            declare
+               Container : constant Gtk.Container.Gtk_Container := Gtk.Container.Gtk_Container (Widget);
+            begin
+               FA.Forall (Container, Apply_Css'Unrestricted_Access, Provider);
+            end;
+         end if;
+
+      end Apply_Css;
+
+       CSS : constant String :=
+       "* {" & ASCII.LF
+     & "  color: green;" & ASCII.LF
+     & "  font-family: Monospace;" & ASCII.LF
+     -- & "  font-size: small;" & ASCII.LF
+     & "  padding: 1px;" & ASCII.LF
+     & "}";
+
    begin
-      Gtk.Box.Gtk_New_Hbox (FKeys_Box, True, 2);  
+
+      Gtk.Box.Gtk_New (FKeys_Box, Gtk.Enums.Orientation_Horizontal, 1);  
+      FKeys_Box.Set_Homogeneous (True);
+      Dummy := FProvider.Load_From_Data (CSS, Error'Access);
+      if not Dummy then
+         Ada.Text_IO.Put_Line ("ERROR: Loading CSS from data");
+      end if;
       for N in FKeys'Range loop
          declare
             Lab : constant String := N'Image;
          begin
             Gtk.Button.Gtk_New(FKeys(N), "F" & Ada.Strings.Fixed.Trim (Lab, Ada.Strings.Both));
-            FKeys(N).Set_Size_Request (Width => 50, Height => 30);
             FKeys(N).On_Clicked (Handle_FKey_Btn_CB'Access);
          end;
       end loop; 
       -- we want labels between the groups of 5 f-key buttons
       for F in 1 .. 5 loop
-         FKeys_Box.Add (FKeys(F));
+         FKeys_Box.Pack_Start (FKeys(F), False, False);
       end loop;
       Gtk.Label.Gtk_New (L_FKeys_Label, " ");
-      FKeys_Box.Add (L_FKeys_Label);
+      FKeys_Box.Pack_Start (L_FKeys_Label);
       for F in 6 .. 10 loop
-         FKeys_Box.Add (FKeys(F));
+         FKeys_Box.Pack_Start (FKeys(F));
       end loop;
       Gtk.Label.Gtk_New (R_FKeys_Label, " ");
-      FKeys_Box.Add (R_FKeys_Label);
+      FKeys_Box.Pack_Start (R_FKeys_Label);
       for F in 11 .. 15 loop
-         FKeys_Box.Add (FKeys(F));
+         FKeys_Box.Pack_Start (FKeys(F));
       end loop;
+      Apply_Css (FKeys_Box, +FProvider);
       return FKeys_Box;
    end Create_FKeys_Box;  
 
-   function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Hbox) return Boolean is
+   function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Box) return Boolean is
    begin
       Gdk.Threads.Enter;
       case Term.Connection is
@@ -482,11 +520,12 @@ package body GUI is
       return SB;
    end Create_Scrollbar;
 
-   function Create_Status_Box return Gtk.Box.Gtk_Hbox is
-      Status_Box : Gtk.Box.Gtk_Hbox;
+   function Create_Status_Box return Gtk.Box.Gtk_Box is
+      Status_Box : Gtk.Box.Gtk_Box;
       Online_Frame, Host_Frame, Logging_Frame, Emul_Frame, Hold_Frame : Gtk.Frame.Gtk_Frame;
    begin
-      Gtk.Box.Gtk_New_Hbox (Status_Box, True, 2);
+      Gtk.Box.Gtk_New (Status_Box, Gtk.Enums.Orientation_Horizontal, 2);
+
       Gtk.Frame.Gtk_New (Online_Frame);
       Gtk.Label.Gtk_New (Online_Label, "Offline");
       Online_Frame.Add (Online_Label);
@@ -505,12 +544,12 @@ package body GUI is
       Gtk.Frame.Gtk_New (Emul_Frame);
       Gtk.Label.Gtk_New (Emul_Label, "D100");
       Emul_Frame.Add (Emul_Label);
-      Status_Box.Pack_Start (Emul_Frame);
+      Status_Box.Pack_Start (Child => Emul_Frame, Expand => False);
 
       Gtk.Frame.Gtk_New (Hold_Frame);
-      Gtk.Label.Gtk_New (Hold_Label, "");
+      Gtk.Label.Gtk_New (Hold_Label, "    ");
       Hold_Frame.Add (Hold_Label);
-      Status_Box.Pack_Start (Hold_Frame);
+      Status_Box.Pack_Start (Child => Hold_Frame, Expand => False);
 
       SB_Timeout := SB_Timeout_P.Timeout_Add (1000, Update_Status_Box_CB'Access, Status_Box);
 
@@ -518,6 +557,7 @@ package body GUI is
    end Create_Status_Box;
 
    function Create_Window return Gtk.Window.Gtk_Window is
+      H_Grid : Gtk.Grid.Gtk_Grid;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
 
@@ -527,18 +567,20 @@ package body GUI is
       Main_Window.Set_Title (App_Title);
       Main_Window.On_Destroy (Window_Close_CB'Access);
 
-      -- Everything is in a Vbox...
-      Gtk.Box.Gtk_New_Vbox (Box => Vbox, Homogeneous => False, Spacing => 2);
+      -- Everything is in a Grid...
+      Gtk.Grid.Gtk_New (Main_Grid);
+      Main_Grid.Set_Orientation (Gtk.Enums.Orientation_Vertical);
+      Main_Grid.Set_Row_Spacing (2);
 
       -- Menu
-      VBox.Pack_Start (Create_Menu_Bar);
+      Main_Grid.Add (Create_Menu_Bar);
 
       -- Virtual Keys, Function Keys and Template
-      VBox.Pack_Start (Create_Keys_Box);
+      Main_Grid.Add (Create_Keys_Box);
       -- TODO All the labels
       Template_Revealer := Create_Template_Labels_Revealer;
-      VBox.Pack_Start (Template_Revealer);
-      VBox.Pack_Start (Create_FKeys_Box);
+      Main_Grid.Add (Template_Revealer);
+      Main_Grid.Add (Create_FKeys_Box);
 
       -- CRT area
       Display.Init;
@@ -546,17 +588,19 @@ package body GUI is
       Crt.Init (Zoom => BDF_Font.Normal);
       Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
       Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-      -- VBox.Pack_Start (Crt.Tube.DA);
+      -- Main_Grid.Add (Crt.Tube.DA);
 
-      Gtk.Box.Gtk_New_Hbox (Box => Hbox, Homogeneous => False, Spacing => 1);
-      Hbox.Pack_Start (Crt.Tube.DA);
-      Hbox.Pack_End (Create_Scrollbar);
-      VBox.Pack_Start (Hbox);
+      Gtk.Grid.Gtk_New (H_Grid);
+      H_Grid.Set_Orientation (Gtk.Enums.Orientation_Horizontal);
+
+      H_Grid.Add (Crt.Tube.DA);
+      H_Grid.Add (Create_Scrollbar);
+      Main_Grid.Add (H_Grid);
       
       -- Status Bar
-      VBox.Pack_End (Create_Status_Box);
+      Main_Grid.Add (Create_Status_Box);
 
-      Main_Window.Add (Vbox);
+      Main_Window.Add (Main_Grid);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
       -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
