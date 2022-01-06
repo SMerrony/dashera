@@ -392,7 +392,7 @@ package body GUI is
          for col in 1 .. 17 loop
             Gtk.Label.Gtk_New (Template_Labels(row, col));
             -- Template_Labels(row, col).Set_Markup ("<small><small>small</small></small>"); -- FIXME debugging
-            Template_Labels(row, col).Set_Size_Request (Width => 54, Height => 30);
+            Template_Labels(row, col).Set_Size_Request (Width => 48, Height => 30);
             Template_Grid.Attach (Child => Template_Labels(row, col), Left => Gint(col) - 1, Top => Gint(row) - 1 , Width => 1, Height => 1);
          end loop;
       end loop;
@@ -403,7 +403,7 @@ package body GUI is
       Template_Labels(2, 12).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
       Template_Labels(3, 12).Set_Markup ("<small><small><b>Shift</b></small></small>");
       Template_Rev.Add (Template_Grid);
-      Template_Rev.Set_Reveal_Child (True); -- FIXME DEBUGGING
+      Template_Rev.Set_Reveal_Child (False); -- FIXME DEBUGGING
       return Template_Rev;
    end Create_Template_Labels_Revealer;
 
@@ -432,11 +432,14 @@ package body GUI is
       end Apply_Css;
 
        CSS : constant String :=
-       "* {" & ASCII.LF
-     & "  color: green;" & ASCII.LF
+       "button {" & ASCII.LF
+     & "  color: white;" & ASCII.LF
+     & "  background-color: rgba(32, 245, 255, 1);" & ASCII.LF
+     & "  border-color: white;" & ASCII.LF
      & "  font-family: Monospace;" & ASCII.LF
-     -- & "  font-size: small;" & ASCII.LF
-     & "  padding: 1px;" & ASCII.LF
+     & "  font-weight: bold;" & ASCII.LF
+     & "  padding-left: 2px;" & ASCII.LF
+     & "  padding-right: 2px;" & ASCII.LF
      & "}";
 
    begin
@@ -453,6 +456,7 @@ package body GUI is
          begin
             Gtk.Button.Gtk_New(FKeys(N), "F" & Ada.Strings.Fixed.Trim (Lab, Ada.Strings.Both));
             FKeys(N).On_Clicked (Handle_FKey_Btn_CB'Access);
+            FKeys(N).Set_Size_Request (Width => 40, Height => 28);
          end;
       end loop; 
       -- we want labels between the groups of 5 f-key buttons
@@ -462,12 +466,12 @@ package body GUI is
       Gtk.Label.Gtk_New (L_FKeys_Label, " ");
       FKeys_Box.Pack_Start (L_FKeys_Label);
       for F in 6 .. 10 loop
-         FKeys_Box.Pack_Start (FKeys(F));
+         FKeys_Box.Pack_Start (FKeys(F), False, False);
       end loop;
       Gtk.Label.Gtk_New (R_FKeys_Label, " ");
       FKeys_Box.Pack_Start (R_FKeys_Label);
       for F in 11 .. 15 loop
-         FKeys_Box.Pack_Start (FKeys(F));
+         FKeys_Box.Pack_Start (FKeys(F), False, False);
       end loop;
       Apply_Css (FKeys_Box, +FProvider);
       return FKeys_Box;
