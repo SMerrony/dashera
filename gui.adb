@@ -61,6 +61,21 @@ with Redirector;
 
 package body GUI is  
 
+   package FA is new Gtk.Container.Forall_User_Data (Gtk.Style_Provider.Gtk_Style_Provider);
+
+   procedure Apply_Css (Widget   : not null access Gtk.Widget.Gtk_Widget_Record'Class;
+                        Provider : Gtk.Style_Provider.Gtk_Style_Provider) is
+   begin
+      Gtk.Style_Context.Get_Style_Context (Widget).Add_Provider (Provider, Glib.Guint'Last);
+      if Widget.all in Gtk.Container.Gtk_Container_Record'Class then
+         declare
+            Container : constant Gtk.Container.Gtk_Container := Gtk.Container.Gtk_Container (Widget);
+         begin
+            FA.Forall (Container, Apply_Css'Unrestricted_Access, Provider);
+         end;
+      end if;
+   end Apply_Css;
+
    procedure Window_Close_CB (Window : access Gtk_Widget_Record'Class) is
       pragma Unreferenced (Window);
    begin
@@ -116,7 +131,7 @@ package body GUI is
    procedure Telnet_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       Dialog : Gtk_Dialog;
-      Vbox   : Gtk.Box.Gtk_Vbox;
+      Dlg_Box   : Gtk.Box.Gtk_Box;
       Host_Label, Port_Label : Gtk.Label.Gtk_Label;
       Host_Entry, Port_Entry : Gtk.GEntry.Gtk_Entry;
       Cancel_Unused, Connect_Unused : Gtk.Widget.Gtk_Widget;
@@ -127,17 +142,18 @@ package body GUI is
       Dialog.Set_Modal (True);
       -- TODO: Dialog.Set_Logo
       Dialog.Set_Title (App_Title & " - Telnet Host");
-      Vbox := Dialog.Get_Content_Area;
+      Dlg_Box := Dialog.Get_Content_Area;
       Gtk.Label.Gtk_New (Host_Label, "Host:");
-      Vbox.Pack_Start (Child => Host_Label, Expand => True, Fill => True, Padding => 5);
+      Dlg_Box.Pack_Start (Child => Host_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Host_Entry);
-      Vbox.Pack_Start (Child => Host_Entry, Expand => True, Fill => True, Padding => 5);
+      Dlg_Box.Pack_Start (Child => Host_Entry, Expand => True, Fill => True, Padding => 5);
       Gtk.Label.Gtk_New (Port_Label, "Port:");
-      Vbox.Pack_Start (Child => Port_Label, Expand => True, Fill => True, Padding => 5);
+      Dlg_Box.Pack_Start (Child => Port_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Port_Entry);
-      Vbox.Pack_Start (Child => Port_Entry, Expand => True, Fill => True, Padding => 5);
+      Dlg_Box.Pack_Start (Child => Port_Entry, Expand => True, Fill => True, Padding => 5);
       Cancel_Unused := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
       Connect_Unused := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
+      Dialog.Set_Default_Response (Gtk_Response_Accept);
       Dialog.Show_All;
       if Dialog.Run = Gtk_Response_Accept then     
          if Host_Entry.Get_Text_Length = 0 or Port_Entry.Get_Text_Length = 0 then
@@ -310,15 +326,17 @@ package body GUI is
       end if; 
    end Handle_Key_Btn_CB;
 
-   function Create_Keys_Box return Gtk.Box.Gtk_Hbox is
-      Keys_Box :  Gtk.Box.Gtk_Hbox;
+   function Create_Keys_Box return Gtk.Box.Gtk_Box is
+      Keys_Box :  Gtk.Box.Gtk_Box;
       Break_Btn, Er_Pg_Btn, Loc_Pr_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
    begin
-      Gtk.Box.Gtk_New_Hbox (Keys_Box, True, 2);
+      Gtk.Box.Gtk_New (Keys_Box, Gtk.Enums.Orientation_Horizontal, 1);  
+      Keys_Box.Set_Homogeneous (True);
       Gtk.Button.Gtk_New (Break_Btn, "Break");
       Break_Btn.Set_Tooltip_Text ("Send BREAK signal on Serial Connection");
       Break_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Break_Btn);
+      Break_Btn.Set_Hexpand (True); -- because they are homegeneous, all will expand
 
       Gtk.Button.Gtk_New (Er_Pg_Btn, "Er.Page");
       Er_Pg_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
@@ -377,7 +395,7 @@ package body GUI is
          Keyboard.Handle_Key_Release (GDK_F13);
       elsif Lab = "F14" then
          Keyboard.Handle_Key_Release (GDK_F14);  
-      elsif Lab = "F5" then
+      elsif Lab = "F15" then
          Keyboard.Handle_Key_Release (GDK_F15);                                                                                                                            
       end if;
    end Handle_FKey_Btn_CB;
@@ -414,27 +432,10 @@ package body GUI is
       FProvider : constant Gtk.Css_Provider.Gtk_Css_Provider := Gtk.Css_Provider.Gtk_Css_Provider_New;
       Dummy    : Boolean;
  
-      package FA is new Gtk.Container.Forall_User_Data (Gtk.Style_Provider.Gtk_Style_Provider);
-
-      procedure Apply_Css (Widget   : not null access Gtk.Widget.Gtk_Widget_Record'Class;
-                           Provider : Gtk.Style_Provider.Gtk_Style_Provider) is
-      begin
-         Gtk.Style_Context.Get_Style_Context (Widget).Add_Provider (Provider, Glib.Guint'Last);
-
-         if Widget.all in Gtk.Container.Gtk_Container_Record'Class then
-            declare
-               Container : constant Gtk.Container.Gtk_Container := Gtk.Container.Gtk_Container (Widget);
-            begin
-               FA.Forall (Container, Apply_Css'Unrestricted_Access, Provider);
-            end;
-         end if;
-
-      end Apply_Css;
-
-       CSS : constant String :=
+      CSS : constant String :=
        "button {" & ASCII.LF
      & "  color: white;" & ASCII.LF
-     & "  background-color: rgba(32, 245, 255, 1);" & ASCII.LF
+     & "  background-color: rgba(31, 220, 232, 1);" & ASCII.LF
      & "  border-color: white;" & ASCII.LF
      & "  font-family: Monospace;" & ASCII.LF
      & "  font-weight: bold;" & ASCII.LF
@@ -443,7 +444,6 @@ package body GUI is
      & "}";
 
    begin
-
       Gtk.Box.Gtk_New (FKeys_Box, Gtk.Enums.Orientation_Horizontal, 1);  
       FKeys_Box.Set_Homogeneous (True);
       Dummy := FProvider.Load_From_Data (CSS, Error'Access);
