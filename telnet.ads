@@ -61,14 +61,20 @@ package Telnet is
 
 	procedure Close_Connection (Sess : in out Session_T);
 
-	task Receiver is
+	task type Receiver is
 		entry Start (Sess : in Session_Acc_T);
 	end Receiver;
+	type Receiver_Acc is access Receiver;
 
-	task Keyboard_Sender is
+	Receiver_Task : Receiver_Acc;
+
+	task type Keyboard_Sender is
       entry Start (S : in Session_Acc_T);
 		entry Accept_Data (BA : in Byte_Arr);
       entry Stop;
    end Keyboard_Sender;
+	type Sender_Acc is access Keyboard_Sender;
+
+	Keyboard_Sender_Task : Sender_Acc;
 
 end Telnet;

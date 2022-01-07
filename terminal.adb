@@ -52,6 +52,9 @@ package body Terminal is
       T.Protectd := False;
 
       T.Updated := True;
+
+      Processor_Task := new Processor; -- TODO this is wonky...
+      Processor_Task.Start (T);
       
       return T;
    end Create;
@@ -125,15 +128,15 @@ package body Terminal is
    end Self_Test;
 
    task body Processor is
-      Term : Terminal_Acc_T;
+      TA : Terminal_Acc_T;
    begin
-      accept Start (T : in Terminal_Acc_T) do
-         Term := T;
+      accept Start (Termin : in Terminal_Acc_T) do
+         TA := Termin;
       end Start;
       loop
          select
             accept Accept_Data (BA : in Byte_Arr) do
-               Term.Process (BA);
+               TA.Process (BA);
             end Accept_Data;
          or
             accept Stop;
@@ -186,7 +189,7 @@ package body Terminal is
             elsif T.New_Y_Addr >= Display.Disp.Visible_Lines then
                -- see end of p.3-24 in D410 User Manual
                if T.Roll_Enabled then
-                  T.Scroll_Up (T.New_Y_Addr - (Display.Disp.Visible_Lines - 1));
+                  Display.Scroll_Up (T.New_Y_Addr - (Display.Disp.Visible_Lines - 1));
                end if;
                T.New_Y_Addr := T.Cursor_Y - Display.Disp.Visible_Lines;
             end if;
@@ -283,7 +286,7 @@ package body Terminal is
                end loop;
                T.Skip_Byte := True;
             when Dasher_Erase_Page =>
-               T.Scroll_Up (Display.Disp.Visible_Lines);
+               Display.Scroll_Up (Display.Disp.Visible_Lines);
                T.Set_Cursor (0, 0);
                T.Skip_Byte := True;
             when Dasher_Home =>
@@ -347,7 +350,7 @@ package body Terminal is
             -- hit bottom of screen?
             if T.Cursor_Y = Display.Disp.Visible_Lines - 1 then
                if T.Roll_Enabled then
-                  T.Scroll_Up (1);
+                  Display.Scroll_Up (1);
                else
                   T.Cursor_Y := 0;
                   Display.Clear_Line (T.Cursor_Y);
@@ -389,17 +392,5 @@ package body Terminal is
          Crt.Tube.DA.Queue_Draw;
       end loop;
    end Process;
-
-   procedure Scroll_Up (T : in out Terminal_T; Lines : in Integer) is
-   begin
-      for L in 1 .. Lines loop
-         Display.Copy_Line_To_History ( 0);
-         for R in 1 .. Display.Disp.Visible_Lines loop
-            Display.Copy_Line (Src => R, Dest => R - 1);
-            Display.Clear_Line (R);
-         end loop;
-         Display.Clear_Line (Display.Disp.Visible_Lines - 1);
-      end loop;
-   end Scroll_Up;
 
 end Terminal;

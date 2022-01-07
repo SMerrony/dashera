@@ -31,6 +31,13 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
          BDF_Font   Cell
 ```
 
+### Tasks
+
+* Telnet.Keyboard_Sender
+* Telnet.Receiver
+* Terminal.Processor
+
+
 ## Build and Clean
 
 Make sure you have all the Ada and GtkAda stuff available.

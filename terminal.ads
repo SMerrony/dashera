@@ -20,7 +20,7 @@
 with Dasher_Codes;   use Dasher_Codes;
 
 package Terminal is
-   
+
    type Emulation_T is (D200, D210);
    type Connection_T is (Local, Async, Network);
 
@@ -45,15 +45,16 @@ package Terminal is
 
    type Terminal_Acc_T is access all Terminal_T;
 
-   function Create (Emul : in Emulation_T) return Terminal_Acc_T;
-   procedure Self_Test (T : in out Terminal_T);
-   procedure Process (T : in out Terminal_T; BA : in Byte_Arr);
-   procedure Scroll_Up (T : in out Terminal_T; Lines : in Integer);
-
-   task Processor is
-      entry Start (T : in Terminal_Acc_T);
+   task type Processor is
+      entry Start (Termin : in Terminal_Acc_T);
       entry Accept_Data (BA : in Byte_Arr);
       entry Stop;
    end Processor;
+   type Processor_Acc is access Processor;
+   Processor_Task : Processor_Acc;
+
+   function Create (Emul : in Emulation_T) return Terminal_Acc_T;
+   procedure Self_Test (T : in out Terminal_T);
+   procedure Process (T : in out Terminal_T; BA : in Byte_Arr);
 
 end Terminal;

@@ -168,7 +168,7 @@ package body GUI is
                Ada.Text_IO.Put_Line ("DEBUG: TODO - Call Telnet-connect...");
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num, Term);
                -- TODO handle exceptions
-               Redirector.Set_Destination (Terminal.Network);
+               Redirector.Set_Destination (Term, Terminal.Network);
                Term.Connection := Terminal.Network;
                -- Terminal.Processor.Stop;
             end;
@@ -608,9 +608,9 @@ package body GUI is
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
       -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
-      Terminal.Processor.Start (Term);
+      -- Terminal.Processor.Start (Term);
       Keyboard.Init (Term);
-      Redirector.Set_Destination (Terminal.Local);
+      Redirector.Set_Destination (Term, Terminal.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 

@@ -19,7 +19,7 @@
 
 package Cell is
 
-   pragma Elaborate_Body;
+   pragma Preelaborate;
 
    type Cell_T is tagged record
       Char_Value                           : Character;

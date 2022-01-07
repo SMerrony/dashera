@@ -91,6 +91,18 @@ package body Display is
       History.Lines(History.Last) := HL;
    end Add_To_History;
 
+   procedure Scroll_Up (Lines : in Natural) is
+   begin
+      for L in 1 .. Lines loop
+         Copy_Line_To_History (0);
+         for R in 1 .. Disp.Visible_Lines loop
+            Copy_Line (Src => R, Dest => R - 1);
+            Clear_Line (R);
+         end loop;
+         Clear_Line (Disp.Visible_Lines - 1);
+      end loop;
+   end Scroll_Up;
+
    procedure Copy_Line_To_History (Src : in Integer) is
       HL : History_Line;
    begin

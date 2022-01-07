@@ -19,6 +19,8 @@
 
 package Dasher_Codes is
 
+   pragma Pure;
+
    type Byte is mod 2**8;
    type Byte_Arr is array (Positive range <>) of Byte;
 

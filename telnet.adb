@@ -36,8 +36,10 @@ package body Telnet is
       GNAT.Sockets.Connect_Socket (Sess.Conn, Address);
       -- GNAT.Sockets.Set_Socket_Option (Socket => Sess.Conn, Option => (No_Delay, True));
       Sess.Term := Term;
-      Receiver.Start (Sess);
-      Keyboard_Sender.Start (Sess);
+      Receiver_Task := new Receiver;
+      Receiver_Task.Start (Sess);
+      Keyboard_Sender_Task := new Keyboard_Sender;
+      Keyboard_Sender_Task.Start (Sess);
       return Sess;
    end New_Connection;
 

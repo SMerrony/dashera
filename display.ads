@@ -63,6 +63,8 @@ package Display is
    procedure Add_To_History (HL : in History_Line);
    -- Inserts a line into the circular history buffer
 
+   procedure Scroll_Up (Lines : in Natural);
+
    procedure Copy_Line_To_History (Src : in Integer);
 
    function Get_Nth_History_Line (N : in Natural) return History_Line;

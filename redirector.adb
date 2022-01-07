@@ -21,23 +21,24 @@ with Telnet;
 
 package body Redirector is
 
-   procedure Set_Destination (Dest : in Connection_T) is
+   procedure Set_Destination (Termin : in Terminal_Acc_T; Dest : in Connection_T) is
    begin
+      Term := Termin;
       Destination := Dest;
    end Set_Destination;
 
    procedure Send_Data (BA : in Byte_Arr) is
    begin
       case Destination is
-         when Local => Terminal.Processor.Accept_Data (BA);
+         when Local => Terminal.Processor_Task.Accept_Data (BA);
          when Async => null;
-         when Network => Telnet.Keyboard_Sender.Accept_Data (BA);
+         when Network => Telnet.Keyboard_Sender_Task.Accept_Data (BA);
       end case;
    end Send_Data;
 
    procedure Handle_Data (BA : in Byte_Arr) is
    begin
-      Terminal.Processor.Accept_Data (BA);
+      Terminal.Processor_Task.Accept_Data (BA);
    end Handle_Data;
 
 end Redirector;
