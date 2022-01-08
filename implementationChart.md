@@ -7,8 +7,8 @@
 | Blink Enable                         | 003         | Ctrl-C                     | Y    | Y    | Enable blinking on screen  |
 | Blink Off                            | 017         | Ctrl-O                     | Y    | Y    |                            |
 | Blink On                             | 016         | Ctrl-N                     | Y    | Y    |                            |
-| Break (CMD-Break)                    | -           | Break Button               |     |     | Only affects Serial operation |
-| Carriage Return                      | 015         | Ctrl-M or CR               |     |     | No implied new line         |
+| Break (CMD-Break)                    | -           | Break Button               |      |     | Only affects Serial operation |
+| Carriage Return                      | 015         | Ctrl-M or CR               | Y    | Y   | No implied new line         |
 | Cursor Down                          | 032         | Ctrl-Z or ↓                | Y    | Y    |                   |
 | Cursor Left                          | 031         | Ctrl-Y or ←                | Y    | Y    |                   |
 | Cursor Right                         | 030         | Ctrl-X or →                | Y    | Y    |                   |

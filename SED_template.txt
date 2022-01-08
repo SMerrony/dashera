@@ -1,0 +1,43 @@
+SED
+Up 1\Screen
+Top\Of\Screen
+1st\Line\Of Page
+
+Down 1\Screen
+Bottom\Of\Screen
+Last\Line\On Page
+
+Go To\Prev.\Position
+Middle\Of\Screen
+Middle\Line\On Page
+
+Position\Page\Prev.
+Position\Page\First
+Display
+
+Position\Page\Next
+Position\Page\Last
+View
+
+Modify\Current
+Insert\Current
+Append
+
+Find
+Backfind
+CLI
+
+Delete\Current
+Undo
+Bye\Yes\Continue
+
+Up 4\Lines
+Up 11\Lines
+
+
+Down 4\Lines
+Down 11\Lines
+
+
+Cut\While\Editing
+Paste\While\Editing

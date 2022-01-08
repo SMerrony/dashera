@@ -18,6 +18,7 @@
 -- THE SOFTWARE.
 
 with Ada.Strings.Fixed;
+with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Gdk.Event;               -- use Gdk.Event;
@@ -52,6 +53,9 @@ with Gtk.Widget; use Gtk.Widget;
 with Gtk.Window; use Gtk.Window;
 
 with Gtkada.Dialogs;
+with Gtkada.File_Selection;
+
+with Text_IO.Unbounded_IO;
 
 with BDF_Font;
 with Crt;
@@ -128,6 +132,56 @@ package body GUI is
       Term.Self_Test;
    end Self_Test_CB;
 
+   function Label_To_Markup (L : in Unbounded_String) return Unbounded_String is
+      M : Unbounded_String := Null_Unbounded_String;
+   begin
+      for Ix in 1 .. Length(L) loop
+         if Element (L, Ix) = '\' then
+            M := M & ASCII.LF;
+         else
+            M := M & Element (L, Ix);
+         end if;
+      end loop;
+      return M;
+   end;
+
+   procedure Load_Template_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Function Key Template", 
+                                                                        Dir_Only => False, 
+                                                                        Must_Exist => True);
+      Templ_File : Ada.Text_IO.File_Type;
+      Lab : Unbounded_String;
+   begin
+      if Filename'Length > 1 then
+         Ada.Text_IO.Put_Line ("DEBUG: Chose template file: " & Filename);
+         -- clear the labels
+         for K in 1 .. 17 loop
+            for R in 1 .. 4 loop
+               if K /= 6 and k /= 12 then
+                  Template_Labels(R,K).Set_Markup ("");
+               end if;
+            end loop;
+         end loop;
+         Ada.Text_IO.Open (File => Templ_File, Mode => Ada.Text_IO.In_File, Name => Filename);
+         Lab := Text_IO.Unbounded_IO.Get_Line (Templ_File);
+         L_FKeys_Label.Set_Markup ("<small><small>" & To_String(Lab) & "</small></small>");
+         R_FKeys_Label.Set_Markup ("<small><small>" & To_String(Lab) & "</small></small>");
+         for K in 1 .. 17 loop
+            for R in reverse 1 .. 4 loop
+               if K /= 6 and K /= 12 and not Ada.Text_IO.End_Of_File(Templ_File) then
+                  Lab := "<small><small>" & Label_To_Markup (Text_IO.Unbounded_IO.Get_Line (Templ_File)) & "</small></small>";
+                  Template_Labels(R,K).Set_Markup (To_String(Lab));
+               end if;
+            end loop;
+         end loop;
+         Ada.Text_IO.Close (Templ_File);
+         Template_Revealer.Set_Reveal_Child (True);
+      else
+         Ada.Text_IO.Put_Line ("DEBUG: No Template file chosen");
+      end if;
+   end Load_Template_CB;   
+
    procedure Telnet_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       Dialog : Gtk_Dialog;
@@ -200,7 +254,7 @@ package body GUI is
       Help_Menu : Gtk.Menu.Gtk_Menu;
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
       Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rcv_Item,
-      D200_Item, D210_Item, Self_Test_Item,
+      D200_Item, D210_Item, Self_Test_Item, Load_Template_Item,
       Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
       Net_Connect_Item, Net_Disconnect_Item,
       Paste_Item,
@@ -272,6 +326,10 @@ package body GUI is
       Gtk_New (Self_Test_Item, "Self-Test");
       Emulation_Menu.Append (Self_Test_Item);
       Self_Test_Item.On_Activate (Self_Test_CB'Access);
+      Emulation_Menu.Append (Sep_Item);
+      Gtk_New (Load_Template_Item, "Load Func. Key Template");
+      Emulation_Menu.Append (Load_Template_Item);
+      Load_Template_Item.On_Activate (Load_Template_CB'Access);
 
       -- Serial
 
@@ -403,14 +461,23 @@ package body GUI is
    function Create_Template_Labels_Revealer return Gtk.Revealer.Gtk_Revealer is 
       Template_Rev : Gtk.Revealer.Gtk_Revealer;
       Template_Grid : Gtk.Grid.Gtk_Grid;
+      FProvider : constant Gtk.Css_Provider.Gtk_Css_Provider := Gtk.Css_Provider.Gtk_Css_Provider_New;
+      Error     : aliased Glib.Error.GError;
+      Dummy     : Boolean;
+      CSS       : constant String :=
+      "label {" & ASCII.LF
+     & "  border-color: white;" & ASCII.LF
+     & "  border-width: 1;" & ASCII.LF
+     & "  border-style: solid;" & ASCII.LF
+     & "}" & ASCII.LF;
    begin
       Gtk.Revealer.Gtk_New (Template_Rev);
       Gtk.Grid.Gtk_New (Template_Grid);
       for row in 1 .. 4 loop
          for col in 1 .. 17 loop
             Gtk.Label.Gtk_New (Template_Labels(row, col));
-            -- Template_Labels(row, col).Set_Markup ("<small><small>small</small></small>"); -- FIXME debugging
             Template_Labels(row, col).Set_Size_Request (Width => 48, Height => 30);
+            Template_Labels(row, col).Set_Justify (Gtk.Enums.Justify_Center);
             Template_Grid.Attach (Child => Template_Labels(row, col), Left => Gint(col) - 1, Top => Gint(row) - 1 , Width => 1, Height => 1);
          end loop;
       end loop;
@@ -421,7 +488,12 @@ package body GUI is
       Template_Labels(2, 12).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
       Template_Labels(3, 12).Set_Markup ("<small><small><b>Shift</b></small></small>");
       Template_Rev.Add (Template_Grid);
-      Template_Rev.Set_Reveal_Child (False); -- FIXME DEBUGGING
+      Dummy := FProvider.Load_From_Data (CSS, Error'Access);
+      if not Dummy then
+         Ada.Text_IO.Put_Line ("ERROR: Loading CSS from data");
+      end if;
+      Apply_Css (Widget => Template_Grid, Provider => +FProvider);
+      Template_Rev.Set_Reveal_Child (False);
       return Template_Rev;
    end Create_Template_Labels_Revealer;
 
