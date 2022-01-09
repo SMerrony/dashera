@@ -89,6 +89,7 @@ package body Terminal is
 
       T.Process (Str_To_BA (NLine));
       T.Process (Str_To_BA (Chars));
+      T.Process (NL);
 
       T.Process (Str_To_BA (DLine));
       Op(1) := Dasher_Dim_On;
@@ -96,6 +97,7 @@ package body Terminal is
       T.Process (Str_To_BA (Chars));
       Op(1) := Dasher_Dim_Off;
       T.Process (Op);
+      T.Process (NL);
 
       T.Process (Str_To_BA (BLine));
       Op(1) := Dasher_Blink_On;
@@ -103,6 +105,7 @@ package body Terminal is
       T.Process (Str_To_BA (Chars));
       Op(1) := Dasher_Blink_Off;
       T.Process (Op);
+      T.Process (NL);
 
       T.Process (Str_To_BA (RLine));
       Op(1) := Dasher_Rev_On;
@@ -110,6 +113,7 @@ package body Terminal is
       T.Process (Str_To_BA (Chars));
       Op(1) := Dasher_Rev_Off;
       T.Process (Op);
+      T.Process (NL);
 
       T.Process (Str_To_BA (ULine));
       Op(1) := Dasher_Underline;
@@ -117,6 +121,7 @@ package body Terminal is
       T.Process (Str_To_BA (Chars));
       Op(1) := Dasher_Normal;
       T.Process (Op);   
+      T.Process (NL);
 
       for L in 8 .. Display.Disp.Visible_Lines loop
          if L > 8  then

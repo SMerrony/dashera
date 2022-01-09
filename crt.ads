@@ -25,7 +25,6 @@ with Gtk.Drawing_Area;
 with Gtk.Widget;
 
 with BDF_Font;
--- with Display;
 
 package Crt is
 
@@ -36,13 +35,10 @@ package Crt is
 
    type Crt_T is record
       DA         : Gtk.Drawing_Area.Gtk_Drawing_Area;
-      -- Disp       : Display.Display_Acc_T;
       Zoom       : BDF_Font.Zoom_T;
       Blink_State : Boolean;
       Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
-
-   -- type Crt_Acc_T is access all Crt_T;
 
    Tube : Crt_T;
 

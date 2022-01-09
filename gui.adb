@@ -35,13 +35,14 @@ with Gtk.Css_Provider;        use Gtk.Css_Provider;
 with Gtk.Dialog;              use Gtk.Dialog;
 with Gtk.Drawing_Area;
 with Gtk.GEntry;
-with Gtk.Enums;
+with Gtk.Enums;               use Gtk.Enums;
 with Gtk.Frame;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
 -- with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
 with Gtk.Menu_Item;           use Gtk.Menu_Item;
+with Gtk.Radio_Button;
 with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
 with Gtk.Scrollbar;           -- use Gtk.Scrollbar;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
@@ -57,7 +58,7 @@ with Gtkada.File_Selection;
 
 with Text_IO.Unbounded_IO;
 
-with BDF_Font;
+with BDF_Font; use BDF_Font;
 with Crt;
 with Display;
 with Keyboard;
@@ -69,6 +70,7 @@ package body GUI is
 
    procedure Apply_Css (Widget   : not null access Gtk.Widget.Gtk_Widget_Record'Class;
                         Provider : Gtk.Style_Provider.Gtk_Style_Provider) is
+   -- Apply the given CSS to the widget (which may be a container)
    begin
       Gtk.Style_Context.Get_Style_Context (Widget).Add_Provider (Provider, Glib.Guint'Last);
       if Widget.all in Gtk.Container.Gtk_Container_Record'Class then
@@ -125,6 +127,125 @@ package body GUI is
    begin
       Term.Emulation := Terminal.D210;
    end D210_CB;
+
+   procedure Resize_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Dialog  : Gtk_Dialog;
+      Dlg_Box, HB1, HB2, HB3 : Gtk.Box.Gtk_Box;
+      Lab : Gtk.Label.Gtk_Label;
+      L24, L25, L36, L48, L66,
+      C80, C81, C132, C135,
+      ZL, ZN, ZS, ZT : Gtk.Radio_Button.Gtk_Radio_Button;
+      Cancel_Unused, Resize_Unused : Gtk.Widget.Gtk_Widget;
+   begin
+      Gtk_New (Dialog);
+      Dialog.Set_Destroy_With_Parent (True);
+      Dialog.Set_Modal (True);
+      -- TODO: Dialog.Set_Logo
+      Dialog.Set_Title (App_Title & " - Resize Terminal");
+      Dlg_Box := Dialog.Get_Content_Area;
+
+      Gtk.Box.Gtk_New (HB1, Orientation => Orientation_Horizontal, Spacing =>6);
+      Gtk.Label.Gtk_New (Lab, "Lines");
+      HB1.Pack_Start (Child =>Lab, Expand => False, Fill => False, Padding => 1);
+      L24 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "24" );
+      HB1.Pack_Start (Child => L24, Expand => False, Fill => False, Padding => 1);
+      L25 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "25" );
+      HB1.Pack_Start (Child => L25, Expand => False, Fill => False, Padding => 1);
+      L36 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "36" );
+      HB1.Pack_Start (Child => L36, Expand => False, Fill => False, Padding => 1);
+      L48 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "48" );
+      HB1.Pack_Start (Child => L48, Expand => False, Fill => False, Padding => 1);
+      L66 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "66" );
+      HB1.Pack_Start (Child => L66, Expand => False, Fill => False, Padding => 1);
+      Dlg_Box.Pack_Start (Child => HB1, Expand => False, Fill => False, Padding => 1);
+      case Display.Disp.Visible_Lines is
+         when 24 => L24.Set_Active (True);
+         when 25 => L25.Set_Active (True);
+         when 36 => L36.Set_Active (True);
+         when 48 => L48.Set_Active (True);
+         when 66 => L66.Set_Active (True);
+         when others => null;                                 
+      end case;
+
+      Gtk.Box.Gtk_New (HB2, Orientation => Orientation_Horizontal, Spacing =>6);
+      Gtk.Label.Gtk_New (Lab, "Columns");
+      HB2.Pack_Start (Child =>Lab, Expand => False, Fill => False, Padding => 1);
+      C80 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "80" );
+      HB2.Pack_Start (Child => C80, Expand => False, Fill => False, Padding => 1);
+      C81 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "81" );
+      HB2.Pack_Start (Child => C81, Expand => False, Fill => False, Padding => 1);
+      C132 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "132" );
+      HB2.Pack_Start (Child => C132, Expand => False, Fill => False, Padding => 1);
+      C135 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "135" );
+      HB2.Pack_Start (Child => C135, Expand => False, Fill => False, Padding => 1);
+      Dlg_Box.Pack_Start (Child => HB2, Expand => False, Fill => False, Padding => 1);
+      case Display.Disp.Visible_Cols is
+         when 80 => C80.Set_Active (True);
+         when 81 => C81.Set_Active (True);
+         when 132 => C132.Set_Active (True);
+         when 135 => C135.Set_Active (True);
+         when others => null;
+      end case;
+
+      Gtk.Box.Gtk_New (HB3, Orientation => Orientation_Horizontal, Spacing =>6);
+      Gtk.Label.Gtk_New (Lab, "Zoom");
+      HB3.Pack_Start (Child =>Lab, Expand => False, Fill => False, Padding => 1);
+      ZL := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "Large" );
+      HB3.Pack_Start (Child => ZL, Expand => False, Fill => False, Padding => 1);
+      ZN := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Normal" );
+      HB3.Pack_Start (Child => ZN, Expand => False, Fill => False, Padding => 1);
+      ZS := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Small" );
+      HB3.Pack_Start (Child => ZS, Expand => False, Fill => False, Padding => 1);
+      ZT := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Tiny" );
+      HB3.Pack_Start (Child => ZT, Expand => False, Fill => False, Padding => 1);
+      Dlg_Box.Pack_Start (Child => HB3, Expand => False, Fill => False, Padding => 1);
+      case Crt.Tube.Zoom is
+         when Large   => ZL.Set_Active (True);
+         when Normal  => ZN.Set_Active (True);
+         when Smaller => ZS.Set_Active (True);
+         when Tiny    => ZT.Set_Active (True);      
+      end case;
+         
+      Cancel_Unused := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
+      Resize_Unused := Dialog.Add_Button ("Resize", Gtk_Response_Accept);
+      Dialog.Set_Default_Response (Gtk_Response_Accept);
+      Dialog.Show_All;
+      if Dialog.Run = Gtk_Response_Accept then 
+         declare
+            New_Zoom : Zoom_T;
+            New_Cols, New_Lines : Gint;
+         begin
+            -- first check if zoom has changed
+            if    ZL.Get_Active then New_Zoom := Large;
+            elsif ZN.Get_Active then New_Zoom := Normal;
+            elsif ZS.Get_Active then New_Zoom := Smaller;
+            else New_Zoom := Tiny;
+            end if;
+            if New_Zoom /= Crt.Tube.Zoom then
+               Load_Font (Crt.Font_Filename, New_Zoom);
+               Crt.Tube.Zoom := New_Zoom;
+            end if;
+            -- resize
+            if    L24.Get_Active then New_Lines := 24;
+            elsif L25.Get_Active then New_Lines := 25;
+            elsif L36.Get_Active then New_Lines := 36;
+            elsif L48.Get_Active then New_Lines := 48;
+            else New_Lines := 66;
+            end if;
+            if C80.Get_Active then New_Cols := 80;
+            elsif C81.Get_Active then New_Cols := 81;
+            elsif C132.Get_Active then New_Cols := 132;
+            else New_Cols := 135;
+            end if;
+            Crt.Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * New_Cols, 
+                               BDF_Font.Decoded.Char_Height * New_Lines);
+            Display.Disp.Visible_Lines := Integer(New_Lines);
+            Display.Disp.Visible_Cols  := Integer(New_Cols);
+         end;
+      end if;
+      Dialog.Destroy;
+   end Resize_CB;
 
    procedure Self_Test_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
@@ -254,7 +375,7 @@ package body GUI is
       Help_Menu : Gtk.Menu.Gtk_Menu;
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
       Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rcv_Item,
-      D200_Item, D210_Item, Self_Test_Item, Load_Template_Item,
+      D200_Item, D210_Item, Self_Test_Item, Load_Template_Item, Resize_Item,
       Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
       Net_Connect_Item, Net_Disconnect_Item,
       Paste_Item,
@@ -323,9 +444,18 @@ package body GUI is
       Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
 
+      Gtk_New (Resize_Item, "Resize");
+      Emulation_Menu.Append (Resize_Item);
+      Resize_Item.On_Activate (Resize_CB'Access);
+
+      Gtk_New (Sep_Item);
+      Emulation_Menu.Append (Sep_Item);
+
       Gtk_New (Self_Test_Item, "Self-Test");
       Emulation_Menu.Append (Self_Test_Item);
       Self_Test_Item.On_Activate (Self_Test_CB'Access);
+
+      Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
       Gtk_New (Load_Template_Item, "Load Func. Key Template");
       Emulation_Menu.Append (Load_Template_Item);
@@ -388,7 +518,7 @@ package body GUI is
       Keys_Box :  Gtk.Box.Gtk_Box;
       Break_Btn, Er_Pg_Btn, Loc_Pr_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
    begin
-      Gtk.Box.Gtk_New (Keys_Box, Gtk.Enums.Orientation_Horizontal, 1);  
+      Gtk.Box.Gtk_New (Keys_Box, Orientation_Horizontal, 1);  
       Keys_Box.Set_Homogeneous (True);
       Gtk.Button.Gtk_New (Break_Btn, "Break");
       Break_Btn.Set_Tooltip_Text ("Send BREAK signal on Serial Connection");
@@ -467,7 +597,7 @@ package body GUI is
       CSS       : constant String :=
       "label {" & ASCII.LF
      & "  border-color: white;" & ASCII.LF
-     & "  border-width: 1;" & ASCII.LF
+     & "  border-width: 1px;" & ASCII.LF
      & "  border-style: solid;" & ASCII.LF
      & "}" & ASCII.LF;
    begin

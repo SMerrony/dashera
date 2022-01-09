@@ -71,7 +71,6 @@ package body BDF_Font is
       X_Offset, Y_Offset                                : Integer;
       X, Y                                              : Gint;
       Line_Byte                                         : Unsigned_8;
-
    begin
       case Zoom is
          when Large =>
@@ -169,14 +168,23 @@ package body BDF_Font is
             end loop;
          end loop;
 
-         Decoded.Font(ASCII_Code).Pix_Buf         := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
-         Decoded.Font(ASCII_Code).Dim_Pix_Buf     := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Dim_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
-         Decoded.Font(ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Reverse_Pix_Buf, Dest_Width => 10, Dest_Height =>18, Inter_Type => Interp_Bilinear);
+         Decoded.Font(ASCII_Code).Pix_Buf         := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, 
+                                                      Dest_Width => Decoded.Char_Width, 
+                                                      Dest_Height => Decoded.Char_Height, 
+                                                      Inter_Type => Interp_Bilinear);
+         Decoded.Font(ASCII_Code).Dim_Pix_Buf     := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Dim_Pix_Buf, 
+                                                      Dest_Width => Decoded.Char_Width, 
+                                                      Dest_Height => Decoded.Char_Height, 
+                                                      Inter_Type => Interp_Bilinear);
+         Decoded.Font(ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Reverse_Pix_Buf, 
+                                                      Dest_Width => Decoded.Char_Width, 
+                                                      Dest_Height => Decoded.Char_Height, 
+                                                      Inter_Type => Interp_Bilinear);
          Decoded.Font(ASCII_Code).Loaded  := true;
 
       end loop;
 
-      -- return Font;
+      Close (File => Font_File);
 
    end Load_Font;
 
