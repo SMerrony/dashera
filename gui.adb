@@ -683,9 +683,15 @@ package body GUI is
    begin
       Gdk.Threads.Enter;
       case Term.Connection is
-         when Terminal.Local =>   Online_Label.Set_Text ("Local (Disconnected)");
-         when Terminal.Async =>   Online_Label.Set_Text ("Online (Serial)");
-         when Terminal.Network => Online_Label.Set_Text ("Online (Telnet)");
+         when Terminal.Local =>   
+            Online_Label.Set_Text ("Local");
+            Host_Label.Set_Text ("(Disconnected)");
+         when Terminal.Async =>   
+            Online_Label.Set_Text ("Online (Serial)");
+         when Terminal.Network => 
+            Online_Label.Set_Text ("Online (Telnet)");
+            Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
+                                 Ada.Strings.Fixed.Trim (Telnet_Sess.Port_Num'Image, Ada.Strings.Both));
       end case;
       case Term.Emulation is
          when Terminal.D200 => Emul_Label.Set_Text ("D200");

@@ -35,6 +35,9 @@ package body Telnet is
       Address.Port := GNAT.Sockets.Port_Type (Port_Num);
       GNAT.Sockets.Connect_Socket (Sess.Conn, Address);
       -- GNAT.Sockets.Set_Socket_Option (Socket => Sess.Conn, Option => (No_Delay, True));
+      -- TODO handle exceptions
+      Sess.Host_Str := To_Unbounded_String (Host_Str);
+      Sess.Port_Num := Port_Num;
       Sess.Term := Term;
       Receiver_Task := new Receiver;
       Receiver_Task.Start (Sess);
@@ -66,7 +69,7 @@ package body Telnet is
       end loop;
    end Keyboard_Sender;
 
-   procedure Send (Sess : in out Session_Acc_T; BA : in Byte_Arr) is
+   procedure Send (Sess : in Session_Acc_T; BA : in Byte_Arr) is
       SEA : Ada.Streams.Stream_Element_Array (1..BA'Length);
       Bytes_Sent : Ada.Streams.Stream_Element_Offset;
    begin

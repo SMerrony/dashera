@@ -17,6 +17,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with GNAT.Sockets;	use GNAT.Sockets;
 
 with Dasher_Codes;   use Dasher_Codes;
@@ -44,8 +46,10 @@ package Telnet is
 	type Message is new String;
 
    type Session_T is tagged record
-      Conn : GNAT.Sockets.Socket_Type;
-		Term : Terminal.Terminal_Acc_T;
+      Conn     : GNAT.Sockets.Socket_Type;
+		Term     : Terminal.Terminal_Acc_T;
+		Host_Str : Unbounded_String;  -- The host as specified by our user
+		Port_Num : Integer;           -- The port as specified by our user
    end record;
 
 	type Session_Acc_T is access all Session_T;
@@ -57,7 +61,7 @@ package Telnet is
 	-- Data from the remote host will be directed to the supplied Terminal.
 	-- To send data, call the Send procedure
 
-	procedure Send (Sess : in out Session_Acc_T; BA : in Byte_Arr);
+	procedure Send (Sess : in Session_Acc_T; BA : in Byte_Arr);
 
 	procedure Close_Connection (Sess : in out Session_T);
 
