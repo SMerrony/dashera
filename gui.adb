@@ -42,8 +42,9 @@ with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
 -- with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
 with Gtk.Menu_Item;           use Gtk.Menu_Item;
+with Gtk.Message_Dialog;      use Gtk.Message_Dialog;
 with Gtk.Radio_Button;
-with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
+-- with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
 with Gtk.Scrollbar;           -- use Gtk.Scrollbar;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 -- with Gtk.Scrollbar;
@@ -62,6 +63,7 @@ with BDF_Font; use BDF_Font;
 with Crt;
 with Display;
 with Keyboard;
+with Logger;
 with Redirector;
 
 package body GUI is  
@@ -301,7 +303,34 @@ package body GUI is
       else
          Ada.Text_IO.Put_Line ("DEBUG: No Template file chosen");
       end if;
-   end Load_Template_CB;   
+   end Load_Template_CB; 
+
+   procedure Logging_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      if Logger.Logging then
+         Logger.Stop_Logging;
+      else
+         declare
+            Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Log File", 
+                                                                        Dir_Only => False, 
+                                                                        Must_Exist => False);
+            OK : Boolean;
+            Message : aliased Gtk_Message_Dialog;
+         begin
+            if Filename'Length > 1 then
+               OK := Logger.Start_Logging (Filename);
+               if not OK then 
+                  Message := Gtk_Message_Dialog_New (Parent => Main_Window, 
+                              Flags => Modal, 
+                              The_Type => Message_Error, 
+                              Buttons => Buttons_Close, 
+                              Message => "Could not open log file");
+               end if;
+            end if;
+         end;
+      end if;
+   end Logging_CB;
 
    procedure Telnet_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
@@ -393,6 +422,8 @@ package body GUI is
 
       Gtk_New (Logging_Item, "Logging");
       File_Menu.Append (Logging_Item);
+      Logging_Item.On_Activate (Logging_CB'Access);
+
       Gtk_New (Sep_Item);
       File_Menu.Append (Sep_Item);
 
@@ -697,6 +728,11 @@ package body GUI is
          when Terminal.D200 => Emul_Label.Set_Text ("D200");
          when Terminal.D210 => Emul_Label.Set_Text ("D210");
       end case;
+      if Logger.Logging then
+         Logging_Label.Set_Text ("Logging");
+      else
+         Logging_Label.Set_Text ("Not Logging");
+      end if;
       if Term.Holding then
          Hold_Label.Set_Text ("HOLD");
       else

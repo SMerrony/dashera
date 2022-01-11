@@ -24,11 +24,11 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
                                   |
                                  GUI
                                   |
-             ----------------------------------------------
-             |        |           |          |             |
-            Crt    Display    Keyboard    Telnet       Terminal   
-             |        |
-         BDF_Font   Cell
+             --------------------------------------------------
+             |        |           |        |       |          |
+            Crt    Display    Keyboard     |     Telnet    Terminal   
+             |        |                    |                 /
+         BDF_Font   Cell                 Logger--------------
 ```
 
 ### Tasks
@@ -36,7 +36,6 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
 * Telnet.Keyboard_Sender
 * Telnet.Receiver
 * Terminal.Processor
-
 
 ## Build and Clean
 

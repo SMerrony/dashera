@@ -12,6 +12,7 @@ DasherA is a free terminal emulator for Data General DASHER series character-bas
 * 15 (plus Ctrl & Shift) DASHER Function keys, Erase Page, Erase EOL, Hold, Local Print and Break keys
 * Loadable function-key templates (BROWSE, SED and SMI provided as examples)
 * 1000-line scrollable terminal history
+* Session logging to file
 * Various terminal widths, heights and zoom-levels available
   
 Here is the full [Implementation Chart](implementationChart.md) for DasherA.

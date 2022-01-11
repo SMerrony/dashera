@@ -34,9 +34,11 @@ package Dasher_Codes is
    Dasher_Home             : constant Byte := 8; -- window home
    Dasher_Tab              : constant Byte := 9;
    Dasher_NL               : constant Byte := 10;
+   Dasher_Char_NL          : constant Character := Character'Val(10);
    Dasher_Erase_EOL        : constant Byte := 11;
    Dasher_Erase_Page       : constant Byte := 12;
    Dasher_CR               : constant Byte := 13;
+   Dasher_Char_CR          : constant Character := Character'Val(13);
    Dasher_Blink_On         : constant Byte := 14;
    Dasher_Blink_Off        : constant Byte := 15;
    Dasher_Write_Window_Addr: constant Byte := 16; -- followed by col then row
