@@ -203,6 +203,11 @@ package body Terminal is
             goto Redraw_Tube;
          end if;
 
+         -- Log it if required
+         if Logger.Logging then
+            Logger.Log_Char (Character'Val(B_Int));
+         end if;
+
          -- short DASHER commands
          if T.In_Command then
             case B is
@@ -372,9 +377,6 @@ package body Terminal is
          -- CR or NL?
          if B = Dasher_CR or B = Dasher_NL then
             T.Cursor_X := 0;
-            if Logger.Logging then
-               Logger.Log_Char (Dasher_Char_NL);
-            end if;
             -- TODO handle Expect case
             goto Redraw_Tube;
          end if;
@@ -393,11 +395,6 @@ package body Terminal is
          Display.Disp.Cells(T.Cursor_Y, T.Cursor_X).Set (Value => C, Blnk => T.Blinking, Dm => T.Dimmed, 
                                                          Rv => T.Reversed, Under => T.Underscored, Prot => T.Protectd);
          T.Cursor_X := T.Cursor_X + 1;
-
-         -- Log it if required
-         if Logger.Logging then
-            Logger.Log_Char (C);
-         end if;
 
          -- TODO handle Expect case
 

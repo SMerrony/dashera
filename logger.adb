@@ -17,8 +17,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Dasher_Codes; use Dasher_Codes;
-
 package body Logger is
 
    function Start_Logging (Filename : in String) return Boolean is
@@ -40,11 +38,7 @@ package body Logger is
 
    procedure Log_Char (Char : in Character) is
    begin
-      if Char = Dasher_Char_NL then
-         New_line (Log_File);
-      else
-         Put (Log_File, Char);
-      end if;
+      Put (Log_File, Char);
    end Log_Char;   
 
 end Logger;
