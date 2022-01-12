@@ -26,9 +26,10 @@ with Gtk.Box;
 with Gtk.Grid;
 with Gtk.Handlers;
 with Gtk.Label;
+with Gtk.Menu_Item;           use Gtk.Menu_Item;
 with Gtk.Revealer;
 with Gtk.Widget;
-with Gtk.Window; 
+with Gtk.Window;              use Gtk.Window;
 
 with Telnet;
 with Terminal;
@@ -47,19 +48,26 @@ package GUI is
 
    History_Lines    : constant Natural := 1000;
       
-   Main_Window : Gtk.Window.Gtk_Window;
+   Main_Window : Gtk_Window;
    Main_Grid   : Gtk.Grid.Gtk_Grid;
-   Adj : Gtk.Adjustment.Gtk_Adjustment;
+   Adj         : Gtk.Adjustment.Gtk_Adjustment;
+
+   -- Function keys/labels...
    L_FKeys_Label, R_FKeys_Label : Gtk.Label.Gtk_Label;
    Template_Revealer : Gtk.Revealer.Gtk_Revealer;
    Template_Labels   : array(1..4,1..17) of Gtk.Label.Gtk_Label;
 
    Telnet_Sess : Telnet.Session_Acc_T;
    Term        : Terminal.Terminal_Acc_T;
+
+   -- Menu items for which we need access...
+   Net_Connect_Item, Net_Disconnect_Item : Gtk_Menu_Item;
+
+   -- Status Bar items...
    Online_Label, Host_Label, Logging_Label, 
    Emul_Label, Hold_Label : Gtk.Label.Gtk_Label;
    SB_Timeout  : Glib.Main.G_Source_ID := 0;
 
-   function Create_Window return Gtk.Window.Gtk_Window;
+   function Create_Window return Gtk_Window;
 
 end GUI;

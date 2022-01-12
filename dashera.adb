@@ -50,9 +50,9 @@ procedure Dashera is
    procedure Print_Help is
    begin
       Ada.Text_IO.Put_Line ("Usage of dashera:");
-      Ada.Text_IO.Put_Line ("  -host <host>  Host to connect with via Telnet");
-      Ada.Text_IO.Put_Line ("  -tracescript  Print trace of Mini-Expect script on STDOUT");
-      Ada.Text_IO.Put_Line ("  -tracexmodem  Show details of XMODEM file transfers on STDOUT");
+      Ada.Text_IO.Put_Line ("  -host <host:port> Host to connect with via Telnet");
+      Ada.Text_IO.Put_Line ("  -tracescript      Print trace of Mini-Expect script on STDOUT");
+      Ada.Text_IO.Put_Line ("  -tracexmodem      Show details of XMODEM file transfers on STDOUT");
       Ada.Text_IO.Put_Line ("  -version          show the version number of dashera and exit");
    end Print_Help;
 

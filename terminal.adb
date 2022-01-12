@@ -32,7 +32,7 @@ package body Terminal is
       T : aliased constant Terminal_Acc_T := new Terminal_T;
    begin
       T.Emulation := Emul;
-      T.Connection := Local;
+      -- T.Connection := Local;
       T.Cursor_X := 0;
       T.Cursor_Y := 0;
       T.In_Command := False;

@@ -41,7 +41,6 @@ with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
 -- with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
-with Gtk.Menu_Item;           use Gtk.Menu_Item;
 with Gtk.Message_Dialog;      use Gtk.Message_Dialog;
 with Gtk.Radio_Button;
 -- with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
@@ -52,7 +51,6 @@ with Gtk.Style_Context;
 with Gtk.Style_Provider;
 -- with Gtk.Table;
 with Gtk.Widget; use Gtk.Widget;
-with Gtk.Window; use Gtk.Window;
 
 with Gtkada.Dialogs;
 with Gtkada.File_Selection;
@@ -372,14 +370,25 @@ package body GUI is
                Ada.Text_IO.Put_Line ("DEBUG: TODO - Call Telnet-connect...");
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num, Term);
                -- TODO handle exceptions
-               Redirector.Set_Destination (Term, Terminal.Network);
-               Term.Connection := Terminal.Network;
-               -- Terminal.Processor.Stop;
+               Redirector.Set_Destination (Term, Redirector.Network);
+               Net_Connect_Item.Set_Sensitive (False);
+               Net_Disconnect_Item.Set_Sensitive (True);
+               -- TODO Serial items...
             end;
          end if;
       end if;
       Dialog.Destroy;
    end Telnet_Connect_CB;
+
+   procedure Telnet_Disconnect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      Telnet_Sess.Close_Connection;
+      Redirector.Set_Destination (Term, Redirector.Local);
+      Net_Connect_Item.Set_Sensitive (True);
+      Net_Disconnect_Item.Set_Sensitive (False);
+   end Telnet_Disconnect_CB;
+   
 
    function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key) 
       return Boolean  is
@@ -406,7 +415,6 @@ package body GUI is
       Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rcv_Item,
       D200_Item, D210_Item, Self_Test_Item, Load_Template_Item, Resize_Item,
       Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
-      Net_Connect_Item, Net_Disconnect_Item,
       Paste_Item,
       About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
    begin
@@ -511,6 +519,8 @@ package body GUI is
 
       Gtk_New (Net_Disconnect_Item, "Disconnect");
       Network_Menu.Append (Net_Disconnect_Item);
+      Net_Disconnect_Item.Set_Sensitive (False);
+      Net_Disconnect_Item.On_Activate (Telnet_Disconnect_CB'Access);
 
       -- Help
 
@@ -713,13 +723,13 @@ package body GUI is
    function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Box) return Boolean is
    begin
       Gdk.Threads.Enter;
-      case Term.Connection is
-         when Terminal.Local =>   
+      case Redirector.Destination is
+         when Redirector.Local =>   
             Online_Label.Set_Text ("Local");
             Host_Label.Set_Text ("(Disconnected)");
-         when Terminal.Async =>   
+         when Redirector.Async =>   
             Online_Label.Set_Text ("Online (Serial)");
-         when Terminal.Network => 
+         when Redirector.Network => 
             Online_Label.Set_Text ("Online (Telnet)");
             Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
                                  Ada.Strings.Fixed.Trim (Telnet_Sess.Port_Num'Image, Ada.Strings.Both));
@@ -854,7 +864,7 @@ package body GUI is
       -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
       -- Terminal.Processor.Start (Term);
       Keyboard.Init (Term);
-      Redirector.Set_Destination (Term, Terminal.Local);
+      Redirector.Set_Destination (Term, Redirector.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 

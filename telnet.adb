@@ -65,7 +65,6 @@ package body Telnet is
          or 
             terminate;
          end select;
-
       end loop;
    end Keyboard_Sender;
 
@@ -88,6 +87,7 @@ package body Telnet is
 	procedure Close_Connection (Sess : in out Session_T) is
    begin
       GNAT.Sockets.Close_Socket (Sess.Conn);
+      Keyboard_Sender_Task.Stop;
    end Close_Connection;
 
    task body Receiver is
@@ -182,6 +182,7 @@ package body Telnet is
       end loop;
       <<Halt>>
       Ada.Text_IO.Put_Line ("DEBUG: Telnet Receiver loop exited");
+      Session.Close_Connection;
    end Receiver;
 
 end Telnet;

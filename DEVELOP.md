@@ -15,6 +15,7 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
 * Display - holds a matrix of ASCII characters (Cells)
 * GUI - the bulk of the Gtk interface
 * Keyboard - guess what?!?
+* Redirector - routes data according to the current connection
 * Telnet - handle the Telnet protocol
 * Terminal - implements the Dasher behaviour
 
@@ -52,8 +53,6 @@ Then...
 * `gprclean`
 
 Default build is with debugging and without optimisation.  Append `-Xmode=release` for optimised build.
-
-TODO - why do we need `-gnatJ` switch to resolve problem with Redirector?
 
 ## Run with Fatal Warnings...
 `./obj/dashera --gtk-fatal-warnings --g-fatal--warnings`

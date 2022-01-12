@@ -22,11 +22,9 @@ with Dasher_Codes;   use Dasher_Codes;
 package Terminal is
 
    type Emulation_T is (D200, D210);
-   type Connection_T is (Local, Async, Network);
 
    type Terminal_T is tagged record
       Emulation                        : Emulation_T;
-      Connection                       : Connection_T;
       Cursor_X, Cursor_Y               : Natural;
       In_Command, In_Extended_Command  : Boolean;
       Getting_X_Addr, Getting_Y_Addr   : Boolean;

@@ -23,7 +23,6 @@ with Terminal;     use Terminal;
 
 package Keyboard is
 
-   Destination : Connection_T := Local;
    Term_Acc    : Terminal_Acc_T;
    Ctrl_Pressed, Shift_Pressed : Boolean := False;
 

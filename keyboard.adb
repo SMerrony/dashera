@@ -46,7 +46,6 @@ package body Keyboard is
       BA          : Byte_Arr(1..1);
    begin
       BA(1) := Byt;
-      -- Queues.Keyboard_Enqueue (BA);
       Redirector.Send_Data (BA);
    end Enqueue_Key;
 
