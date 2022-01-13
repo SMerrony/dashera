@@ -26,7 +26,7 @@ with Gdk.Threads;
 with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
 
 with Glib;                    use Glib;
-with Glib.Error;
+with Glib.Error;              use Glib.Error;
 
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
 with Gtk.Button;
@@ -105,7 +105,7 @@ package body GUI is
       Gtk_New (Dialog);
       Dialog.Set_Destroy_With_Parent (True);
       Dialog.Set_Modal (True);
-      -- TODO: Dialog.Set_Logo
+      Dialog.Set_Logo (Icon_PB);
       Dialog.Set_Authors ((1 => new String'(App_Author)));
       Dialog.Set_Copyright (App_Copyright);
       Dialog.Set_Comments (App_Comment);
@@ -816,6 +816,7 @@ package body GUI is
 
    function Create_Window return Gtk.Window.Gtk_Window is
       H_Grid : Gtk.Grid.Gtk_Grid;
+      Error : aliased Glib.Error.GError;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
 
@@ -867,6 +868,13 @@ package body GUI is
       Redirector.Set_Destination (Term, Redirector.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
+
+      Gdk.Pixbuf.Gdk_New_From_File (Pixbuf => Icon_PB, Filename => App_Icon, Error => Error);
+      if Error /= null then
+         Ada.Text_IO.Put_Line ("WARNING: Could not find/load icon file: " & App_Icon);
+      else
+         Main_Window.Set_Icon (Icon_PB);
+      end if;
 
       Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");
 

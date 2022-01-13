@@ -18,6 +18,7 @@
 -- THE SOFTWARE.
 
 -- with Gtkada.Builder; use Gtkada.Builder;
+with Gdk.Pixbuf;
 
 with Glib.Main;
 
@@ -50,6 +51,7 @@ package GUI is
       
    Main_Window : Gtk_Window;
    Main_Grid   : Gtk.Grid.Gtk_Grid;
+   Icon_PB     : Gdk.Pixbuf.Gdk_Pixbuf;
    Adj         : Gtk.Adjustment.Gtk_Adjustment;
 
    -- Function keys/labels...
