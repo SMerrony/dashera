@@ -102,39 +102,40 @@ package body Crt is
       Cr := Cairo.Create (surface);
 
       for Line in 0 .. Display.Disp.Visible_Lines-1 loop
+
+         Char_Y  := Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height);
+         
          for Col in 0 .. Display.Disp.Visible_Cols-1 loop
             Char_X  := Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width);
-            Char_Y  := Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height);
-            Char_UL := (Gdouble(Gint(Line + 1) * BDF_Font.Decoded.Char_Height)) - 1.0;
             Char_Ix := Character'Pos (Display.Disp.Cells(Line, Col).Char_Value);
-            if Char_Ix > 31 and Char_Ix < 128 then
-               -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt @ Line: " & Line'Image & ", Col: " & Col'Image & 
-               -- " char is: " &  Display.Disp.Cells(Line, Col).Char_Value & " char index is: " & Char_Ix'Image);
-               if Display.Disp.Blink_Enabled and Tube.Blink_State and Display.Disp.Cells(Line, Col).Blink then
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                               Pixbuf => BDF_Font.Decoded.Font(32).Dim_Pix_Buf, 
-                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
-               elsif Display.Disp.Cells(Line, Col).Dim then
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                               Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Dim_Pix_Buf, 
-                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
-               elsif Display.Disp.Cells(Line, Col).Rev then
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                               Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf,
-                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
-               else
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                               Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
-                                               Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
-               end if;
-               Cairo.Paint (Cr);
-               -- Underlined?
-               if Display.Disp.Cells(Line, Col).Underscore then
-                  Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
-                  Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(BDF_Font.Decoded.Char_Width), 1.0);
-                  Cairo.Fill (Cr);
-               end if;
+
+            if Display.Disp.Blink_Enabled and Tube.Blink_State and Display.Disp.Cells(Line, Col).Blink then
+               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                             Pixbuf => BDF_Font.Decoded.Font(32).Dim_Pix_Buf, 
+                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+            elsif Display.Disp.Cells(Line, Col).Dim then
+               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                             Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Dim_Pix_Buf, 
+                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+            elsif Display.Disp.Cells(Line, Col).Rev then
+               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                             Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf,
+                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
+            else
+               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                             Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
+                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
             end if;
+            Cairo.Paint (Cr);
+
+            -- Underlined?
+            if Display.Disp.Cells(Line, Col).Underscore then
+               Char_UL := (Gdouble(Gint(Line + 1) * BDF_Font.Decoded.Char_Height)) - 1.0;
+               Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
+               Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(BDF_Font.Decoded.Char_Width), 1.0);
+               Cairo.Fill (Cr);
+            end if;
+
          end loop;
       end loop;
 
