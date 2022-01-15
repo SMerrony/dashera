@@ -63,6 +63,8 @@ package GUI is
 
    Telnet_Sess : Telnet.Session_Acc_T;
    Term        : Terminal.Terminal_Acc_T;
+   Saved_Host,
+   Saved_Port  : Unbounded_String := Null_Unbounded_String;
 
    -- Menu items for which we need access...
    Net_Connect_Item, Net_Disconnect_Item : Gtk_Menu_Item;

@@ -7,6 +7,12 @@ GtkAda toolkit and only Gtk3 elements.
 
 The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is probably a good time to leave Gtk2 behind. 
 
+## Objects
+
+I've wasted too much time taking a 'purist' approach to making things objects.  
+DasherA is only ever going to be single-session, there will only ever be a single connection/terminal etc.
+Henceforth, try to use objects only where required, elsewhere a traditional Ada procedural approach works just fine.
+
 ## Major Elements
 
 * Cell - a single ASCII character and it's Dasher attributes
@@ -18,19 +24,6 @@ The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is
 * Redirector - routes data according to the current connection
 * Telnet - handle the Telnet protocol
 * Terminal - implements the Dasher behaviour
-
-### Hierarchy
-```
-                               Dashera
-                                  |
-                                 GUI
-                                  |
-             --------------------------------------------------
-             |        |           |        |       |          |
-            Crt    Display    Keyboard     |     Telnet    Terminal   
-             |        |                    |                 /
-         BDF_Font   Cell                 Logger--------------
-```
 
 ### Tasks
 

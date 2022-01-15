@@ -18,18 +18,16 @@
 -- THE SOFTWARE.
 
 with Dasher_Codes; use Dasher_Codes;
-with Terminal;     use Terminal;
 
 package Redirector is
 
    type Connection_T is (Local, Async, Network);
 
-   procedure Set_Destination (Termin : in Terminal_Acc_T; Dest : in Connection_T);
+   procedure Set_Destination (Dest : in Connection_T);
 
    procedure Send_Data (BA : in Byte_Arr);
    procedure Handle_Data (BA : in Byte_Arr);
 
    Destination : Connection_T;
-   Term        : Terminal_Acc_T;
 
 end Redirector;

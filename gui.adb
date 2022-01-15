@@ -348,9 +348,15 @@ package body GUI is
       Dlg_Box.Pack_Start (Child => Host_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Host_Entry);
       Dlg_Box.Pack_Start (Child => Host_Entry, Expand => True, Fill => True, Padding => 5);
+      if Saved_Host /= Null_Unbounded_String then
+         Host_Entry.Set_Text (To_String (Saved_Host));
+      end if;
       Gtk.Label.Gtk_New (Port_Label, "Port:");
       Dlg_Box.Pack_Start (Child => Port_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Port_Entry);
+      if Saved_Port /= Null_Unbounded_String then
+         Port_Entry.Set_Text (To_String (Saved_Port));
+      end if;
       Dlg_Box.Pack_Start (Child => Port_Entry, Expand => True, Fill => True, Padding => 5);
       Cancel_Unused := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
       Connect_Unused := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
@@ -363,15 +369,17 @@ package body GUI is
          else
             declare
                Host_Str : constant Glib.UTF8_String := Host_Entry.Get_Text;
-               Port_Num : Integer;
+               Port_Num : Positive;
             begin
-               Port_Num := Integer'Value (Port_Entry.Get_Text);
+               Port_Num := Positive'Value (Port_Entry.Get_Text);
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num);
                -- TODO handle exceptions
-               Redirector.Set_Destination (Term, Redirector.Network);
+               Redirector.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
                -- TODO Serial items...
+               Saved_Host := To_Unbounded_String (Host_Str);
+               Saved_Port := To_Unbounded_String (Port_Entry.Get_Text);
             end;
          end if;
       end if;
@@ -382,7 +390,7 @@ package body GUI is
       pragma Unreferenced (Self);
    begin
       Telnet_Sess.Close_Connection;
-      Redirector.Set_Destination (Term, Redirector.Local);
+      Redirector.Set_Destination (Redirector.Local);
       Net_Connect_Item.Set_Sensitive (True);
       Net_Disconnect_Item.Set_Sensitive (False);
    end Telnet_Disconnect_CB;
@@ -861,7 +869,7 @@ package body GUI is
       Main_Window.Add (Main_Grid);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
-      Redirector.Set_Destination (Term, Redirector.Local);
+      Redirector.Set_Destination (Redirector.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 
@@ -882,14 +890,16 @@ package body GUI is
             declare
                Colon_Ix : constant Natural := Index (Host_Arg, ":");
                Host_Str : constant String  := Slice (Host_Arg, 1, Colon_Ix - 1);
-               Port_Num : constant Integer := Integer'Value (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
+               Port_Num : constant Positive := Positive'Value (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
             begin
               Telnet_Sess := Telnet.New_Connection (Host_Str, Port_Num);
                -- TODO handle exceptions
-               Redirector.Set_Destination (Term, Redirector.Network);
+               Redirector.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
                -- TODO Serial items...
+               Saved_Host := To_Unbounded_String (Host_Str);
+               Saved_Port := To_Unbounded_String (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
             end;
          end if;
       end if;

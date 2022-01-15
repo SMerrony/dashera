@@ -18,12 +18,12 @@
 -- THE SOFTWARE.
 
 with Telnet;
+with Terminal;
 
 package body Redirector is
 
-   procedure Set_Destination (Termin : in Terminal_Acc_T; Dest : in Connection_T) is
+   procedure Set_Destination (Dest : in Connection_T) is
    begin
-      Term := Termin;
       Destination := Dest;
    end Set_Destination;
 
