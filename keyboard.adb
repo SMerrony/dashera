@@ -28,11 +28,6 @@ with Redirector;
 
 package body Keyboard is
 
-   procedure Init (Term : in Terminal_Acc_T) is
-   begin
-      Term_Acc := Term;
-   end Init;
-
    procedure Handle_Key_Press (Key  : in Gdk_Key_Type) is
    begin
       case Key is 

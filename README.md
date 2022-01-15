@@ -7,6 +7,7 @@ DasherA is a free terminal emulator for Data General DASHER series character-bas
 
 * DASHER D200 & D210 Emulation
 * Network Interface (Telnet) support
+* May specify ```-host=host:port``` on command line
 * Reverse video, blinking, dim and underlined characters
 * Pixel-for-pixel copy of D410 character set
 * 15 (plus Ctrl & Shift) DASHER Function keys, Erase Page, Erase EOL, Hold, Local Print and Break keys

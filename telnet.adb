@@ -21,11 +21,11 @@ with Ada.Streams;	use Ada.Streams;
 with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
+with Redirector;
+
 package body Telnet is
 
-	function New_Connection (Host_Str : in String; 
-                            Port_Num : in Integer;  
-                            Term : in Terminal.Terminal_Acc_T) return Session_Acc_T is
+	function New_Connection (Host_Str : in String; Port_Num : in Integer) return Session_Acc_T is
       Sess : aliased constant Session_Acc_T := new Session_T;
       Address : GNAT.Sockets.Sock_Addr_Type;
    begin
@@ -38,7 +38,6 @@ package body Telnet is
       -- TODO handle exceptions
       Sess.Host_Str := To_Unbounded_String (Host_Str);
       Sess.Port_Num := Port_Num;
-      Sess.Term := Term;
       Receiver_Task := new Receiver;
       Receiver_Task.Start (Sess);
       Keyboard_Sender_Task := new Keyboard_Sender;
@@ -175,7 +174,7 @@ package body Telnet is
             end if;
 
             One_Char_BA(1) := One_Byte;
-            Session.Term.Process (One_Char_BA);
+            Redirector.Handle_Data (One_Char_BA);
 
          <<continue>>
          end loop;

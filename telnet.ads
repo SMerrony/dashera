@@ -22,7 +22,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.Sockets;	use GNAT.Sockets;
 
 with Dasher_Codes;   use Dasher_Codes;
-with Terminal;			use Terminal;
 
 package Telnet is
 
@@ -47,16 +46,13 @@ package Telnet is
 
    type Session_T is tagged record
       Conn     : GNAT.Sockets.Socket_Type;
-		Term     : Terminal.Terminal_Acc_T;
 		Host_Str : Unbounded_String;  -- The host as specified by our user
 		Port_Num : Integer;           -- The port as specified by our user
    end record;
 
 	type Session_Acc_T is access all Session_T;
 
-	function New_Connection (Host_Str : in String; 
-									 Port_Num : in Integer; 
-									 Term : in Terminal.Terminal_Acc_T) return Session_Acc_T;
+	function New_Connection (Host_Str : in String; Port_Num : in Integer) return Session_Acc_T;
 	-- Attempt to initiate a new TCPIP/Telnet connection to the specified Host and Port.
 	-- Data from the remote host will be directed to the supplied Terminal.
 	-- To send data, call the Send procedure

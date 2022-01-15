@@ -17,6 +17,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
+
 -- with Gtkada.Builder; use Gtkada.Builder;
 with Gdk.Pixbuf;
 
@@ -70,6 +72,6 @@ package GUI is
    Emul_Label, Hold_Label : Gtk.Label.Gtk_Label;
    SB_Timeout  : Glib.Main.G_Source_ID := 0;
 
-   function Create_Window return Gtk_Window;
+   function Create_Window (Host_Arg : in Unbounded_String) return Gtk_Window;
 
 end GUI;

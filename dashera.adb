@@ -40,7 +40,7 @@ procedure Dashera is
 
    -- program args etc.
    Arg_Ix : Natural := 1;
-   Host_Arg : Unbounded_String;
+   Host_Arg : Unbounded_String := Null_Unbounded_String;
    Trace_Script : Boolean := false;
    Trace_Xmodem : Boolean := false;
 
@@ -81,7 +81,7 @@ begin
    Gtk.Main.Init;
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
-   Main_Window := Gui.Create_Window;
+   Main_Window := Gui.Create_Window (Host_Arg);
    Main_Window.Show_All;
    Gtk.Main.Main;
    Gdk.Threads.Leave;

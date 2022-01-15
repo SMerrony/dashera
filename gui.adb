@@ -18,7 +18,6 @@
 -- THE SOFTWARE.
 
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Gdk.Event;               -- use Gdk.Event;
@@ -367,8 +366,7 @@ package body GUI is
                Port_Num : Integer;
             begin
                Port_Num := Integer'Value (Port_Entry.Get_Text);
-               Ada.Text_IO.Put_Line ("DEBUG: TODO - Call Telnet-connect...");
-               Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num, Term);
+               Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num);
                -- TODO handle exceptions
                Redirector.Set_Destination (Term, Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
@@ -814,9 +812,10 @@ package body GUI is
       return Status_Box;
    end Create_Status_Box;
 
-   function Create_Window return Gtk.Window.Gtk_Window is
+   function Create_Window (Host_Arg : in Unbounded_String) return Gtk.Window.Gtk_Window is
       H_Grid : Gtk.Grid.Gtk_Grid;
       Error : aliased Glib.Error.GError;
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
 
@@ -862,9 +861,6 @@ package body GUI is
       Main_Window.Add (Main_Grid);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
-      -- Keyboard.Key_Handler.Start (Term, Terminal.Disconnected);
-      -- Terminal.Processor.Start (Term);
-      Keyboard.Init (Term);
       Redirector.Set_Destination (Term, Redirector.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
@@ -877,6 +873,26 @@ package body GUI is
       end if;
 
       Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");
+
+      if Host_Arg /= Null_Unbounded_String then
+         if Count (Host_Arg, ":") /= 1 then
+            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter both Host and Port separated by a colon", 
+                                                             Title => "DasherA - Error");
+         else
+            declare
+               Colon_Ix : constant Natural := Index (Host_Arg, ":");
+               Host_Str : constant String  := Slice (Host_Arg, 1, Colon_Ix - 1);
+               Port_Num : constant Integer := Integer'Value (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
+            begin
+              Telnet_Sess := Telnet.New_Connection (Host_Str, Port_Num);
+               -- TODO handle exceptions
+               Redirector.Set_Destination (Term, Redirector.Network);
+               Net_Connect_Item.Set_Sensitive (False);
+               Net_Disconnect_Item.Set_Sensitive (True);
+               -- TODO Serial items...
+            end;
+         end if;
+      end if;
 
       return Main_Window;
 

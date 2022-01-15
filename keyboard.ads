@@ -19,15 +19,10 @@
 
 with Gdk.Types; use Gdk.Types;
 
-with Terminal;     use Terminal;
-
 package Keyboard is
 
-   Term_Acc    : Terminal_Acc_T;
    Ctrl_Pressed, Shift_Pressed : Boolean := False;
 
-   procedure Init               (Term : in Terminal_Acc_T);
-   
    procedure Handle_Key_Press   (Key  : in Gdk_Key_Type);
 
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type);
