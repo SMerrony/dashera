@@ -67,7 +67,8 @@ package GUI is
    Saved_Port  : Unbounded_String := Null_Unbounded_String;
 
    -- Menu items for which we need access...
-   Net_Connect_Item, Net_Disconnect_Item : Gtk_Menu_Item;
+   Net_Connect_Item, Net_Disconnect_Item,
+   Serial_Connect_Item, Serial_Disconnect_Item : Gtk_Menu_Item;
 
    -- Status Bar items...
    Online_Label, Host_Label, Logging_Label, 

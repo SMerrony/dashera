@@ -29,6 +29,7 @@ with Glib.Error;              use Glib.Error;
 
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
 with Gtk.Button;
+with Gtk.Combo_Box_Text;
 with Gtk.Container;
 with Gtk.Css_Provider;        use Gtk.Css_Provider;
 with Gtk.Dialog;              use Gtk.Dialog;
@@ -329,6 +330,96 @@ package body GUI is
       end if;
    end Logging_CB;
 
+   procedure Serial_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Dialog   : Gtk_Dialog;
+      Dlg_Box  : Gtk.Box.Gtk_Box;
+      Ser_Grid : Gtk.Grid.Gtk_Grid;
+      Port_Label, Baud_Label, Bits_Label, Parity_Label, Stop_Bits_Label : Gtk.Label.Gtk_Label;
+      Port_Entry : Gtk.GEntry.Gtk_Entry;
+      Baud_Combo, Bits_Combo, Parity_Combo, Stop_Bits_Combo : Gtk.Combo_Box_Text.Gtk_Combo_Box_Text;
+      Cancel_Unused, Connect_Unused : Gtk.Widget.Gtk_Widget;
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
+   begin
+      Gtk_New (Dialog);
+      Dialog.Set_Destroy_With_Parent (True);
+      Dialog.Set_Modal (True);
+      -- TODO: Dialog.Set_Logo
+      Dialog.Set_Title (App_Title & " - Serial Port");
+      Dlg_Box := Dialog.Get_Content_Area;
+      Gtk.Grid.Gtk_New (Ser_Grid);
+
+      Gtk.Label.Gtk_New (Port_Label, "Port:");
+      Ser_Grid.Attach (Child => Port_Label, Left => 0, Top => 0);
+      Gtk.GEntry.Gtk_New (The_Entry => Port_Entry); 
+      Ser_Grid.Attach (Child => Port_Entry, Left => 1, Top => 0);
+
+      Gtk.Label.Gtk_New (Baud_Label, "Baud:");
+      Ser_Grid.Attach (Child => Baud_Label, Left => 0, Top => 1);
+      Gtk.Combo_Box_Text.Gtk_New (Baud_Combo);
+      Baud_Combo.Append_Text ("300");
+      Baud_Combo.Append_Text ("1200");
+      Baud_Combo.Append_Text ("2400");
+      Baud_Combo.Append_Text ("9600");
+      Baud_Combo.Append_Text ("19200");
+      Baud_Combo.Set_Active (3);
+      Ser_Grid.Attach (Child => Baud_Combo, Left => 1, Top => 1);
+
+      Gtk.Label.Gtk_New (Bits_Label, "Data Bits:");
+      Ser_Grid.Attach (Child => Bits_Label, Left => 0, Top => 2);
+      Gtk.Combo_Box_Text.Gtk_New (Bits_Combo);
+      Bits_Combo.Append_Text ("7");
+      Bits_Combo.Append_Text ("8");
+      Bits_Combo.Set_Active (1);
+      Ser_Grid.Attach (Child => Bits_Combo, Left => 1, Top => 2);
+
+      Gtk.Label.Gtk_New (Parity_Label, "Parity:");
+      Ser_Grid.Attach (Child => Parity_Label, Left => 0, Top => 3);
+      Gtk.Combo_Box_Text.Gtk_New (Parity_Combo);
+      Parity_Combo.Append_Text ("None");
+      Parity_Combo.Append_Text ("Even");
+      Parity_Combo.Append_Text ("Odd");
+      Parity_Combo.Set_Active (0);
+      Ser_Grid.Attach (Child => Parity_Combo, Left => 1, Top => 3);
+
+      Gtk.Label.Gtk_New (Stop_Bits_Label, "Stop Bits:");
+      Ser_Grid.Attach (Child => Stop_Bits_Label, Left => 0, Top => 4);
+      Gtk.Combo_Box_Text.Gtk_New (Stop_Bits_Combo);
+      Stop_Bits_Combo.Append_Text ("1");
+      Stop_Bits_Combo.Append_Text ("2");
+      Stop_Bits_Combo.Set_Active (0);
+      Ser_Grid.Attach (Child => Stop_Bits_Combo, Left => 1, Top => 4);
+
+      Dlg_Box.Pack_Start (Child => Ser_Grid, Padding => 5);
+
+      Cancel_Unused := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
+      Connect_Unused := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
+      Dialog.Set_Default_Response (Gtk_Response_Accept);
+      Dialog.Show_All;
+      if Dialog.Run = Gtk_Response_Accept then 
+         if Port_Entry.Get_Text_Length = 0 then
+            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter a Serial Port", 
+                                                             Title => "DasherA - Error");
+         else
+            declare
+               Port_Str : constant Glib.UTF8_String := Port_Entry.Get_Text;
+            begin
+null;
+            end;
+         end if;
+      end if;
+      Dialog.Destroy;
+   end Serial_Connect_CB;
+
+   procedure Serial_Disconnect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      -- Telnet_Sess.Close_Connection;
+      Redirector.Set_Destination (Redirector.Local);
+      Serial_Connect_Item.Set_Sensitive (True);
+      Serial_Disconnect_Item.Set_Sensitive (False);
+   end Serial_Disconnect_CB;
+
    procedure Telnet_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       Dialog : Gtk_Dialog;
@@ -512,6 +603,14 @@ package body GUI is
       Menu_Bar.Append(Menu_Item);
       Gtk_New (Serial_Menu);
       Menu_Item.Set_Submenu (Serial_Menu);
+      Gtk_New (Serial_Connect_Item, "Connect");
+      Serial_Menu.Append (Serial_Connect_Item);
+      Serial_Connect_Item.On_Activate (Serial_Connect_CB'Access);
+
+      Gtk_New (Serial_Disconnect_Item, "Disconnect");
+      Serial_Menu.Append (Serial_Disconnect_Item);
+      Serial_Disconnect_Item.Set_Sensitive (False);
+      Serial_Disconnect_Item.On_Activate (Serial_Disconnect_CB'Access);
 
       -- Network
 
