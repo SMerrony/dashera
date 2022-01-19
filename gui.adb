@@ -20,6 +20,8 @@
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
+with GNAT.Serial_Communications; use GNAT.Serial_Communications;
+
 with Gdk.Event;               -- use Gdk.Event;
 with Gdk.Threads;
 with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
@@ -63,6 +65,7 @@ with Display;
 with Keyboard;
 with Logger;
 with Redirector;
+with Serial;
 
 package body GUI is  
 
@@ -403,8 +406,40 @@ package body GUI is
          else
             declare
                Port_Str : constant Glib.UTF8_String := Port_Entry.Get_Text;
+               Rate : Data_Rate;
+               Bits : Data_Bits;
+               Stop_Bits : Stop_Bits_Number;
+               Parity : Parity_Check;
             begin
-null;
+               case Baud_Combo.Get_Active is
+                  when 0 => Rate := B300;
+                  when 1 => Rate := B1200;
+                  when 2 => Rate := B2400;
+                  when 3 => Rate := B9600;
+                  when 4 => Rate := B19200;
+                  when others => null; -- TODO raise exception;
+               end case;
+               case Bits_Combo.Get_Active is
+                  when 0 => Bits := CS7;
+                  when 1 => Bits := CS8;
+                  when others => null; -- TODO raise exception;
+               end case;
+               case Parity_Combo.Get_Active is
+                  when 0 => Parity := None;
+                  when 1 => Parity := Even;
+                  when 2 => Parity := Odd;
+                  when others => null; -- TODO raise exception;
+               end case;
+               case Stop_Bits_Combo.Get_Active is
+                  when 0 => Stop_Bits := One;
+                  when 1 => Stop_Bits := Two;
+                  when others => null; -- TODO raise exception;
+               end case;
+               Serial.Open (Port_Str, Rate, Bits, Parity, Stop_Bits);
+               -- TODO handle exceptions
+               Redirector.Set_Destination (Redirector.Async);
+               Serial_Connect_Item.Set_Sensitive (False);
+               Serial_Disconnect_Item.Set_Sensitive (True);
             end;
          end if;
       end if;

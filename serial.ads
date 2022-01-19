@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C) 2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -17,29 +17,36 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Serial;
-with Telnet;
-with Terminal;
+with GNAT.Serial_Communications; use GNAT.Serial_Communications;
 
-package body Redirector is
+with Dasher_Codes; use Dasher_Codes;
 
-   procedure Set_Destination (Dest : in Connection_T) is
-   begin
-      Destination := Dest;
-   end Set_Destination;
+package Serial is
 
-   procedure Send_Data (BA : in Byte_Arr) is
-   begin
-      case Destination is
-         when Local => Terminal.Processor_Task.Accept_Data (BA);
-         when Async => Serial.Keyboard_Sender_Task.Accept_Data (BA);
-         when Network => Telnet.Keyboard_Sender_Task.Accept_Data (BA);
-      end case;
-   end Send_Data;
+   procedure Open (Port_Str  : in String;
+                   Rate      : in Data_Rate;
+                   Bits      : in Data_Bits;
+                   Parity    : in Parity_Check;
+                   Stop_Bits : in Stop_Bits_Number);
 
-   procedure Handle_Data (BA : in Byte_Arr) is
-   begin
-      Terminal.Processor_Task.Accept_Data (BA);
-   end Handle_Data;
+   procedure Close;
 
-end Redirector;
+   task type Receiver is
+		entry Start;
+	end Receiver;
+	type Receiver_Acc is access Receiver;
+
+	Receiver_Task : Receiver_Acc;
+
+	task type Keyboard_Sender is
+      entry Start;
+		entry Accept_Data (BA : in Byte_Arr);
+      entry Stop;
+   end Keyboard_Sender;
+	type Sender_Acc is access Keyboard_Sender;
+
+	Keyboard_Sender_Task : Sender_Acc;
+
+   Port : aliased Serial_Port;
+
+end Serial;
