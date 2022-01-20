@@ -60,6 +60,7 @@ package body Telnet is
             end Accept_Data;
          or
             accept Stop;
+               Ada.Text_IO.Put_Line ("DEBUG: Telnet Keyboard_Sender task stopping");
                exit;
          or 
             terminate;
@@ -85,8 +86,11 @@ package body Telnet is
 
 	procedure Close_Connection (Sess : in out Session_T) is
    begin
-      GNAT.Sockets.Close_Socket (Sess.Conn);
+      GNAT.Sockets.Shutdown_Socket (Sess.Conn);
       Keyboard_Sender_Task.Stop;
+   exception
+      when others =>
+         null;
    end Close_Connection;
 
    task body Receiver is

@@ -22,7 +22,8 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 * GUI - the bulk of the Gtk interface
 * Keyboard - guess what?!?
 * Redirector - routes data according to the current connection
-* Telnet - handle the Telnet protocol
+* Serial - handle the serial (async) connection
+* Telnet - handle the Telnet connection and protocol
 * Terminal - implements the Dasher behaviour
 
 ### Tasks
@@ -51,5 +52,7 @@ Default build is with debugging and without optimisation.  Append `-Xmode=releas
 `./obj/dashera --gtk-fatal-warnings --g-fatal--warnings`
 
 ## Terminal setting on Linux host:
+
+Ensure `ncurses-term` package is installed.
 
 `export TERM=d210-dg`
