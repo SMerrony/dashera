@@ -47,7 +47,7 @@ package GUI is
    App_Author       : constant String := "Stephen Merrony";
    App_Copyright    : constant String := "Copyright ©2021 S.Merrony";
    App_Icon         : constant String := "DGlogoOrange.ico";
-   App_Website      : constant String := "https://github.com/SMerrony/DasherA"; -- FIXME
+   App_Website      : constant String := "https://github.com/SMerrony/dashera";
 
    History_Lines    : constant Natural := 1000;
       

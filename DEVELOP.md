@@ -56,3 +56,5 @@ Default build is with debugging and without optimisation.  Append `-Xmode=releas
 Ensure `ncurses-term` package is installed.
 
 `export TERM=d210-dg`
+
+You may have to `stty echo` if no characters appear when you type.

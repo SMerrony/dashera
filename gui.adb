@@ -440,6 +440,8 @@ package body GUI is
                Redirector.Set_Destination (Redirector.Async);
                Serial_Connect_Item.Set_Sensitive (False);
                Serial_Disconnect_Item.Set_Sensitive (True);
+               Net_Connect_Item.Set_Sensitive (False);
+               Net_Disconnect_Item.Set_Sensitive (False);
             end;
          end if;
       end if;
@@ -449,10 +451,12 @@ package body GUI is
    procedure Serial_Disconnect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
    begin
-      -- Telnet_Sess.Close_Connection;
+      Serial.Close;
       Redirector.Set_Destination (Redirector.Local);
       Serial_Connect_Item.Set_Sensitive (True);
       Serial_Disconnect_Item.Set_Sensitive (False);
+      Net_Connect_Item.Set_Sensitive (True);
+      Net_Disconnect_Item.Set_Sensitive (False);
    end Serial_Disconnect_CB;
 
    procedure Telnet_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
@@ -503,7 +507,8 @@ package body GUI is
                Redirector.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
-               -- TODO Serial items...
+               Serial_Connect_Item.Set_Sensitive (False);
+               Serial_Disconnect_Item.Set_Sensitive (False);
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Port_Entry.Get_Text);
             end;
@@ -519,6 +524,8 @@ package body GUI is
       Redirector.Set_Destination (Redirector.Local);
       Net_Connect_Item.Set_Sensitive (True);
       Net_Disconnect_Item.Set_Sensitive (False);
+      Serial_Connect_Item.Set_Sensitive (True);
+      Serial_Disconnect_Item.Set_Sensitive (False);
    end Telnet_Disconnect_CB;
    
 
@@ -1031,7 +1038,8 @@ package body GUI is
                Redirector.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
-               -- TODO Serial items...
+               Serial_Connect_Item.Set_Sensitive (False);
+               Serial_Disconnect_Item.Set_Sensitive (False);
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
             end;
