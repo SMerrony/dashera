@@ -60,7 +60,7 @@ package body Serial is
          begin
             Byte'Read (Port'Access, B);
             One_Char_BA(1) := B;
-            Redirector.Handle_Data (One_Char_BA);
+            Redirector.Router.Handle_Data (One_Char_BA);
          exception
             when Ada.IO_Exceptions.END_ERROR =>
                null;

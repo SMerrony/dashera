@@ -41,7 +41,7 @@ package body Keyboard is
       BA          : Byte_Arr(1..1);
    begin
       BA(1) := Byt;
-      Redirector.Send_Data (BA);
+      Redirector.Router.Send_Data (BA);
    end Enqueue_Key;
 
 
@@ -58,8 +58,7 @@ package body Keyboard is
    begin
       BA(1) := B1;
       BA(2) := B2;
-      -- Queues.Keyboard_Enqueue (BA);
-      Redirector.Send_Data (BA);
+      Redirector.Router.Send_Data (BA);
    end Enqueue_Pair;
 
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is

@@ -1,0 +1,5 @@
+# Mini-Expect test script for DasherA
+
+send "Hello, World!\n"
+expect "found"
+exit

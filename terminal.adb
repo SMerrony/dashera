@@ -24,6 +24,7 @@ with BDF_Font;
 with Crt;
 with Display;
 with Logger;
+with Mini_Expect;
 with Redirector;
 
 package body Terminal is
@@ -309,7 +310,7 @@ package body Terminal is
                   B3_Arr(1) := 31;
                   B3_Arr(2) := Byte(T.Cursor_X);
                   B3_Arr(3) := Byte(T.Cursor_Y);
-                  Redirector.Send_Data (B3_Arr);
+                  Redirector.Router.Send_Data (B3_Arr);
                end;
                T.Skip_Byte := True;
             when Dasher_Rev_On =>
@@ -381,9 +382,18 @@ package body Terminal is
             goto Redraw_Tube;
          end if;
 
-         if T.Skip_Byte then
-            goto Redraw_Tube;
-         end if;
+         -- if Mini_Expect.Runner.Is_Expecting then
+         if Mini_Expect.Expecting then
+            -- Mini_Expect.Runner_Task.Expect (B);
+            declare
+               Finished : Boolean;
+            begin
+               Mini_Expect.Handle_Byte (B, Finished);
+               -- if not Finished then
+               --    Mini_Expect.Runner.Execute;
+               -- end if;
+            end;
+         end if;   
 
          -- Finally! Put the character in the displayable matrix
          C := Character'Val(127); -- the 'unknown character' character
@@ -397,6 +407,7 @@ package body Terminal is
          T.Cursor_X := T.Cursor_X + 1;
 
          -- TODO handle Expect case
+  
 
       <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);

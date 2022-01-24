@@ -17,6 +17,7 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * 1000-line scrollable terminal history
 * Session logging to file
 * Various terminal widths, heights and zoom-levels available
+* Support for mini-Expect scripts to automate some tasks [see Wiki](https://github.com/SMerrony/DasherG/wiki/DasherG-Mini-Expect-Scripts)
   
 Here is the full [Implementation Chart](implementationChart.md) for DasherA.
 

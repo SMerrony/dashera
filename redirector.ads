@@ -20,13 +20,19 @@
 with Dasher_Codes; use Dasher_Codes;
 
 package Redirector is
-
+   
+   pragma Elaborate_Body;
+   
    type Connection_T is (Local, Async, Network);
-
-   procedure Set_Destination (Dest : in Connection_T);
-
-   procedure Send_Data (BA : in Byte_Arr);
-   procedure Handle_Data (BA : in Byte_Arr);
+   
+   task Router is
+      Entry Set_Destination (Dest : in Connection_T);
+      Entry Get_Destination (Dest : out Connection_T);
+      Entry Send_Data (BA : in Byte_Arr);
+      Entry Handle_Data (BA : in Byte_Arr);
+      -- Entry Set_Expecting (Exp : in Boolean);
+      -- Entry Get_Expecting (Exp : out Boolean);
+    end Router;
 
    Destination : Connection_T;
 

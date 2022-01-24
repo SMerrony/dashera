@@ -17,29 +17,50 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+-- with Ada.Text_IO;  use Ada.Text_IO;
+
+-- with Mini_Expect;
 with Serial;
 with Telnet;
 with Terminal;
 
 package body Redirector is
 
-   procedure Set_Destination (Dest : in Connection_T) is
+   task body Router is
    begin
-      Destination := Dest;
-   end Set_Destination;
-
-   procedure Send_Data (BA : in Byte_Arr) is
-   begin
-      case Destination is
-         when Local => Terminal.Processor_Task.Accept_Data (BA);
-         when Async => Serial.Keyboard_Sender_Task.Accept_Data (BA);
-         when Network => Telnet.Keyboard_Sender_Task.Accept_Data (BA);
-      end case;
-   end Send_Data;
-
-   procedure Handle_Data (BA : in Byte_Arr) is
-   begin
-      Terminal.Processor_Task.Accept_Data (BA);
-   end Handle_Data;
+      loop
+         select
+            accept Set_Destination (Dest : in Connection_T) do
+               Destination := Dest;
+            end Set_Destination;
+         or
+            accept Get_Destination (Dest : out Connection_T) do
+               Dest := Destination;
+            end Get_Destination;
+         -- or
+         --    accept Set_Expecting (Exp : in Boolean) do
+         --       Expecting := Exp;
+         --    end Set_Expecting;
+         -- or
+         --    accept Get_Expecting (Exp : out Boolean) do
+         --       Exp := Expecting;
+         --    end Get_Expecting;
+         or
+            accept Send_Data (BA : in Byte_Arr) do
+               case Destination is
+                  when Local => Terminal.Processor_Task.Accept_Data (BA);
+                  when Async => Serial.Keyboard_Sender_Task.Accept_Data (BA);
+                  when Network => Telnet.Keyboard_Sender_Task.Accept_Data (BA);
+               end case;
+            end Send_Data;
+         or
+            accept Handle_Data (BA : in Byte_Arr) do
+               Terminal.Processor_Task.Accept_Data (BA);
+            end Handle_Data;
+         or
+            terminate; 
+         end select;
+      end loop;
+   end Router;
 
 end Redirector;

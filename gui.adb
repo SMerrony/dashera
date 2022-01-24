@@ -63,6 +63,7 @@ with BDF_Font; use BDF_Font;
 with Crt;
 with Display;
 with Keyboard;
+with Mini_Expect;
 with Logger;
 with Redirector;
 with Serial;
@@ -304,7 +305,21 @@ package body GUI is
       else
          Ada.Text_IO.Put_Line ("DEBUG: No Template file chosen");
       end if;
-   end Load_Template_CB; 
+   end Load_Template_CB;
+
+   procedure Expect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA mini-Expect Script", 
+                                                                        Dir_Only => False, 
+                                                                        Must_Exist => True);
+   begin
+      if Filename'Length > 1 then
+         -- Mini_Expect.Prepare (Filename);
+         -- -- TODO handle exceptions
+         -- Mini_Expect.Runner_Task.Start;
+         Mini_Expect.Prepare (Filename);
+      end if;
+   end Expect_CB;
 
    procedure Logging_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
@@ -437,7 +452,7 @@ package body GUI is
                end case;
                Serial.Open (Port_Str, Rate, Bits, Parity, Stop_Bits);
                -- TODO handle exceptions
-               Redirector.Set_Destination (Redirector.Async);
+               Redirector.Router.Set_Destination (Redirector.Async);
                Serial_Connect_Item.Set_Sensitive (False);
                Serial_Disconnect_Item.Set_Sensitive (True);
                Net_Connect_Item.Set_Sensitive (False);
@@ -452,7 +467,7 @@ package body GUI is
       pragma Unreferenced (Self);
    begin
       Serial.Close;
-      Redirector.Set_Destination (Redirector.Local);
+      Redirector.Router.Set_Destination (Redirector.Local);
       Serial_Connect_Item.Set_Sensitive (True);
       Serial_Disconnect_Item.Set_Sensitive (False);
       Net_Connect_Item.Set_Sensitive (True);
@@ -504,7 +519,7 @@ package body GUI is
                Port_Num := Positive'Value (Port_Entry.Get_Text);
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num);
                -- TODO handle exceptions
-               Redirector.Set_Destination (Redirector.Network);
+               Redirector.Router.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
                Serial_Connect_Item.Set_Sensitive (False);
@@ -521,7 +536,7 @@ package body GUI is
       pragma Unreferenced (Self);
    begin
       Telnet_Sess.Close_Connection;
-      Redirector.Set_Destination (Redirector.Local);
+      Redirector.Router.Set_Destination (Redirector.Local);
       Net_Connect_Item.Set_Sensitive (True);
       Net_Disconnect_Item.Set_Sensitive (False);
       Serial_Connect_Item.Set_Sensitive (True);
@@ -576,6 +591,8 @@ package body GUI is
 
       Gtk_New (Expect_Item, "Run mini-Expect Script");
       File_Menu.Append (Expect_Item);
+      Expect_Item.On_Activate (Expect_CB'Access);
+
       Gtk_New (Sep_Item);
       File_Menu.Append (Sep_Item);
 
@@ -868,9 +885,11 @@ package body GUI is
    end Create_FKeys_Box;  
 
    function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Box) return Boolean is
+      Dest : Redirector.Connection_T;
    begin
       Gdk.Threads.Enter;
-      case Redirector.Destination is
+      Redirector.Router.Get_Destination (Dest);
+      case Dest is
          when Redirector.Local =>   
             Online_Label.Set_Text ("Local");
             Host_Label.Set_Text ("(Disconnected)");
@@ -1010,7 +1029,7 @@ package body GUI is
       Main_Window.Add (Main_Grid);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
-      Redirector.Set_Destination (Redirector.Local);
+      Redirector.Router.Set_Destination (Redirector.Local);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 
@@ -1035,7 +1054,7 @@ package body GUI is
             begin
               Telnet_Sess := Telnet.New_Connection (Host_Str, Port_Num);
                -- TODO handle exceptions
-               Redirector.Set_Destination (Redirector.Network);
+               Redirector.Router.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
                Serial_Connect_Item.Set_Sensitive (False);

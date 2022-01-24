@@ -70,18 +70,18 @@ package body Telnet is
 
    procedure Send (Sess : in Session_Acc_T; BA : in Byte_Arr) is
       SEA : Ada.Streams.Stream_Element_Array (1..BA'Length);
-      Bytes_Sent : Ada.Streams.Stream_Element_Offset;
+      Dummy_Bytes_Sent : Ada.Streams.Stream_Element_Offset;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send called with No. bytes: " & BA'Length'Image);
+      -- Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send called with No. bytes: " & BA'Length'Image);
       for I in 1 .. BA'Length loop
          SEA(Ada.Streams.Stream_Element_Offset(I)) := Ada.Streams.Stream_Element(BA(I));
       end loop;
       GNAT.Sockets.Send_Socket (Socket => Sess.Conn, 
                                 Item => SEA, 
-                                Last => Bytes_Sent 
+                                Last => Dummy_Bytes_Sent 
                                 -- Flags => Send_End_Of_Record
                                 );
-      Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send sent No. Bytes: " & Bytes_Sent'Image);
+      -- Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send sent No. Bytes: " & Bytes_Sent'Image);
    end Send;
 
 	procedure Close_Connection (Sess : in out Session_T) is
@@ -178,7 +178,7 @@ package body Telnet is
             end if;
 
             One_Char_BA(1) := One_Byte;
-            Redirector.Handle_Data (One_Char_BA);
+            Redirector.Router.Handle_Data (One_Char_BA);
 
          <<continue>>
          end loop;
