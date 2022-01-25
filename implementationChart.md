@@ -7,8 +7,8 @@
 | Blink Enable                         | 003         | Ctrl-C                     | Y    | Y    | Enable blinking on screen  |
 | Blink Off                            | 017         | Ctrl-O                     | Y    | Y    |                            |
 | Blink On                             | 016         | Ctrl-N                     | Y    | Y    |                            |
-| Break (CMD-Break)                    | -           | Break Button               |      |     | Only affects Serial operation |
-| Carriage Return                      | 015         | Ctrl-M or CR               | Y    | Y   | No implied new line         |
+| Break (CMD-Break)                    | -           | Break Button               | Y    | Y    | Only affects Serial operation |
+| Carriage Return                      | 015         | Ctrl-M or CR               | Y    | Y    | No implied new line         |
 | Cursor Down                          | 032         | Ctrl-Z or ↓                | Y    | Y    |                   |
 | Cursor Left                          | 031         | Ctrl-Y or ←                | Y    | Y    |                   |
 | Cursor Right                         | 030         | Ctrl-X or →                | Y    | Y    |                   |
@@ -16,12 +16,12 @@
 | Dim Off                              | 035         | Ctrl-}                     | Y    | Y    |                   |
 | Dim On                               | 034         | Ctrl-\                     | Y    | Y    |                   |
 | Erase EOL                            | 013         | Ctrl-K or Erase EOL        | Y    | Y    | Erase from Cursor to End of Line |
-| Erase (Unprotected) to End of Screen | 036 106 106 | Cmd-Brk FF                 | -    |     |                         |
+| Erase (Unprotected) to End of Screen | 036 106 106 | Cmd-Brk FF                 | -    |     |  TODO                       |
 | Erase Page/Window                    | 014         | Ctrl-L or Erase Page       | Y    | Y    | ~Clear Screen on a D200    |
 | New Line                             | 012         | Ctrl-J                     | Y    | Y    | ~Enter/Return              |
 | Print Form                           | 001         | Ctrl-A or Shift-Local Print | -   | -    | TODO            |
-| Print Screen/Window                  | 021         | Ctrl-Q or Local Print      | N    | N    | Local Print button works    |
-| Read Model ID                        | 036 103     | Cmd-Brk C                  |     |     |                 |
+| Print Screen/Window                  | 021         | Ctrl-Q or Local Print      | N    | N    | TODO    |
+| Read Model ID                        | 036 103     | Cmd-Brk C                  |     |     |   TODO              |
 | Read Cursor/Window Address           | 005         | Ctrl-E                     | Y    | Y    |                 |
 | Remote Test Enter                    | 036 101     |                            | N    | N    | *Will not implement in emulator* |
 | Remote Test Exit                     | 036 102     |                            | N    | N    | *Will not implement in emulator* |

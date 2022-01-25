@@ -36,11 +36,16 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 
 Make sure you have all the Ada and GtkAda stuff available.
 
-On my Linux dev box, where I installed GtkAda from source I need to do...
+On Debian-based systems you can use the `gnat` compiler and the `libgtkada19-dev` (or later) GUI
+toolkit from the standard provided packages.
+
+On a Linux dev box where I had installed GtkAda from source, I had to do...
 ```
 GPR_PROJECT_PATH=/usr/local/lib/gnat
 export GPR_PROJECT_PATH
 ```
+Create the `obj` directory if it does not exist.
+
 Then...
 
 * `gprbuild`
@@ -49,7 +54,7 @@ Then...
 Default build is with debugging and without optimisation.  Append `-Xmode=release` for optimised build.
 
 ## Run with Fatal Warnings...
-`./obj/dashera --gtk-fatal-warnings --g-fatal--warnings`
+`./dashera --gtk-fatal-warnings --g-fatal--warnings`
 
 ## Terminal setting on Linux host:
 
