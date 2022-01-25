@@ -65,21 +65,6 @@ package body Serial is
       Keyboard_Sender_Task.Stop;
    end Close;
 
-   procedure Send_Break is
-      SEA : Stream_Element_Array (1..1);
-   begin
-      Keyboard_Sender_Task.Stop;
-      -- Set a very slow data rate
-      GNAT.Serial_Communications.Set (Port, B110, CS8, Two, None);
-      SEA(1) := 0; -- all zeroes
-      Write (Port, SEA);
-      -- Reset port to user settings
-      GNAT.Serial_Communications.Set (Port, User_Rate, User_Bits, User_Stop_Bits, User_Parity);
-      Keyboard_Sender_Task := new Keyboard_Sender;
-      Keyboard_Sender_Task.Start;
-      Ada.Text_IO.Put_Line ("DEBUG: BREAK signal sent");
-   end Send_Break;
-
    task body Receiver is
       B : Byte;
       One_Char_BA : Byte_Arr(1..1);

@@ -47,7 +47,6 @@ package Serial is
                    Stop_Bits : in Stop_Bits_Number);
 
    procedure Close;
-   procedure Send_Break;
 
 private
 
