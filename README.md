@@ -8,6 +8,7 @@ DasherA is a free terminal emulator for Data General DASHER series character-bas
 * DASHER D200 & D210 Emulation
 * Serial interface support at 300, 1200, 2400, 9600 & 19200 baud, 7 or 8 data bits,
 no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
+* BREAK key support for serial interface - permits use as master console
 * Network Interface (Telnet) support
 * May specify ```-host=host:port``` on command line
 * Reverse video, blinking, dim and underlined characters

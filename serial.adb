@@ -17,6 +17,17 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+-- Note the serial break does not seem to be provided by GNAT.Serial_Communications
+-- It is claimed that...
+--
+-- Sending break can be achieved by:
+--
+-- * lowering the bit-rate
+-- * sending 0x00 which will seem as break.
+-- * change bit-rate back.
+--
+-- During the break, it won't be possible to receive data since the bit-rate is not correct.
+
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.IO_Exceptions;
 with Ada.Streams;	   use Ada.Streams;
@@ -35,6 +46,11 @@ package body Serial is
    begin
       GNAT.Serial_Communications.Open (Port, Port_Name(Port_Str));
       GNAT.Serial_Communications.Set (Port, Rate, Bits, Stop_Bits, Parity);
+      -- Save the user-specified settings so we can reset after sending a Break
+      User_Rate      := Rate;
+      User_Bits      := Bits;
+      User_Parity    := Parity;
+      User_Stop_Bits := Stop_Bits;
       Ada.Text_IO.Put_Line ("DEBUG: Serial port opened and set-up");
       Receiver_Task := new Receiver;
       Receiver_Task.Start;
@@ -48,6 +64,21 @@ package body Serial is
       Close (Port);
       Keyboard_Sender_Task.Stop;
    end Close;
+
+   procedure Send_Break is
+      SEA : Stream_Element_Array (1..1);
+   begin
+      Keyboard_Sender_Task.Stop;
+      -- Set a very slow data rate
+      GNAT.Serial_Communications.Set (Port, B110, CS8, Two, None);
+      SEA(1) := 0; -- all zeroes
+      Write (Port, SEA);
+      -- Reset port to user settings
+      GNAT.Serial_Communications.Set (Port, User_Rate, User_Bits, User_Stop_Bits, User_Parity);
+      Keyboard_Sender_Task := new Keyboard_Sender;
+      Keyboard_Sender_Task.Start;
+      Ada.Text_IO.Put_Line ("DEBUG: BREAK signal sent");
+   end Send_Break;
 
    task body Receiver is
       B : Byte;
@@ -91,7 +122,21 @@ package body Serial is
                end;
             end Accept_Data;
          or
+            accept Send_Break do
+               declare
+                  SEA : Stream_Element_Array (1..1);
+               begin
+                  -- Set a very slow data rate
+                  GNAT.Serial_Communications.Set (Port, B110, CS8, Two, None);
+                  SEA(1) := 0; -- all zeroes
+                  Write (Port, SEA);
+                  -- Reset port to user settings
+                  GNAT.Serial_Communications.Set (Port, User_Rate, User_Bits, User_Stop_Bits, User_Parity);
+               end;
+            end Send_Break;
+         or
             accept Stop;
+               Ada.Text_IO.Put_Line ("DEBUG: Serial Keyboard_Sender Stopped");
                exit;
          or 
             terminate;

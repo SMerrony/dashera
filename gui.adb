@@ -699,10 +699,18 @@ package body GUI is
    end Create_Menu_Bar;
 
    procedure Handle_Key_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
+      use Redirector;
       Lab : constant String := Btn.Get_Label;
+      Dest : Redirector.Connection_T;
    begin
       if Lab = "Break" then
-         Keyboard.Handle_Key_Release (GDK_Break); -- TODO Serial BREAK handling
+         Keyboard.Handle_Key_Release (GDK_Break);
+         Redirector.Router.Get_Destination (Dest);
+         if Dest = Async then
+            Serial.Keyboard_Sender_Task.Send_Break;
+         else
+            Ada.Text_IO.Put_Line ("INFO: BREAK only implemented for Serial connections");
+         end if;
       elsif Lab = "Er.Page" then
          Keyboard.Handle_Key_Release (GDK_3270_EraseEOF);
       elsif Lab = "Loc.Print" then
