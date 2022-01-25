@@ -1,4 +1,4 @@
--- Copyright (C) 2022 Steve Merrony
+-- Copyright (C)2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,20 @@
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
 
-with Gdk.Threads;
-
 with Redirector;
 
 package body Mini_Expect is
 
    -- protected body Runner is
 
-      procedure Prepare (Filename : in String) is
+      procedure Prepare (Filename : in String; Trace : in Boolean) is
       begin
          if Expecting then
             raise Already_Expecting with "Cannot run mini-Expect script while another is still active";
          end if;
          Open (File => Expect_File, Mode => In_File, Name => Filename);
+         Tracing := Trace;
+         Log ("DEBUG: mini-Expect script opened: " & Filename);
          Runner_Task := new Runner_T;
       end Prepare;
 
@@ -46,9 +46,9 @@ package body Mini_Expect is
          Out_Ix : Positive := 1;
          Changed : Boolean := False;
       begin
-         Put_Line ("DEBUG: Convert_Line called with: " & Script_Line);
-         Put_Line ("DEBUG: ... Src_Start set to" & Src_Start'Image & ", Src_End set to" & Src_End'Image);
-         Put_Line ("DEBUG: ... Max result length set to" & Result'Length'Image);
+         Log ("DEBUG: Convert_Line called with: " & Script_Line);
+         Log ("DEBUG: ... Src_Start set to" & Src_Start'Image & ", Src_End set to" & Src_End'Image);
+         Log ("DEBUG: ... Max result length set to" & Result'Length'Image);
          while In_Ix < Src_End loop
             Changed := False;
             if In_Ix < Src_End then
@@ -67,7 +67,7 @@ package body Mini_Expect is
                Out_Ix := Out_Ix + 1;
             end if;
          end loop;
-         Put_Line ("DEBUG: Convert_Line returning: " & Result(1 .. Out_Ix-1));
+         Log ("DEBUG: Convert_Line returning: " & Result(1 .. Out_Ix-1));
          return Result(1 .. Out_Ix-1);
       end Convert_Line;
 
@@ -78,13 +78,13 @@ package body Mini_Expect is
             Host_Str := Null_Unbounded_String;
          else
             Host_Str := Host_Str & Character'Val(Byt);
-            Put_Line ("DEBUG: ... so far we have: "  & To_String (Host_Str));
+            Log ("DEBUG: ... so far we have: "  & To_String (Host_Str));
             if Length (Host_Str) >= Length (Search_Str) then
-               Put_Line ("DEBUG: ... Handle_Byte comparing '" & To_String (Tail(Host_Str, Length (Search_Str)))
+               Log ("DEBUG: ... Handle_Byte comparing '" & To_String (Tail(Host_Str, Length (Search_Str)))
                   & "' with '" & To_String (Search_Str));
                if Tail(Host_Str, Length (Search_Str)) = Search_Str then
                   Expecting := False;
-                  Put_Line ("DEBUG: ... MATCHED!");
+                  Log ("DEBUG: ... MATCHED!");
                end if;
             end if;
          end if;
@@ -158,33 +158,33 @@ package body Mini_Expect is
 
       while not End_Of_File (Expect_File) loop
          Get_Line (Expect_File, Expect_Line, Expect_Line_Length);
-         Put_Line ("DEBUG: Expect script line: " & Expect_Line (1 .. Expect_Line_Length));
+         Log ("DEBUG: Expect script line: " & Expect_Line (1 .. Expect_Line_Length));
          if Expect_Line_Length = 0 then
             -- empty line
-            Put_Line ("DEBUG: ... Skipping empty line");
+            Log ("DEBUG: ... Skipping empty line");
 
          elsif Expect_Line(1) = '#' then
             -- comment line
-            Put_Line ("DEBUG: ... Skipping comment line");
+            Log ("DEBUG: ... Skipping comment line");
 
          elsif Expect_Line(1..6) = "expect" then
             -- expect string from host command, no timeout  
             Expecting := True;
-            Put_Line ("DEBUG: ... Processing 'expect' command");
+            Log ("DEBUG: ... Processing 'expect' command");
             -- delay 0.2;
             Search_Str := To_Unbounded_String (Convert_Line (Expect_Line(8..Expect_Line_Length)));
-            Put_Line ("DEBUG: ... the search sting is '" & To_String (Search_Str) & "'");
+            Log ("DEBUG: ... the search sting is '" & To_String (Search_Str) & "'");
             Host_Str   := Null_Unbounded_String;       
             while Expecting loop
-               Put_Line ("DEBUG: Mini_Expect waiting for match");
+               Log ("DEBUG: Mini_Expect waiting for match");
                delay 0.1;
             end loop;
-            Put_Line ("DEBUG: ... found Expect string: " & To_String (Search_Str));
+            Log ("DEBUG: ... found Expect string: " & To_String (Search_Str));
             delay 0.2;
            
          elsif Expect_Line(1..4) = "send" then
             -- send line to host command  
-            Put_Line ("DEBUG: ... Processing 'send' command");
+            Log ("DEBUG: ... Processing 'send' command");
             declare
                Converted : constant String := Convert_Line (Expect_Line(6..Expect_Line_Length));
                BA : Byte_Arr (1 .. Converted'Length);
@@ -205,8 +205,15 @@ package body Mini_Expect is
          end if;
       end loop;
       Close (Expect_File);
-      Ada.Text_IO.Put_Line ("DEBUG: Mini-Expect script ***completed***");
+      Log ("DEBUG: Mini-Expect script ***completed***");
 
    end Runner_T;
+
+   procedure Log (Msg : in String) is
+   begin
+      if Tracing then
+         Ada.Text_IO.Put_Line (Msg);
+      end if;
+   end Log;
 
 end Mini_Expect;

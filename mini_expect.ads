@@ -1,4 +1,4 @@
--- Copyright (C) 2022 Steve Merrony
+-- Copyright (C)2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -24,19 +24,17 @@ with Dasher_Codes;          use Dasher_Codes;
 
 package Mini_Expect is
 
-   task type Runner_T; -- is
-   --    entry Start;
-   --    -- entry Expect (Byt : in Byte);
-   -- end Runner_T;
+   task type Runner_T;
    type Runner_Acc is access Runner_T;
 
-   procedure Prepare (Filename : in String);
+   procedure Prepare (Filename : in String; Trace : in Boolean);
    -- Try to open a DasherA mini-Expect script.
    -- Could also sanity-check it in the future...
 
    procedure Handle_Byte (Byt : in Byte; Done : out Boolean);
 
    Expect_File : File_Type;
+   Tracing     : Boolean;
    Runner_Task : Runner_Acc;
    Expecting   : Boolean;
    Search_Str, 
@@ -61,5 +59,8 @@ package Mini_Expect is
    -- end Runner;
 
    Already_Expecting : exception;
+
+private
+   procedure Log (Msg : in String);
 
 end Mini_Expect;

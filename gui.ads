@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C) 2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -75,6 +75,10 @@ package GUI is
    Emul_Label, Hold_Label : Gtk.Label.Gtk_Label;
    SB_Timeout  : Glib.Main.G_Source_ID := 0;
 
-   function Create_Window (Host_Arg : in Unbounded_String) return Gtk_Window;
+   -- Flags
+   Trace_Script : Boolean;
+
+   function Create_Window (Host_Arg     : in Unbounded_String;
+                           Trace_Expect : in Boolean) return Gtk_Window;
 
 end GUI;

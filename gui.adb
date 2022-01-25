@@ -314,10 +314,7 @@ package body GUI is
                                                                         Must_Exist => True);
    begin
       if Filename'Length > 1 then
-         -- Mini_Expect.Prepare (Filename);
-         -- -- TODO handle exceptions
-         -- Mini_Expect.Runner_Task.Start;
-         Mini_Expect.Prepare (Filename);
+         Mini_Expect.Prepare (Filename, Trace_Script);
       end if;
    end Expect_CB;
 
@@ -980,12 +977,14 @@ package body GUI is
       return Status_Box;
    end Create_Status_Box;
 
-   function Create_Window (Host_Arg : in Unbounded_String) return Gtk.Window.Gtk_Window is
+   function Create_Window (Host_Arg     : in Unbounded_String;
+                           Trace_Expect : in Boolean) return Gtk.Window.Gtk_Window is
       H_Grid : Gtk.Grid.Gtk_Grid;
       Error : aliased Glib.Error.GError;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
+      Trace_Script := Trace_Expect;
 
       -- Gtk.Window.Initialize (Main_Window);
       Gtk.Window.Gtk_New (Main_Window);

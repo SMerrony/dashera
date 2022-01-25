@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,7 @@ begin
    Gtk.Main.Init;
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
-   Main_Window := Gui.Create_Window (Host_Arg);
+   Main_Window := Gui.Create_Window (Host_Arg, Trace_Script);
    Main_Window.Show_All;
    Gtk.Main.Main;
    Gdk.Threads.Leave;
