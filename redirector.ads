@@ -34,6 +34,8 @@ package Redirector is
       -- Entry Get_Expecting (Exp : out Boolean);
     end Router;
 
+   function String_To_BA (Str : in String) return Byte_Arr; 
+
    Destination : Connection_T;
 
 end Redirector;

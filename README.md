@@ -19,11 +19,30 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * Session logging to file
 * Various terminal widths, heights and zoom-levels available
 * Support for mini-Expect scripts to automate some tasks [see Wiki](https://github.com/SMerrony/DasherG/wiki/DasherG-Mini-Expect-Scripts)
+* Paste from system Clipboard
   
 Here is the full [Implementation Chart](implementationChart.md) for DasherA.
 
 ## Download
 DasherA is [hosted on GitHub](https://github.com/SMerrony/dashera).
+
+A binary version for 64-bit GNU/Linux *may* be available as part of a release.
+
+## Build
+
+You will need the Ada compiler chain, and the GtkAda (libgtkada-dev) libraries installed.
+On modern (2022) Debian-based systems the `gnat` and `libgtkada19-dev` packages work just fine.
+
+* Unpack (or `git clone`) DasherA and `cd` into its directory
+* Create an `obj` directory if it does not already exist
+* Build with `gprbuild`
+
+The default build is with debugging and without optimisation.  Append `-Xmode=release` to the build command for an optimised build.
+
+## Run
+`./dashera`
+
+Append `-h` to see all options.
 
 ## Operational Notes
 * The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the

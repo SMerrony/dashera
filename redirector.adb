@@ -18,6 +18,7 @@
 -- THE SOFTWARE.
 
 -- with Ada.Text_IO;  use Ada.Text_IO;
+with Ada.Unchecked_Conversion;
 
 -- with Mini_Expect;
 with Serial;
@@ -62,5 +63,18 @@ package body Redirector is
          end select;
       end loop;
    end Router;
+
+   function Char_To_Byte is new Ada.Unchecked_Conversion(Character, Byte);
+
+   function String_To_BA (Str : in String) return Byte_Arr is
+      BA : Byte_Arr(1..Str'Length);
+      Ix : Positive := 1;
+   begin
+      for C of Str loop
+         BA(Ix) := Char_To_Byte(C);
+         Ix := Ix + 1;
+      end loop;
+      return BA;
+   end String_To_BA;
 
 end Redirector;

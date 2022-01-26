@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ with Glib.Error;              use Glib.Error;
 
 with Gtk.About_Dialog;        use Gtk.About_Dialog;
 with Gtk.Button;
+with Gtk.Clipboard;
 with Gtk.Combo_Box_Text;
 with Gtk.Container;
 with Gtk.Css_Provider;        use Gtk.Css_Provider;
@@ -345,6 +346,26 @@ package body GUI is
       end if;
    end Logging_CB;
 
+   procedure Paste_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      use Gtk.Clipboard;
+      use Gtkada.Dialogs;
+      pragma Unreferenced (Self);
+      Clipboard : constant Gtk_Clipboard := Get;
+      Unused_Buttons : Message_Dialog_Buttons;
+   begin
+      if Wait_Is_Text_Available (Clipboard) then
+         declare
+            Text : constant String := String(Wait_For_Text (Clipboard));
+         begin
+            Redirector.Router.Handle_Data (Redirector.String_To_BA (Text));
+         end;
+      else
+         Unused_Buttons := Message_Dialog (Msg => "Nothing in Clipboard to Paste", 
+                                           Title => "DasherA - Infomation");
+      end if;
+
+   end Paste_CB;
+
    procedure Serial_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       Dialog   : Gtk_Dialog;
@@ -619,6 +640,7 @@ package body GUI is
       Menu_Item.Set_Submenu (Edit_Menu);
       Gtk_New (Paste_Item, "Paste");
       Edit_Menu.Append (Paste_Item);
+      Paste_Item.On_Activate (Paste_CB'Access);
 
       -- Emulation
 
