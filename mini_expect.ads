@@ -20,8 +20,6 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded; 
 with Ada.Text_IO;           use Ada.Text_IO;
 
-with Dasher_Codes;          use Dasher_Codes;
-
 package Mini_Expect is
 
    task type Runner_T;
@@ -31,7 +29,7 @@ package Mini_Expect is
    -- Try to open a DasherA mini-Expect script.
    -- Could also sanity-check it in the future...
 
-   procedure Handle_Byte (Byt : in Byte; Done : out Boolean);
+   procedure Handle_Char (Ch : in Character; Done : out Boolean);
 
    Expect_File : File_Type;
    Tracing     : Boolean;

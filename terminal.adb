@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@ with Ada.Strings.Fixed;
 
 with BDF_Font;
 with Crt;
+with Dasher_Codes;   use Dasher_Codes;
 with Display;
 with Logger;
 with Mini_Expect;
@@ -60,15 +61,6 @@ package body Terminal is
       return T;
    end Create;
 
-   function Str_To_BA (S : in String) return Byte_Arr is
-      BA : Byte_Arr (S'Range);
-   begin
-      for I in S'Range loop
-         BA(I) := Byte(Character'Pos(S(I)));
-      end loop;
-      return BA;
-   end Str_To_BA;
-
    procedure Self_Test (T : in out Terminal_T) is 
       HRule1 : constant String := "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012245";
       HRule2 : constant String := "         1         2         3         4         5         6         7         8         9         10        11        12        13    ";
@@ -78,48 +70,48 @@ package body Terminal is
       BLine  : constant String := "5 Blink  : ";
       RLine  : constant String := "6 Reverse: ";
       ULine  : constant String := "7 Under  : ";
-      NL, Op : Byte_Arr (1..1);
+      NL, Op : String (1..1);
    begin
       NL(1) := Dasher_NL;
       
       Op(1) := Dasher_Erase_Page;
       T.Process (Op);
       
-      T.Process (Str_To_BA (HRule1(1..Display.Disp.Visible_Cols)));
-      T.Process (Str_To_BA (HRule2(1..Display.Disp.Visible_Cols)));
+      T.Process (HRule1(1..Display.Disp.Visible_Cols));
+      T.Process (HRule2(1..Display.Disp.Visible_Cols));
 
-      T.Process (Str_To_BA (NLine));
-      T.Process (Str_To_BA (Chars));
+      T.Process (NLine);
+      T.Process (Chars);
       T.Process (NL);
 
-      T.Process (Str_To_BA (DLine));
+      T.Process (DLine);
       Op(1) := Dasher_Dim_On;
       T.Process (Op);
-      T.Process (Str_To_BA (Chars));
+      T.Process (Chars);
       Op(1) := Dasher_Dim_Off;
       T.Process (Op);
       T.Process (NL);
 
-      T.Process (Str_To_BA (BLine));
+      T.Process (BLine);
       Op(1) := Dasher_Blink_On;
       T.Process (Op);
-      T.Process (Str_To_BA (Chars));
+      T.Process (Chars);
       Op(1) := Dasher_Blink_Off;
       T.Process (Op);
       T.Process (NL);
 
-      T.Process (Str_To_BA (RLine));
+      T.Process (RLine);
       Op(1) := Dasher_Rev_On;
       T.Process (Op);
-      T.Process (Str_To_BA (Chars));
+      T.Process (Chars);
       Op(1) := Dasher_Rev_Off;
       T.Process (Op);
       T.Process (NL);
 
-      T.Process (Str_To_BA (ULine));
+      T.Process (ULine);
       Op(1) := Dasher_Underline;
       T.Process (Op);
-      T.Process (Str_To_BA (Chars));
+      T.Process (Chars);
       Op(1) := Dasher_Normal;
       T.Process (Op);   
       T.Process (NL);
@@ -128,7 +120,7 @@ package body Terminal is
          if L > 8  then
             T.Process (NL);
          end if;
-         T.Process (Str_To_BA (Ada.Strings.Fixed.Trim (L'Image, Ada.Strings.Left)));
+         T.Process (Ada.Strings.Fixed.Trim (L'Image, Ada.Strings.Left));
       end loop;
    
    end Self_Test;
@@ -141,8 +133,8 @@ package body Terminal is
       end Start;
       loop
          select
-            accept Accept_Data (BA : in Byte_Arr) do
-               TA.Process (BA);
+            accept Accept_Data (Str : in String) do
+               TA.Process (Str);
             end Accept_Data;
          or
             accept Stop;
@@ -161,15 +153,15 @@ package body Terminal is
 
    -- Process is to be called with a Byte_Arr whenever there is any data for 
    -- the terminal to display or otherwise handle.
-   procedure Process (T : in out Terminal_T; BA : in Byte_Arr) is
-      B : Byte;
+   procedure Process (T : in out Terminal_T; Str : in String) is
+      B : Character;
       B_Int : Integer;
       C : Character;
    begin
       
-      for Ix in BA'Range loop
-         B := BA(Ix);
-         B_Int := Integer(B);
+      for Ix in Str'Range loop
+         B := Str(Ix);
+         B_Int := Character'Pos(B);
 
          -- Ada.Text_IO.Put_Line ("DEBUG: Terminal.Process got: " & B'Image);
 
@@ -213,11 +205,11 @@ package body Terminal is
          if T.In_Command then
             case B is
                -- when 'C' => -- TODO
-               when 68 => -- "D"
+               when 'D' => 
                   T.Reversed := True;
-               when 69 => -- "E"
+               when 'E' => 
                   T.Reversed := False;
-               when 70 => -- "F"
+               when 'F' => 
                   T.In_Extended_Command := True;
                when others =>
                   Ada.Text_IO.Put_Line ("WARNING: Unrecognised Break-CMD code:" & B_Int'Image);
@@ -227,7 +219,7 @@ package body Terminal is
          end if;
 
          case B is
-            when 0 =>
+            when Dasher_Null =>
                T.Skip_Byte := True;
             when Dasher_Bell =>
                Ada.Text_IO.Put (Ada.Characters.Latin_1.BEL); -- on running terminal...
@@ -305,11 +297,11 @@ package body Terminal is
                T.Skip_Byte := True;
             when Dasher_Read_Window_Addr => -- REQUIRES RESPONSE - see D410 User Manual p.3-18
                declare
-                  B3_Arr : Byte_Arr(1..3);
+                  B3_Arr : String(1..3);
                begin
-                  B3_Arr(1) := 31;
-                  B3_Arr(2) := Byte(T.Cursor_X);
-                  B3_Arr(3) := Byte(T.Cursor_Y);
+                  B3_Arr(1) := Character'Val(31);
+                  B3_Arr(2) := Character'Val(T.Cursor_X);
+                  B3_Arr(3) := Character'Val(T.Cursor_Y);
                   Redirector.Router.Send_Data (B3_Arr);
                end;
                T.Skip_Byte := True;
@@ -388,7 +380,7 @@ package body Terminal is
             declare
                Finished : Boolean;
             begin
-               Mini_Expect.Handle_Byte (B, Finished);
+               Mini_Expect.Handle_Char (B, Finished);
                -- if not Finished then
                --    Mini_Expect.Runner.Execute;
                -- end if;
@@ -399,7 +391,7 @@ package body Terminal is
          C := Character'Val(127); -- the 'unknown character' character
          if B >= Dasher_Space and B_Int < BDF_Font.Max_Chars then
             if BDF_Font.Decoded.Font(B_Int).Loaded then
-               C := Character'Val(B_Int);
+               C := B;
             end if;
          end if;
          Display.Disp.Cells(T.Cursor_Y, T.Cursor_X).Set (Value => C, Blnk => T.Blinking, Dm => T.Dimmed, 

@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -16,8 +16,6 @@
 -- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
-
-with Dasher_Codes;   use Dasher_Codes;
 
 package Terminal is
 
@@ -45,7 +43,7 @@ package Terminal is
 
    task type Processor is
       entry Start (Termin : in Terminal_Acc_T);
-      entry Accept_Data (BA : in Byte_Arr);
+      entry Accept_Data (Str : in String);
       entry Stop;
    end Processor;
    type Processor_Acc is access Processor;
@@ -53,6 +51,6 @@ package Terminal is
 
    function Create (Emul : in Emulation_T) return Terminal_Acc_T;
    procedure Self_Test (T : in out Terminal_T);
-   procedure Process (T : in out Terminal_T; BA : in Byte_Arr);
+   procedure Process (T : in out Terminal_T; Str : in String);
 
 end Terminal;

@@ -17,8 +17,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Dasher_Codes; use Dasher_Codes;
-
 package Redirector is
    
    pragma Elaborate_Body;
@@ -28,13 +26,11 @@ package Redirector is
    task Router is
       Entry Set_Destination (Dest : in Connection_T);
       Entry Get_Destination (Dest : out Connection_T);
-      Entry Send_Data (BA : in Byte_Arr);
-      Entry Handle_Data (BA : in Byte_Arr);
+      Entry Send_Data (Data : in String);
+      Entry Handle_Data (Data : in String);
       -- Entry Set_Expecting (Exp : in Boolean);
       -- Entry Get_Expecting (Exp : out Boolean);
     end Router;
-
-   function String_To_BA (Str : in String) return Byte_Arr; 
 
    Destination : Connection_T;
 

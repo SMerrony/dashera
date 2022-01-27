@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -55,8 +55,8 @@ package body Telnet is
       end Start;
       loop
          select
-            accept Accept_Data (BA : in Byte_Arr) do
-               Send (Sess, BA);
+            accept Accept_Data (Str : in String) do
+               Send (Sess, Str);
             end Accept_Data;
          or
             accept Stop;
@@ -68,13 +68,13 @@ package body Telnet is
       end loop;
    end Keyboard_Sender;
 
-   procedure Send (Sess : in Session_Acc_T; BA : in Byte_Arr) is
-      SEA : Ada.Streams.Stream_Element_Array (1..BA'Length);
+   procedure Send (Sess : in Session_Acc_T; Str : in String) is
+      SEA : Ada.Streams.Stream_Element_Array (1..Str'Length);
       Dummy_Bytes_Sent : Ada.Streams.Stream_Element_Offset;
    begin
-      -- Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send called with No. bytes: " & BA'Length'Image);
-      for I in 1 .. BA'Length loop
-         SEA(Ada.Streams.Stream_Element_Offset(I)) := Ada.Streams.Stream_Element(BA(I));
+      -- Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send called with No. bytes: " & Str'Length'Image);
+      for I in 1 .. Str'Length loop
+         SEA(Ada.Streams.Stream_Element_Offset(I)) := Ada.Streams.Stream_Element(Character'Pos(Str(I)));
       end loop;
       GNAT.Sockets.Send_Socket (Socket => Sess.Conn, 
                                 Item => SEA, 
@@ -94,12 +94,12 @@ package body Telnet is
    end Close_Connection;
 
    task body Receiver is
-      Session : Session_Acc_T;
-      Block : Ada.Streams.Stream_Element_Array (1..2048);
-      Offset : Ada.Streams.Stream_Element_Count;
-      One_Byte : Byte;
-      Three_Bytes : Byte_Arr(1..3);
-      One_Char_BA : Byte_Arr(1..1);
+      Session      : Session_Acc_T;
+      Block        : Ada.Streams.Stream_Element_Array (1..2048);
+      Offset       : Ada.Streams.Stream_Element_Count;
+      One_Byte     : Character;
+      Three_Bytes  : String(1..3);
+      One_Char_Str : String(1..1);
       In_Telnet_Cmd, Got_DO, Got_WILL : Boolean := False;
 
    begin
@@ -116,7 +116,7 @@ package body Telnet is
             goto Halt;
          end if;
          for I in 1..Offset loop
-            One_Byte := Byte(Block(I)); 
+            One_Byte := Character'Val(Block(I)); 
             -- Ada.Text_IO.Put_Line ("DEBUG: ...Telnet Receiver handling byte: " & One_Byte'Image);
             if One_Byte = Cmd_IAC then
                if In_Telnet_Cmd then
@@ -177,8 +177,8 @@ package body Telnet is
                goto continue;
             end if;
 
-            One_Char_BA(1) := One_Byte;
-            Redirector.Router.Handle_Data (One_Char_BA);
+            One_Char_Str(1) := One_Byte;
+            Redirector.Router.Handle_Data (One_Char_Str);
 
          <<continue>>
          end loop;

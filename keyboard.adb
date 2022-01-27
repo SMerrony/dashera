@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -37,32 +37,32 @@ package body Keyboard is
       end case;
    end Handle_Key_Press;
 
-   procedure Enqueue_Key (Byt : in Byte) is 
-      BA          : Byte_Arr(1..1);
+   procedure Enqueue_Key (Ch : in Character) is 
+      Str : String(1..1);
    begin
-      BA(1) := Byt;
-      Redirector.Router.Send_Data (BA);
+      Str(1) := Ch;
+      Redirector.Router.Send_Data (Str);
    end Enqueue_Key;
 
 
-   function Modify (B : in Byte) return Byte is
-      MB : byte := B;
+   function Modify (C : in Character) return Character is
+      MC : Character := C;
    begin
-      if Shift_Pressed then MB := MB - 16; end if;
-      if Ctrl_Pressed  then MB := MB - 64; end if;
-      return MB;
+      if Shift_Pressed then MC := Character'Val(Character'Pos(MC) - 16); end if;
+      if Ctrl_Pressed  then MC := Character'Val(Character'Pos(MC) - 64); end if;
+      return MC;
    end Modify;
 
-   procedure Enqueue_Pair (B1, B2 : in Byte) is
-      BA : Byte_Arr(1..2);
+   procedure Enqueue_Pair (C1, C2 : in Character) is
+      Str2 : String(1..2);
    begin
-      BA(1) := B1;
-      BA(2) := B2;
-      Redirector.Router.Send_Data (BA);
+      Str2(1) := C1;
+      Str2(2) := C2;
+      Redirector.Router.Send_Data (Str2);
    end Enqueue_Pair;
 
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is
-      Char_Byte : Byte;
+      Char : Character;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image); 
       case Key is
@@ -86,21 +86,21 @@ package body Keyboard is
 
          -- N.B. At least on Debian with $TERM set to "d210-dg", the host
          -- expects both bytes to arrive in the same packet...
-         when GDK_F1  => Enqueue_Pair (Dasher_Command, Modify (113));
-         when GDK_F2  => Enqueue_Pair (Dasher_Command, Modify (114));
-         when GDK_F3  => Enqueue_Pair (Dasher_Command, Modify (115));
-         when GDK_F4  => Enqueue_Pair (Dasher_Command, Modify (116));
-         when GDK_F5  => Enqueue_Pair (Dasher_Command, Modify (117));
-         when GDK_F6  => Enqueue_Pair (Dasher_Command, Modify (118));
-         when GDK_F7  => Enqueue_Pair (Dasher_Command, Modify (119));
-         when GDK_F8  => Enqueue_Pair (Dasher_Command, Modify (120));
-         when GDK_F9  => Enqueue_Pair (Dasher_Command, Modify (121));
-         when GDK_F10 => Enqueue_Pair (Dasher_Command, Modify (122));
-         when GDK_F11 => Enqueue_Pair (Dasher_Command, Modify (123));
-         when GDK_F12 => Enqueue_Pair (Dasher_Command, Modify (124));
-         when GDK_F13 => Enqueue_Pair (Dasher_Command, Modify (125));
-         when GDK_F14 => Enqueue_Pair (Dasher_Command, Modify (126));
-         when GDK_F15 => Enqueue_Pair (Dasher_Command, Modify (112));
+         when GDK_F1  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(113)));
+         when GDK_F2  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(114)));
+         when GDK_F3  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(115)));
+         when GDK_F4  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(116)));
+         when GDK_F5  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(117)));
+         when GDK_F6  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(118)));
+         when GDK_F7  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(119)));
+         when GDK_F8  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(120)));
+         when GDK_F9  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(121)));
+         when GDK_F10 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(122)));
+         when GDK_F11 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(123)));
+         when GDK_F12 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(124)));
+         when GDK_F13 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(125)));
+         when GDK_F14 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(126)));
+         when GDK_F15 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(112)));
 
          -- Special codes from the virtual key buttons on the GUI
          when GDK_3270_EraseEOF => Enqueue_Key (Dasher_Erase_Page);
@@ -108,11 +108,11 @@ package body Keyboard is
 
          when others =>
             if Key < 256 then
-               Char_Byte := Byte(Key);
+               Char := Character'Val(Key);
                if Ctrl_Pressed then
-                  Char_Byte := Char_Byte mod 32;
+                  Char := Character'Val(Character'Pos(Char) mod 32);
                end if;
-               Enqueue_Key (Char_Byte);
+               Enqueue_Key (Char);
             end if;
       end case;
    end Handle_Key_Release;

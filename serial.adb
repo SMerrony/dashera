@@ -66,17 +66,17 @@ package body Serial is
    end Close;
 
    task body Receiver is
-      B : Byte;
-      One_Char_BA : Byte_Arr(1..1);
+      B : Character;
+      One_Char_Str : String(1..1);
    begin
       accept Start do
          Ada.Text_IO.Put_Line ("DEBUG: Serial Receiver Started");
       end Start;
       loop
          begin
-            Byte'Read (Port'Access, B);
-            One_Char_BA(1) := B;
-            Redirector.Router.Handle_Data (One_Char_BA);
+            Character'Read (Port'Access, B);
+            One_Char_Str(1) := B;
+            Redirector.Router.Handle_Data (One_Char_Str);
          exception
             when Ada.IO_Exceptions.END_ERROR =>
                null;
@@ -96,12 +96,12 @@ package body Serial is
       end Start;
       loop
          select 
-            accept Accept_Data (BA : in Byte_Arr) do
+            accept Accept_Data (Data : in String) do
                declare
-                  SEA : Stream_Element_Array (1..BA'Length);
+                  SEA : Stream_Element_Array (1..Data'Length);
                begin
-                  for I in 1 .. BA'Length loop
-                     SEA(Stream_Element_Offset(I)) := Stream_Element(BA(I));
+                  for I in 1 .. Data'Length loop
+                     SEA(Stream_Element_Offset(I)) := Stream_Element(Character'Pos(Data(I)));
                   end loop;
                   Write (Port, SEA);
                end;

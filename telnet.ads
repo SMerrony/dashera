@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,24 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Sockets;	use GNAT.Sockets;
 
-with Dasher_Codes;   use Dasher_Codes;
-
 package Telnet is
 
-   Cmd_SE   : constant Byte := 240;
-	Cmd_NOP  : constant Byte := 241;
-	Cmd_DM   : constant Byte := 242;
-	Cmd_BRK  : constant Byte := 243;
-	Cmd_IP   : constant Byte := 244;
-	Cmd_AO   : constant Byte := 245;
-	Cmd_AYT  : constant Byte := 246;
-	Cmd_EC   : constant Byte := 247;
-	Cmd_EL   : constant Byte := 248;
-	Cmd_GA   : constant Byte := 249;
-	Cmd_SB   : constant Byte := 250;
-	Cmd_WILL : constant Byte := 251;
-	Cmd_WONT : constant Byte := 252;
-	Cmd_DO   : constant Byte := 253;
-	Cmd_DONT : constant Byte := 254;
-	Cmd_IAC  : constant Byte := 255;
+   Cmd_SE   : constant Character := Character'Val(240);
+	Cmd_NOP  : constant Character := Character'Val(241);
+	Cmd_DM   : constant Character := Character'Val(242);
+	Cmd_BRK  : constant Character := Character'Val(243);
+	Cmd_IP   : constant Character := Character'Val(244);
+	Cmd_AO   : constant Character := Character'Val(245);
+	Cmd_AYT  : constant Character := Character'Val(246);
+	Cmd_EC   : constant Character := Character'Val(247);
+	Cmd_EL   : constant Character := Character'Val(248);
+	Cmd_GA   : constant Character := Character'Val(249);
+	Cmd_SB   : constant Character := Character'Val(250);
+	Cmd_WILL : constant Character := Character'Val(251);
+	Cmd_WONT : constant Character := Character'Val(252);
+	Cmd_DO   : constant Character := Character'Val(253);
+	Cmd_DONT : constant Character := Character'Val(254);
+	Cmd_IAC  : constant Character := Character'Val(255);
 
 	type Message is new String;
 
@@ -57,7 +55,7 @@ package Telnet is
 	-- Data from the remote host will be directed to the supplied Terminal.
 	-- To send data, call the Send procedure
 
-	procedure Send (Sess : in Session_Acc_T; BA : in Byte_Arr);
+	procedure Send (Sess : in Session_Acc_T; Str : in String);
 
 	procedure Close_Connection (Sess : in out Session_T);
 
@@ -70,7 +68,7 @@ package Telnet is
 
 	task type Keyboard_Sender is
       entry Start (S : in Session_Acc_T);
-		entry Accept_Data (BA : in Byte_Arr);
+		entry Accept_Data (Str : in String);
       entry Stop;
    end Keyboard_Sender;
 	type Sender_Acc is access Keyboard_Sender;

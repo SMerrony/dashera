@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -47,34 +47,21 @@ package body Redirector is
          --       Exp := Expecting;
          --    end Get_Expecting;
          or
-            accept Send_Data (BA : in Byte_Arr) do
+            accept Send_Data (Data : in String) do
                case Destination is
-                  when Local => Terminal.Processor_Task.Accept_Data (BA);
-                  when Async => Serial.Keyboard_Sender_Task.Accept_Data (BA);
-                  when Network => Telnet.Keyboard_Sender_Task.Accept_Data (BA);
+                  when Local => Terminal.Processor_Task.Accept_Data (Data);
+                  when Async => Serial.Keyboard_Sender_Task.Accept_Data (Data);
+                  when Network => Telnet.Keyboard_Sender_Task.Accept_Data (Data);
                end case;
             end Send_Data;
          or
-            accept Handle_Data (BA : in Byte_Arr) do
-               Terminal.Processor_Task.Accept_Data (BA);
+            accept Handle_Data (Data : in String) do
+               Terminal.Processor_Task.Accept_Data (Data);
             end Handle_Data;
          or
             terminate; 
          end select;
       end loop;
    end Router;
-
-   function Char_To_Byte is new Ada.Unchecked_Conversion(Character, Byte);
-
-   function String_To_BA (Str : in String) return Byte_Arr is
-      BA : Byte_Arr(1..Str'Length);
-      Ix : Positive := 1;
-   begin
-      for C of Str loop
-         BA(Ix) := Char_To_Byte(C);
-         Ix := Ix + 1;
-      end loop;
-      return BA;
-   end String_To_BA;
 
 end Redirector;

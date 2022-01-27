@@ -19,8 +19,6 @@
 
 with GNAT.Serial_Communications; use GNAT.Serial_Communications;
 
-with Dasher_Codes; use Dasher_Codes;
-
 package Serial is
 
    task type Receiver is
@@ -32,7 +30,7 @@ package Serial is
 
 	task type Keyboard_Sender is
       entry Start;
-		entry Accept_Data (BA : in Byte_Arr);
+		entry Accept_Data (Data : in String);
       entry Send_Break;
       entry Stop;
    end Keyboard_Sender;

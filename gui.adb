@@ -357,7 +357,7 @@ package body GUI is
          declare
             Text : constant String := String(Wait_For_Text (Clipboard));
          begin
-            Redirector.Router.Handle_Data (Redirector.String_To_BA (Text));
+            Redirector.Router.Handle_Data (Text);
          end;
       else
          Unused_Buttons := Message_Dialog (Msg => "Nothing in Clipboard to Paste", 

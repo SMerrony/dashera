@@ -20,6 +20,7 @@
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
 
+with Dasher_Codes;          use Dasher_Codes;
 with Redirector;
 
 package body Mini_Expect is
@@ -54,7 +55,7 @@ package body Mini_Expect is
             if In_Ix < Src_End then
                if Script_Line(In_Ix) = '\' then 
                   if Script_Line(In_Ix + 1) = 'n' then
-                     Result(Out_Ix) := Dasher_Char_NL;
+                     Result(Out_Ix) := Dasher_NL;
                      In_Ix := In_Ix + 2; -- skip over a character
                      Out_Ix := Out_Ix + 1;
                      Changed := True;
@@ -71,16 +72,16 @@ package body Mini_Expect is
          return Result(1 .. Out_Ix-1);
       end Convert_Line;
 
-      procedure Handle_Byte (Byt : in Byte; Done : out Boolean) is
+      procedure Handle_Char (Ch : in Character; Done : out Boolean) is
       begin
-         if Byt = Dasher_NL or Byt = Dasher_CR then
+         if Ch = Dasher_NL or Ch = Dasher_CR then
             -- Reset the search on every new line
             Host_Str := Null_Unbounded_String;
          else
-            Host_Str := Host_Str & Character'Val(Byt);
+            Host_Str := Host_Str & Ch;
             Log ("DEBUG: ... so far we have: "  & To_String (Host_Str));
             if Length (Host_Str) >= Length (Search_Str) then
-               Log ("DEBUG: ... Handle_Byte comparing '" & To_String (Tail(Host_Str, Length (Search_Str)))
+               Log ("DEBUG: ... Handle_Char comparing '" & To_String (Tail(Host_Str, Length (Search_Str)))
                   & "' with '" & To_String (Search_Str));
                if Tail(Host_Str, Length (Search_Str)) = Search_Str then
                   Expecting := False;
@@ -89,7 +90,7 @@ package body Mini_Expect is
             end if;
          end if;
          Done := not Expecting;
-      end Handle_Byte;
+      end Handle_Char;
 
    --    function Is_Expecting return Boolean is 
    --       (Expecting);
@@ -187,12 +188,8 @@ package body Mini_Expect is
             Log ("DEBUG: ... Processing 'send' command");
             declare
                Converted : constant String := Convert_Line (Expect_Line(6..Expect_Line_Length));
-               BA : Byte_Arr (1 .. Converted'Length);
             begin
-               for Ix in Converted'Range loop
-                  BA(Ix) := Byte(Character'Pos(Converted(Ix)));
-               end loop;
-               Redirector.Router.Send_Data (BA);
+               Redirector.Router.Send_Data (Converted);
             end;
 
          elsif Expect_Line(1..4) = "exit" then
