@@ -19,8 +19,6 @@
 
 -- See include/gtkada/gtkada.relocatable/gtkada/gdk-types-keysyms.ads for key symbol definitions
 
-with Ada.Text_IO;
-
 with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
 
 with Dasher_Codes; use Dasher_Codes;
@@ -31,8 +29,8 @@ package body Keyboard is
    procedure Handle_Key_Press (Key  : in Gdk_Key_Type) is
    begin
       case Key is 
-         when GDK_Control_L | GDK_Control_R => Ctrl_Pressed := True;
-         when GDK_Shift_L | GDK_Shift_R     => Shift_Pressed := True;
+         when GDK_Control_L | GDK_Control_R => Ctrl_Pressed  := True;
+         when GDK_Shift_L   | GDK_Shift_R   => Shift_Pressed := True;
          when others => null;
       end case;
    end Handle_Key_Press;
@@ -64,10 +62,10 @@ package body Keyboard is
    procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is
       Char : Character;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image); 
+      -- Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image); 
       case Key is
-         when GDK_Control_L | GDK_Control_R => Ctrl_Pressed := False;
-         when GDK_Shift_L | GDK_Shift_R => Shift_Pressed := False;
+         when GDK_Control_L | GDK_Control_R => Ctrl_Pressed  := False;
+         when GDK_Shift_L   | GDK_Shift_R   => Shift_Pressed := False;
 
          when GDK_Return   => Enqueue_Key (Dasher_NL); -- convert PC-style Return to DG NL
          when GDK_KP_Enter => Enqueue_Key (Dasher_CR); -- convert PC Keypad Enter to DG CR

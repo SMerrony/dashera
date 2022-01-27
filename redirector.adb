@@ -20,7 +20,6 @@
 -- with Ada.Text_IO;  use Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
--- with Mini_Expect;
 with Serial;
 with Telnet;
 with Terminal;
@@ -38,14 +37,6 @@ package body Redirector is
             accept Get_Destination (Dest : out Connection_T) do
                Dest := Destination;
             end Get_Destination;
-         -- or
-         --    accept Set_Expecting (Exp : in Boolean) do
-         --       Expecting := Exp;
-         --    end Set_Expecting;
-         -- or
-         --    accept Get_Expecting (Exp : out Boolean) do
-         --       Exp := Expecting;
-         --    end Get_Expecting;
          or
             accept Send_Data (Data : in String) do
                case Destination is

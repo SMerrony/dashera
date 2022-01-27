@@ -55,7 +55,7 @@ with Gtk.Style_Provider;
 -- with Gtk.Table;
 with Gtk.Widget; use Gtk.Widget;
 
-with Gtkada.Dialogs;
+with Gtkada.Dialogs;          use Gtkada.Dialogs;
 with Gtkada.File_Selection;
 
 with Text_IO.Unbounded_IO;
@@ -271,6 +271,28 @@ package body GUI is
       return M;
    end;
 
+   procedure Send_Text_File_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      use Ada.Text_IO;
+      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Text File", 
+                                                                        Dir_Only => False, 
+                                                                        Must_Exist => True);
+      Text_File : File_Type;
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;                                                              
+   begin
+      if Filename'Length > 1 then
+         Open (File => Text_File, Mode => In_File, Name => Filename); 
+         while not End_Of_File (Text_File) loop
+            Redirector.Router.Send_Data (Get_Line (Text_File));
+         end loop;
+         Close (Text_File);
+      end if;
+   exception
+      when others =>
+         Unused_Buttons := Message_Dialog (Msg => "Could not open text file", 
+                                           Title => "DasherA - Error");
+   end Send_Text_File_CB;
+
    procedure Load_Template_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Function Key Template", 
@@ -278,6 +300,7 @@ package body GUI is
                                                                         Must_Exist => True);
       Templ_File : Ada.Text_IO.File_Type;
       Lab : Unbounded_String;
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       if Filename'Length > 1 then
          Ada.Text_IO.Put_Line ("DEBUG: Chose template file: " & Filename);
@@ -306,6 +329,10 @@ package body GUI is
       else
          Ada.Text_IO.Put_Line ("DEBUG: No Template file chosen");
       end if;
+   exception
+      when others =>
+         Unused_Buttons := Message_Dialog (Msg => "Could not load template file", 
+                                           Title => "DasherA - Error"); 
    end Load_Template_CB;
 
    procedure Expect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
@@ -618,6 +645,7 @@ package body GUI is
       File_Menu.Append (Send_File_Item);
       Gtk_New (Sep_Item);
       File_Menu.Append (Sep_Item);
+      Send_File_Item.On_Activate (Send_Text_File_CB'Access);
 
       Gtk_New (Xmodem_Rcv_Item, "XMODEM-CRC - Receive File");
       File_Menu.Append (Xmodem_Rcv_Item);

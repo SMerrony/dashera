@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,7 @@
 -- THE SOFTWARE.
 
 package Redirector is
-   
+     
    pragma Elaborate_Body;
    
    type Connection_T is (Local, Async, Network);
@@ -28,8 +28,6 @@ package Redirector is
       Entry Get_Destination (Dest : out Connection_T);
       Entry Send_Data (Data : in String);
       Entry Handle_Data (Data : in String);
-      -- Entry Set_Expecting (Exp : in Boolean);
-      -- Entry Get_Expecting (Exp : out Boolean);
     end Router;
 
    Destination : Connection_T;
