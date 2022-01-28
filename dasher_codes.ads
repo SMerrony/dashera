@@ -54,7 +54,23 @@ package Dasher_Codes is
    Dasher_Command          : constant Character := Character'Val(30);
 
    Dasher_Space            : constant Character := Character'Val(32);
-
+   
+   Dasher_F15              : constant Character := Character'Val(112);
+   Dasher_F1               : constant Character := Character'Val(113);
+   Dasher_F2               : constant Character := Character'Val(114);
+   Dasher_F3               : constant Character := Character'Val(115);
+   Dasher_F4               : constant Character := Character'Val(116);
+   Dasher_F5               : constant Character := Character'Val(117);
+   Dasher_F6               : constant Character := Character'Val(118);
+   Dasher_F7               : constant Character := Character'Val(119);
+   Dasher_F8               : constant Character := Character'Val(120);
+   Dasher_F9               : constant Character := Character'Val(121);
+   Dasher_F10              : constant Character := Character'Val(122);
+   Dasher_F11              : constant Character := Character'Val(123);
+   Dasher_F12              : constant Character := Character'Val(124);  
+   Dasher_F13              : constant Character := Character'Val(125);
+   Dasher_F14              : constant Character := Character'Val(126);
+               
    Dasher_Delete           : constant Character := Character'Val(127);
 
 end Dasher_Codes;

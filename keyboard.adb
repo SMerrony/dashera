@@ -84,21 +84,21 @@ package body Keyboard is
 
          -- N.B. At least on Debian with $TERM set to "d210-dg", the host
          -- expects both bytes to arrive in the same packet...
-         when GDK_F1  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(113)));
-         when GDK_F2  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(114)));
-         when GDK_F3  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(115)));
-         when GDK_F4  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(116)));
-         when GDK_F5  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(117)));
-         when GDK_F6  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(118)));
-         when GDK_F7  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(119)));
-         when GDK_F8  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(120)));
-         when GDK_F9  => Enqueue_Pair (Dasher_Command, Modify (Character'Val(121)));
-         when GDK_F10 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(122)));
-         when GDK_F11 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(123)));
-         when GDK_F12 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(124)));
-         when GDK_F13 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(125)));
-         when GDK_F14 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(126)));
-         when GDK_F15 => Enqueue_Pair (Dasher_Command, Modify (Character'Val(112)));
+         when GDK_F1  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F1);
+         when GDK_F2  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F2);
+         when GDK_F3  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F3);
+         when GDK_F4  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F4);
+         when GDK_F5  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F5);
+         when GDK_F6  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F6);
+         when GDK_F7  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F7);
+         when GDK_F8  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F8);
+         when GDK_F9  => Enqueue_Pair (Dasher_Command, Modify (Dasher_F9);
+         when GDK_F10 => Enqueue_Pair (Dasher_Command, Modify (Dasher_F10);
+         when GDK_F11 => Enqueue_Pair (Dasher_Command, Modify (Dasher_F11);
+         when GDK_F12 => Enqueue_Pair (Dasher_Command, Modify (Dasher_F12);
+         when GDK_F13 => Enqueue_Pair (Dasher_Command, Modify (Dasher_F13);
+         when GDK_F14 => Enqueue_Pair (Dasher_Command, Modify (Dasher_F14);
+         when GDK_F15 => Enqueue_Pair (Dasher_Command, Modify (Dasher_F15);
 
          -- Special codes from the virtual key buttons on the GUI
          when GDK_3270_EraseEOF => Enqueue_Key (Dasher_Erase_Page);
