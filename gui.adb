@@ -895,8 +895,9 @@ package body GUI is
       Dummy    : Boolean;
  
       CSS : constant String :=
-       "button {" & ASCII.LF
+       "#FKey_Button {" & ASCII.LF
      & "  color: white;" & ASCII.LF
+     & "  background-image: none;" & ASCII.LF
      & "  background-color: rgba(31, 220, 232, 1);" & ASCII.LF
      & "  border-color: white;" & ASCII.LF
      & "  font-family: Monospace;" & ASCII.LF
@@ -919,6 +920,7 @@ package body GUI is
             Gtk.Button.Gtk_New(FKeys(N), "F" & Ada.Strings.Fixed.Trim (Lab, Ada.Strings.Both));
             FKeys(N).On_Clicked (Handle_FKey_Btn_CB'Access);
             FKeys(N).Set_Size_Request (Width => 40, Height => 28);
+            FKeys(N).Set_Name ("FKey_Button");
          end;
       end loop; 
       -- we want labels between the groups of 5 f-key buttons
