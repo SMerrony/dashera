@@ -23,7 +23,7 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * Support for mini-Expect scripts to automate some tasks [see Wiki](https://github.com/SMerrony/DasherG/wiki/DasherG-Mini-Expect-Scripts)
 * Paste from system Clipboard
   
-Here is the full [Implementation Chart](implementationChart.md) for DasherA.
+Here is the full [Implementation Chart](./Docs/implementationChart.md) for DasherA.
 
 ## Download
 DasherA is [hosted on GitHub](https://github.com/SMerrony/dashera).
