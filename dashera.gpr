@@ -25,8 +25,8 @@ project Dashera is
 
    for Languages use ("Ada");
    for Main use ("dashera.adb");
-   for Source_Dirs use ("./");
-   for Object_Dir use "obj/";
+   for Source_Dirs use ("Src");
+   for Object_Dir use "obj";
    for Exec_Dir use "./";
 
    package Compiler is
