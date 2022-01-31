@@ -16,9 +16,14 @@
 -- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
+
 with Ada.Text_IO; 
 with Ada.Characters.Latin_1;
 with Ada.Strings.Fixed;
+
+-- These are only here for the Beep functionality...
+with Gdk.Main;
+with Glib.Main;
 
 with BDF_Font;
 with Crt;
@@ -151,6 +156,12 @@ package body Terminal is
       T.Cursor_Y := Y;
    end Set_Cursor;
 
+   function Beep return Boolean is
+   begin
+      Gdk.Main.Beep;
+      return False;
+   end Beep;
+
    -- Process is to be called with a Byte_Arr whenever there is any data for 
    -- the terminal to display or otherwise handle.
    procedure Process (T : in out Terminal_T; Str : in String) is
@@ -222,7 +233,12 @@ package body Terminal is
             when Dasher_Null =>
                T.Skip_Byte := True;
             when Dasher_Bell =>
-               Ada.Text_IO.Put (Ada.Characters.Latin_1.BEL); -- on running terminal...
+               declare
+                  Dummy_ID : Glib.Main.G_Source_Id;
+               begin
+                  Dummy_ID := Glib.Main.Idle_Add (Beep'Access);
+               end;
+               Ada.Text_IO.Put_Line ("*** BEEP! ***" & Ada.Characters.Latin_1.BEL); -- on running terminal...
                T.Skip_Byte := True;
             when Dasher_Blink_On =>
                T.Blinking := True;
@@ -394,12 +410,11 @@ package body Terminal is
                C := B;
             end if;
          end if;
-         Display.Disp.Cells(T.Cursor_Y, T.Cursor_X).Set (Value => C, Blnk => T.Blinking, Dm => T.Dimmed, 
-                                                         Rv => T.Reversed, Under => T.Underscored, Prot => T.Protectd);
-         T.Cursor_X := T.Cursor_X + 1;
 
-         -- TODO handle Expect case
-  
+         Display.Set_Cell(Line => T.Cursor_Y, Col => T.Cursor_X, Char => C, Blink => T.Blinking, Dim => T.Dimmed, 
+                          Rev => T.Reversed, Under => T.Underscored, Prot => T.Protectd);
+
+         T.Cursor_X := T.Cursor_X + 1; 
 
       <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);

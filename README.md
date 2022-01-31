@@ -51,4 +51,7 @@ Append `-h` to see all options.
 numeric keypad enter key (if present).
 * The DASHER 'Hold' key is available from both the GUI 'Hold' button and the PC-style 'Pause'
 button (if present).
+* The BELL sound will only work if DasherA is started from a terminal supporting such an event, 
+or if the windowing system permits Window Beeps.  In Mint 20, the critical setting is
+Accessibility => Keyboard => Event Feedback => Sound to use for window alerts.
 

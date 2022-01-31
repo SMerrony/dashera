@@ -54,6 +54,14 @@ package body Display is
       Disp.Cells(Line, Col).Clear_To_Space;
    end Clear_Cell;
 
+   procedure Set_Cell (Line, Col : in Natural; Char : in Character;
+                       Blink, Dim, Rev, Under, Prot : in Boolean) is
+   begin
+      Disp.Cells(Line,Col).Set (Value => Char, Blnk => Blink, Dm => Dim, 
+                                Rv => Rev, Under => Under, Prot => Prot);
+
+   end Set_Cell;
+
    procedure Clear_Line (Line : in Integer) is
    begin
       for Col in 0 .. Total_Cols - 1 loop

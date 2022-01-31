@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright (C)2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,6 @@ package Display is
       Visible_Lines, Visible_Cols : Integer;
       Cursor_X, Cursor_Y : Natural;
       Blink_Enabled : Boolean;
-      Dirty : Boolean;
    end record;
 
    type History_T is record
@@ -53,10 +52,8 @@ package Display is
    procedure Init;
    procedure Clear_Cell (Line, Col : in Integer);
    procedure Clear_Line (Line : in Integer);
-   -- procedure Set_Cell (This : in out Display_T;
-   --                     Line, Col : in Integer;
-   --                     Char : in Character;
-   --                     Blink, Dim, Rev, Under, Prot : in Boolean);
+   procedure Set_Cell (Line, Col : in Natural; Char : in Character;
+                       Blink, Dim, Rev, Under, Prot : in Boolean);
    procedure Copy_Line (Src, Dest : in Integer);
    procedure Set_Cursor (X, Y : in Natural);
 
