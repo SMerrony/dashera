@@ -68,6 +68,7 @@ with Mini_Expect;
 with Logger;
 with Redirector;
 with Serial;
+with Xmodem;
 
 package body GUI is  
 
