@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -40,15 +40,12 @@ package body Crt is
    end Blink_Timeout_CB;
 
    procedure Init (Zoom : in BDF_Font.Zoom_T) is
-      -- C : aliased Crt_Acc_T := new Crt_T;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Creating Crt");
-      -- Tube.Font := BDF_Font.Load_Font (Font_Filename, Zoom);
       BDF_Font.Load_Font (Font_Filename, Zoom);
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
       Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * Gint(Display.Disp.Visible_Cols), 
                                BDF_Font.Decoded.Char_Height * Gint(Display.Disp.Visible_Lines));
-      -- Tube.Disp := Disp;
       Tube.Zoom := Zoom;
 
       -- Blink timer
@@ -96,6 +93,8 @@ package body Crt is
       Cr             : Cairo.Cairo_Context;
       Char_Ix        : Natural;
       Char_X, Char_Y, Char_UL : Gdouble;
+      Value : Character; 
+      Blnk, Dm, Rv, Under, Prot : Boolean;
       use Glib;
    begin
       -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt called");
@@ -107,17 +106,20 @@ package body Crt is
          
          for Col in 0 .. Display.Disp.Visible_Cols-1 loop
             Char_X  := Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width);
-            Char_Ix := Character'Pos (Display.Disp.Cells(Line, Col).Char_Value);
 
-            if Display.Disp.Blink_Enabled and Tube.Blink_State and Display.Disp.Cells(Line, Col).Blink then
+            Display.Disp.Cells(Line, Col).Get (Value, Blnk, Dm, Rv, Under, Prot);
+
+            Char_Ix := Character'Pos (Value);
+
+            if Display.Disp.Blink_Enabled and Tube.Blink_State and Blnk then
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                              Pixbuf => BDF_Font.Decoded.Font(32).Dim_Pix_Buf, 
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
-            elsif Display.Disp.Cells(Line, Col).Dim then
+            elsif Dm then
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                              Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Dim_Pix_Buf, 
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
-            elsif Display.Disp.Cells(Line, Col).Rev then
+            elsif Rv then
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                              Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf,
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
@@ -129,7 +131,7 @@ package body Crt is
             Cairo.Paint (Cr);
 
             -- Underlined?
-            if Display.Disp.Cells(Line, Col).Underscore then
+            if Under then
                Char_UL := (Gdouble(Gint(Line + 1) * BDF_Font.Decoded.Char_Height)) - 1.0;
                Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
                Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(BDF_Font.Decoded.Char_Width), 1.0);
@@ -141,11 +143,12 @@ package body Crt is
 
       -- Draw the cursor if it's on-screen
       if Display.Disp.Cursor_X < Display.Disp.Visible_Cols and Display.Disp.Cursor_Y < Display.Disp.Visible_Lines then
-         Char_Ix := Character'Pos (Display.Disp.Cells(Display.Disp.Cursor_Y, Display.Disp.Cursor_X).Char_Value);
+         Display.Disp.Cells(Display.Disp.Cursor_Y, Display.Disp.Cursor_X).Get (Value, Blnk, Dm, Rv, Under, Prot);
+         Char_Ix := Character'Pos (Value);
          if Char_Ix = 0 then
             Char_Ix := 32;
          end if;
-         if Display.Disp.Cells(Display.Disp.Cursor_Y, Display.Disp.Cursor_X).Rev then
+         if Rv then
             Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                          Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
                                          Pixbuf_X => Gdouble(Gint(Display.Disp.Cursor_X) * BDF_Font.Decoded.Char_Width),
@@ -175,13 +178,5 @@ package body Crt is
       Cairo.Paint (Cr);
       return False;
    end Draw_CB;
-
-   -- function On_Redraw (This : access GObject_Record'Class; Cr : Cairo_Context) return Boolean is
-   -- begin
-   --    if C.Disp.Dirty then 
-   --       Cairo := 
-   --       C.Disp.Dirty := false;
-   --    end if;
-   -- end Draw;
 
 end Crt;

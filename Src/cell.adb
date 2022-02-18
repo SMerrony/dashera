@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -19,34 +19,46 @@
 
 package body Cell is
 
-   procedure Set (This : in out Cell_T; Value : in Character; Blnk, Dm, Rv, Under, Prot : in Boolean) is
-   begin
-      This.Char_Value := Value;
-      This.Blink      := Blnk;
-      This.Dim        := Dm;
-      This.Rev        := Rv;
-      This.Underscore := Under;
-      This.Protect    := Prot;
-   end Set;
+   protected body Cell_T is
 
-   procedure Clear_To_Space (This : in out Cell_T) is
-   begin
-      This.Char_Value := ' ';
-      This.Blink      := false;
-      This.Dim        := false;
-      This.Rev        := false;
-      This.Underscore := false;
-      This.Protect    := false;
-   end Clear_To_Space;
+      procedure Set (Value : in Character; Blnk, Dm, Rv, Under, Prot : in Boolean) is
+      begin
+         Char_Value := Value;
+         Blink      := Blnk;
+         Dim        := Dm;
+         Rev        := Rv;
+         Underscore := Under;
+         Protect    := Prot;
+      end Set;
 
-   procedure Copy_From (C : in out Cell_T; Src : in Cell_T) is
+      procedure Get (Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean) is
+      begin
+         Value := Char_Value;
+         Blnk  := Blink;
+         Dm    := Dim;
+         Rv    := Rev;
+         Under := Underscore;
+         Prot  := Protect;
+      end Get;
+
+      procedure Clear_To_Space is
+      begin
+         Char_Value := ' ';
+         Blink      := false;
+         Dim        := false;
+         Rev        := false;
+         Underscore := false;
+         Protect    := false;
+      end Clear_To_Space;
+  
+   end Cell_T;
+
+   procedure Copy (Src : in out Cell_T; Dest : out Cell_T)is
+      Value : Character; 
+      Blnk, Dm, Rv, Under, Prot : Boolean;
    begin
-      C.Char_Value := Src.Char_Value;
-      C.Blink := Src.Blink;
-      C.Dim := Src.Dim;
-      C.Rev := Src.Rev;
-      C.Underscore := Src.Underscore;
-      C.Protect := Src.Protect;
-   end Copy_From;
+      Src.Get (Value, Blnk, Dm, Rv, Under, Prot);
+      Dest.Set (Value, Blnk, Dm, Rv, Under, Prot);
+   end Copy;
 
 end Cell;

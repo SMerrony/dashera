@@ -1,4 +1,4 @@
--- Copyright (C)2021,2022 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -57,14 +57,12 @@ package Display is
    procedure Copy_Line (Src, Dest : in Integer);
    procedure Set_Cursor (X, Y : in Natural);
 
-   procedure Add_To_History (HL : in History_Line);
+   procedure Add_To_History (HL : in out History_Line);
    -- Inserts a line into the circular history buffer
 
    procedure Scroll_Up (Lines : in Natural);
 
    procedure Copy_Line_To_History (Src : in Integer);
-
-   function Get_Nth_History_Line (N : in Natural) return History_Line;
 
    procedure Scroll_Back (Start_Line : in Natural);
    procedure Cancel_Scroll_Back;

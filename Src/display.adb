@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -19,16 +19,6 @@
 
 package body Display is   
 
-   -- function Create return Display_Acc_T is
-   --    D : aliased Display_Acc_T := new Display_T;
-   -- begin
-   --    D.Visible_Lines := Default_Lines;
-   --    D.Visible_Cols := Default_Cols;
-   --    D.Cells(12,39).Char_Value := 'O';
-   --    D.Cells(12,40).Char_Value := 'K';
-   --    return D;
-   -- end Create;
-
    procedure Init is
    begin
       Disp.Visible_Lines := Default_Lines;
@@ -38,8 +28,8 @@ package body Display is
             Disp.Cells(Line, Col).Clear_To_Space;
          end loop;
       end loop;
-      Disp.Cells(12,39).Char_Value := 'O';
-      Disp.Cells(12,40).Char_Value := 'K';
+      Disp.Cells(12,39).Set (Value => 'O', Blnk => False, Dm => False, Rv => False, Under => False, Prot => False);
+      Disp.Cells(12,40).Set (Value => 'K', Blnk => False, Dm => False, Rv => False, Under => False, Prot => False);
       Disp.Blink_Enabled := True;
       History.First := 0;
       History.Last  := 0;
@@ -72,7 +62,7 @@ package body Display is
    procedure Copy_Line (Src, Dest : in Integer) is
    begin
       for Col in 0 .. Total_Cols - 1 loop
-         Disp.Cells(Dest,Col).Copy_From (Disp.Cells(Src,Col));
+         Cell.Copy (Src => Disp.Cells(Src,Col), Dest => Disp.Cells(Dest,Col));
       end loop;
    end Copy_Line;
 
@@ -82,7 +72,7 @@ package body Display is
       Disp.Cursor_Y := Y;
    end Set_Cursor;
 
-   procedure Add_To_History (HL : in History_Line) is
+   procedure Add_To_History (HL : in out History_Line) is
    begin
       History.Last := History.Last + 1;
       if History.Last = History_Lines then
@@ -96,7 +86,10 @@ package body Display is
             History.First := 0;
          end if;
       end if;
-      History.Lines(History.Last) := HL;
+
+      for C in History.Lines(History.Last)'Range loop
+         Cell.Copy (Src => HL(C), Dest => History.Lines(History.Last)(C));
+      end loop;
    end Add_To_History;
 
    procedure Scroll_Up (Lines : in Natural) is
@@ -115,39 +108,52 @@ package body Display is
       HL : History_Line;
    begin
       for Col in 0 .. Total_Cols - 1 loop
-         HL(Col).Copy_From (Disp.Cells(Src,Col));
+         Cell.Copy (Src => Disp.Cells(Src,Col), Dest => HL(Col));
       end loop;
       Add_To_History (HL);
    end Copy_Line_To_History;
 
    procedure Copy_Line_From_History (Src, Dest : in Natural) is
-      HL : constant History_Line := Get_Nth_History_Line (Src);
-   begin
-      for Col in 0 .. Total_Cols - 1 loop
-         Disp.Cells(Dest,Col).Copy_From (HL(Col));
-      end loop;
-   end Copy_Line_From_History;
-
-   function Get_Nth_History_Line (N : in Natural) return History_Line is
       HL : History_Line;
       Ix : Integer;
    begin
       if History.First = History.Last then -- no history yet
-         HL := Empty_History_Line;
+         for C in Empty_History_Line'Range loop
+            Cell.Copy (Src => Empty_History_Line(C), Dest => HL(C));
+         end loop;
       else
-         Ix := History.Last - N;
+         Ix := History.Last - Src;
          if Ix < 0 then
             Ix := Ix + History_Lines;
          end if;
-         HL := History.Lines(Ix);
+         for C in History.Lines(Ix)'Range loop
+            Cell.Copy (Src => History.Lines(Ix)(C), Dest => HL(C));
+         end loop;
       end if;
-      return HL;
-   end Get_Nth_History_Line;
+
+      for Col in 0 .. Total_Cols - 1 loop
+         Cell.Copy (Src => HL(Col), Dest => Disp.Cells(Dest,Col));
+      end loop;
+   end Copy_Line_From_History;
+
+   procedure Copy (Src : in out Display_T; Dest : out Display_T) is
+   begin
+      for Line in 0 .. Src.Visible_Lines-1 loop
+         for Col in 0 .. Src.Visible_Cols-1 loop
+            Cell.Copy (Src => Src.Cells(Line,Col), Dest => Dest.Cells(Line,Col));
+         end loop;
+      end loop;
+      Dest.Blink_Enabled := Src.Blink_Enabled;
+      Dest.Cursor_X      := Src.Cursor_X;
+      Dest.Cursor_Y      := Src.Cursor_Y;
+      Dest.Visible_Cols  := Src.Visible_Cols;
+      Dest.Visible_Lines := Src.Visible_Lines;
+   end Copy;
 
    procedure Scroll_Back (Start_Line : in Natural) is
    begin
       if not Scrolled_Back then
-         Saved_Disp := Disp;
+         Copy (Src => Disp, Dest => Saved_Disp);
          Scrolled_Back := True;
       end if;
 	   -- there are two cases: we are already scrolled back beyond the 'live' screen, 
@@ -176,7 +182,7 @@ package body Display is
 
    procedure Cancel_Scroll_Back is
    begin 
-      Disp := Saved_Disp;
+      Copy (Src => Saved_Disp, Dest => Disp);
       Scrolled_Back := False;
    end Cancel_Scroll_Back;
 

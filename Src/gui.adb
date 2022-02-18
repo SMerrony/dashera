@@ -985,8 +985,9 @@ package body GUI is
             Online_Label.Set_Text ("Online (Serial)");
          when Redirector.Network => 
             Online_Label.Set_Text ("Online (Telnet)");
-            Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
-                                 Ada.Strings.Fixed.Trim (Telnet_Sess.Port_Num'Image, Ada.Strings.Both));
+            -- FIXME - maybe causing crash...
+            -- Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
+            --                      Ada.Strings.Fixed.Trim (Telnet_Sess.Port_Num'Image, Ada.Strings.Both));
       end case;
       case Term.Emulation is
          when Terminal.D200 => Emul_Label.Set_Text ("D200");

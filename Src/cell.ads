@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,22 @@ package Cell is
 
    pragma Preelaborate;
 
-   type Cell_T is tagged record
+   protected type Cell_T is
+
+      procedure Set (Value : in Character; Blnk, Dm, Rv, Under, Prot : in Boolean);
+
+      procedure Get (Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
+
+      procedure Clear_To_Space;
+
+   private
       Char_Value                           : Character;
       Blink, Dim, Rev, Underscore, Protect : Boolean;
-   end record;
 
-   procedure Set
-     (This                      : in out Cell_T; Value : in Character;
-      Blnk, Dm, Rv, Under, Prot : in     Boolean);
-   procedure Clear_To_Space (This : in out Cell_T);
+   end Cell_T;
 
-   procedure Copy_From (C : in out Cell_T; Src : in Cell_T);
+   type Cell_Acc_T is access all Cell_T;
 
+   procedure Copy (Src : in out Cell_T; Dest : out Cell_T);
 
 end Cell;
