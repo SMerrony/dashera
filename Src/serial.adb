@@ -67,7 +67,6 @@ package body Serial is
 
    task body Receiver is
       B : Character;
-      One_Char_Str : String(1..1);
    begin
       accept Start do
          Ada.Text_IO.Put_Line ("DEBUG: Serial Receiver Started");
@@ -75,8 +74,7 @@ package body Serial is
       loop
          begin
             Character'Read (Port'Access, B);
-            One_Char_Str(1) := B;
-            Redirector.Router.Handle_Data (One_Char_Str);
+            Redirector.Router.Handle_Data (B);
          exception
             when Ada.IO_Exceptions.END_ERROR =>
                null;

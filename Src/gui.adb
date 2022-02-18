@@ -39,6 +39,8 @@ with Gtk.Dialog;              use Gtk.Dialog;
 with Gtk.Drawing_Area;
 with Gtk.GEntry;
 with Gtk.Enums;               use Gtk.Enums;
+with Gtk.File_Chooser;
+with Gtk.File_Chooser_Dialog;
 with Gtk.Frame;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
@@ -50,6 +52,7 @@ with Gtk.Radio_Button;
 with Gtk.Scrollbar;           -- use Gtk.Scrollbar;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 -- with Gtk.Scrollbar;
+with Gtk.Stock;
 with Gtk.Style_Context;
 with Gtk.Style_Provider;
 -- with Gtk.Table;
@@ -385,7 +388,9 @@ package body GUI is
          declare
             Text : constant String := String(Wait_For_Text (Clipboard));
          begin
-            Redirector.Router.Handle_Data (Text);
+            for C of Text loop
+               Redirector.Router.Handle_Data (C);
+            end loop;
          end;
       else
          Unused_Buttons := Message_Dialog (Msg => "Nothing in Clipboard to Paste", 
@@ -588,7 +593,31 @@ package body GUI is
       Serial_Connect_Item.Set_Sensitive (True);
       Serial_Disconnect_Item.Set_Sensitive (False);
    end Telnet_Disconnect_CB;
-   
+
+   procedure Xmodem_Rx_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      use Gtk.File_Chooser;   use Gtk.File_Chooser_Dialog;
+      use Gtk.Stock;
+      FC_Dialog : Gtk_File_Chooser_Dialog;
+      Dummy_Button : Gtk_Widget;
+      Unused_Buttons : Message_Dialog_Buttons;
+   begin
+      FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Xmodem Receive File As...", 
+                                                Parent => Main_Window,
+                                                Action => Action_Save);
+      Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);  
+      Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
+      if FC_Dialog.Run = Gtk_Response_OK then
+         Ada.Text_IO.Put_Line ("DEBUG: Chosen file for Xmodem Rx: " & FC_Dialog.Get_Filename);
+         Xmodem.Receive (String(FC_Dialog.Get_Filename));
+      end if; 
+      FC_Dialog.Destroy; 
+   exception
+      when E : Xmodem.Already_Exists =>
+         FC_Dialog.Destroy; 
+         Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist", 
+                                                          Title => "DasherA - Error");
+   end Xmodem_Rx_CB;
 
    function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key) 
       return Boolean  is
@@ -612,7 +641,7 @@ package body GUI is
       File_Menu, Edit_Menu, Emulation_Menu, Serial_Menu, Network_Menu,
       Help_Menu : Gtk.Menu.Gtk_Menu;
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
-      Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rcv_Item,
+      Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rx_Item,
       D200_Item, D210_Item, Self_Test_Item, Load_Template_Item, Resize_Item,
       Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
       Paste_Item,
@@ -648,8 +677,9 @@ package body GUI is
       File_Menu.Append (Sep_Item);
       Send_File_Item.On_Activate (Send_Text_File_CB'Access);
 
-      Gtk_New (Xmodem_Rcv_Item, "XMODEM-CRC - Receive File");
-      File_Menu.Append (Xmodem_Rcv_Item);
+      Gtk_New (Xmodem_Rx_Item, "XMODEM-CRC - Receive File");
+      File_Menu.Append (Xmodem_Rx_Item);
+      Xmodem_Rx_Item.On_Activate (Xmodem_Rx_CB'Access);
       Gtk_New (Xmodem_Send_Item, "XMODEM-CRC - Send File");
       File_Menu.Append (Xmodem_Send_Item);
       Gtk_New (Xmodem_Send1k_Item, "XMODEM-CRC - Send File (1k packets");
@@ -1090,6 +1120,7 @@ package body GUI is
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
       Redirector.Router.Set_Destination (Redirector.Local);
+      Redirector.Router.Set_Handler (Redirector.Visual);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 

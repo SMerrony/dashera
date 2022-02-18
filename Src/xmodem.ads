@@ -1,4 +1,4 @@
--- Copyright (C)2022 Steve Merrony
+-- Copyright ©2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -17,6 +17,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Streams.Stream_IO;      use Ada.Streams.Stream_IO;
 with Ada.Unchecked_Conversion;
 
 with Interfaces;  use Interfaces;
@@ -26,8 +27,23 @@ package Xmodem is
    type Packet_Size is (Short, Long);
    for Packet_Size use (Short => 128, Long => 1024);
 
-   -- procedure Receive;
+   task type Receiver is
+		entry Start;
+      entry Accept_Data (Char : in Character);
+      entry Done;
+      entry Stop;
+	end Receiver;
+	type Receiver_Acc is access Receiver;
+
+   Receiver_Task : Receiver_Acc;
+
+   procedure Receive (Filename : in String);
+
    -- procedure Send ( Pkt_Len : in Packet_Size);
+
+   Already_Exists, 
+   Protocol_Error,
+   Sender_Cancelled : exception;
 
 private
 
@@ -48,5 +64,7 @@ private
    procedure Send_Block (Data : in Byte_Arr; Block_Num : in Natural; Block_Size : in Packet_Size);
 
    Tracing : Boolean;
+   RX_File : File_Type;
+
 
 end Xmodem;

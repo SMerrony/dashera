@@ -23,6 +23,7 @@ with Ada.Unchecked_Conversion;
 with Serial;
 with Telnet;
 with Terminal;
+with Xmodem;
 
 package body Redirector is
 
@@ -46,8 +47,15 @@ package body Redirector is
                end case;
             end Send_Data;
          or
-            accept Handle_Data (Data : in String) do
-               Terminal.Processor_Task.Accept_Data (Data);
+            accept Set_Handler (Handlr : in Handler_T) do
+               Handler := Handlr;
+            end Set_Handler;
+         or
+            accept Handle_Data (C : in Character) do
+               case Handler is
+                  when Visual => Terminal.Processor_Task.Accept_Data ("" & C);
+                  when File_Transfer => Xmodem.Receiver_Task.Accept_Data (C);
+               end case;
             end Handle_Data;
          or
             terminate; 

@@ -22,14 +22,17 @@ package Redirector is
    pragma Elaborate_Body;
    
    type Connection_T is (Local, Async, Network);
+   type Handler_T is (Visual, File_Transfer);
    
    task Router is
       Entry Set_Destination (Dest : in Connection_T);
       Entry Get_Destination (Dest : out Connection_T);
       Entry Send_Data (Data : in String);
-      Entry Handle_Data (Data : in String);
+      Entry Set_Handler (Handlr : in Handler_T);
+      Entry Handle_Data (C : in Character);
     end Router;
-
+    
    Destination : Connection_T;
+   Handler     : Handler_T;
 
 end Redirector;

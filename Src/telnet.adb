@@ -99,7 +99,6 @@ package body Telnet is
       Offset       : Ada.Streams.Stream_Element_Count;
       One_Byte     : Character;
       Three_Bytes  : String(1..3);
-      One_Char_Str : String(1..1);
       In_Telnet_Cmd, Got_DO, Got_WILL : Boolean := False;
 
    begin
@@ -177,8 +176,7 @@ package body Telnet is
                goto continue;
             end if;
 
-            One_Char_Str(1) := One_Byte;
-            Redirector.Router.Handle_Data (One_Char_Str);
+            Redirector.Router.Handle_Data (One_Byte);
 
          <<continue>>
          end loop;
