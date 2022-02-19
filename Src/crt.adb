@@ -28,16 +28,23 @@ with Display;
 
 package body Crt is
 
-   surface : Cairo.Cairo_Surface;
-   Timeout : Glib.Main.G_Source_ID;
    use type Cairo.Cairo_Surface;
 
    function Blink_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
+      pragma Unreferenced (DA);
    begin
       Tube.Blink_State := not Tube.Blink_State;
-      DA.Queue_Draw;
+      Display.Prot.Set_Dirty;
       return True;
    end Blink_Timeout_CB;
+
+   function Redraw_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
+   begin
+      if Display.Prot.Is_Dirty then
+         DA.Queue_Draw;
+      end if;
+      return True;
+   end Redraw_Timeout_CB;
 
    procedure Init (Zoom : in BDF_Font.Zoom_T) is
    begin
@@ -49,8 +56,13 @@ package body Crt is
       Tube.Zoom := Zoom;
 
       -- Blink timer
-      if Timeout = 0 then
-         Timeout := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, Tube.DA);
+      if Blink_TO = 0 then
+         Blink_TO := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, Tube.DA);
+      end if;
+
+      -- TESTING = Redraw timer...
+      if Redraw_TO = 0 then
+         Redraw_TO := Redraw_Timeout.Timeout_Add (50, Redraw_Timeout_CB'Access, Tube.DA);
       end if;
 
    end Init;
@@ -163,6 +175,7 @@ package body Crt is
       end if;
 
       Cairo.Destroy (Cr);
+      Display.Prot.Clear_Dirty;
    end Draw_Crt;
 
    function Draw_CB

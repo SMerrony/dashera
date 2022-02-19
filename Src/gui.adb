@@ -975,8 +975,8 @@ package body GUI is
    function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Box) return Boolean is
       Dest : Redirector.Connection_T;
    begin
-      Gdk.Threads.Enter;
       Redirector.Router.Get_Destination (Dest);
+      Gdk.Threads.Enter;
       case Dest is
          when Redirector.Local =>   
             Online_Label.Set_Text ("Local");
@@ -1003,8 +1003,8 @@ package body GUI is
       else
          Hold_Label.Set_Text ("");
       end if;
-      Gdk.Threads.Leave;
       SB.Queue_Draw;
+      Gdk.Threads.Leave;
       return True;
    end Update_Status_Box_CB;
 

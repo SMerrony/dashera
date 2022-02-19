@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ with BDF_Font;
 package Crt is
 
    package Blink_Timeout is new Glib.Main.Generic_Sources (Gtk.Drawing_Area.Gtk_Drawing_Area);
+   package Redraw_Timeout is new Glib.Main.Generic_Sources (Gtk.Drawing_Area.Gtk_Drawing_Area);
 
    Font_Filename  : constant String := "D410-b-12.bdf";
    Blink_Period_MS : constant Guint := 500;
@@ -37,10 +38,12 @@ package Crt is
       DA         : Gtk.Drawing_Area.Gtk_Drawing_Area;
       Zoom       : BDF_Font.Zoom_T;
       Blink_State : Boolean;
-      Timeout_ID : Glib.Main.G_Source_ID := 0;
+      -- Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
 
    Tube : Crt_T;
+   surface : Cairo.Cairo_Surface;
+   Blink_TO, Redraw_TO : Glib.Main.G_Source_ID;
 
    procedure Init (Zoom : in BDF_Font.Zoom_T);
 

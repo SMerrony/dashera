@@ -186,4 +186,10 @@ package body Display is
       Scrolled_Back := False;
    end Cancel_Scroll_Back;
 
+   protected body Prot is
+      procedure Set_Dirty   is begin Dirty := True;  end Set_Dirty;
+      procedure Clear_Dirty is begin Dirty := False; end Clear_Dirty;
+      function Is_Dirty return Boolean is (Dirty);
+   end Prot;
+
 end Display;

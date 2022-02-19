@@ -66,4 +66,13 @@ package Display is
 
    procedure Scroll_Back (Start_Line : in Natural);
    procedure Cancel_Scroll_Back;
+
+   protected Prot is
+      procedure Set_Dirty;
+      procedure Clear_Dirty;
+      function Is_Dirty return Boolean;
+   private
+      Dirty : Boolean;
+   end Prot;
+
 end Display;
