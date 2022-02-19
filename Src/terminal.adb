@@ -1,4 +1,4 @@
--- Copyright (C)2021,2022 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,10 @@ with Ada.Text_IO;
 with Ada.Characters.Latin_1;
 with Ada.Strings.Fixed;
 
--- These are only here for the Beep functionality...
 with Gdk.Main;
 with Glib.Main;
 
 with BDF_Font;
-with Crt;
 with Dasher_Codes;   use Dasher_Codes;
 with Display;
 with Logger;
@@ -418,7 +416,7 @@ package body Terminal is
 
       <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);
-         Crt.Tube.DA.Queue_Draw;
+         Display.Prot.Set_Dirty;
       end loop;
    end Process;
 
