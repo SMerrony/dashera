@@ -63,9 +63,9 @@ with Gtkada.File_Selection;
 
 with Text_IO.Unbounded_IO;
 
-with BDF_Font; use BDF_Font;
+with BDF_Font;  use BDF_Font;
 with Crt;
-with Display;
+with Display_P; use Display_P;
 with Keyboard;
 with Mini_Expect;
 with Logger;
@@ -168,7 +168,7 @@ package body GUI is
       L66 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "66" );
       HB1.Pack_Start (Child => L66, Expand => False, Fill => False, Padding => 1);
       Dlg_Box.Pack_Start (Child => HB1, Expand => False, Fill => False, Padding => 1);
-      case Display.Disp.Visible_Lines is
+      case Display.Get_Visible_Lines is
          when 24 => L24.Set_Active (True);
          when 25 => L25.Set_Active (True);
          when 36 => L36.Set_Active (True);
@@ -189,7 +189,7 @@ package body GUI is
       C135 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "135" );
       HB2.Pack_Start (Child => C135, Expand => False, Fill => False, Padding => 1);
       Dlg_Box.Pack_Start (Child => HB2, Expand => False, Fill => False, Padding => 1);
-      case Display.Disp.Visible_Cols is
+      case Display.Get_Visible_Cols is
          when 80 => C80.Set_Active (True);
          when 81 => C81.Set_Active (True);
          when 132 => C132.Set_Active (True);
@@ -249,8 +249,8 @@ package body GUI is
             end if;
             Crt.Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * New_Cols, 
                                BDF_Font.Decoded.Char_Height * New_Lines);
-            Display.Disp.Visible_Lines := Integer(New_Lines);
-            Display.Disp.Visible_Cols  := Integer(New_Cols);
+            Display.Set_Visible_Lines (Positive(New_Lines));
+            Display.Set_Visible_Cols  (Positive(New_Cols));
          end;
       end if;
       Dialog.Destroy;
@@ -346,7 +346,7 @@ package body GUI is
                                                                         Must_Exist => True);
    begin
       if Filename'Length > 1 then
-         Mini_Expect.Prepare (Filename, Trace_Script);
+         Mini_Expect.Prepare (Filename, Trace_Script_Opt);
       end if;
    end Expect_CB;
 
@@ -609,11 +609,11 @@ package body GUI is
       Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
       if FC_Dialog.Run = Gtk_Response_OK then
          Ada.Text_IO.Put_Line ("DEBUG: Chosen file for Xmodem Rx: " & FC_Dialog.Get_Filename);
-         Xmodem.Receive (String(FC_Dialog.Get_Filename));
+         Xmodem.Receive (String(FC_Dialog.Get_Filename), Trace_Xmodem_Opt);
       end if; 
       FC_Dialog.Destroy; 
    exception
-      when E : Xmodem.Already_Exists =>
+      when Xmodem.Already_Exists =>
          FC_Dialog.Destroy; 
          Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist", 
                                                           Title => "DasherA - Error");
@@ -1012,10 +1012,10 @@ package body GUI is
       Posn : constant Natural := Natural(Self.Get_Value);
    begin
       -- Ada.Text_IO.Put_Line ("DEBUG: Adj changed to " & Posn'Image);
-      if Posn = Display.History_Lines then
-         Display.Cancel_Scroll_Back;
+      if Posn = Display_P.History_Lines then
+         Display_P.Display.Cancel_Scroll_Back;
       else
-         Display.Scroll_Back (Display.History_Lines - Posn);
+         Display_P.Display.Scroll_Back (Display_P.History_Lines - Posn);
       end if;
    end Adj_Changed_CB;
 
@@ -1070,13 +1070,15 @@ package body GUI is
    end Create_Status_Box;
 
    function Create_Window (Host_Arg     : in Unbounded_String;
-                           Trace_Expect : in Boolean) return Gtk.Window.Gtk_Window is
+                           Trace_Expect : in Boolean;
+                           Trace_Xmodem : in Boolean) return Gtk.Window.Gtk_Window is
       H_Grid : Gtk.Grid.Gtk_Grid;
       Error : aliased Glib.Error.GError;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
-      Trace_Script := Trace_Expect;
+      Trace_Script_Opt := Trace_Expect;
+      Trace_Xmodem_Opt := Trace_Xmodem;
 
       -- Gtk.Window.Initialize (Main_Window);
       Gtk.Window.Gtk_New (Main_Window);
@@ -1100,7 +1102,7 @@ package body GUI is
       Main_Grid.Add (Create_FKeys_Box);
 
       -- CRT area
-      Display.Init;
+      Display_P.Display.Init;
       Term := Terminal.Create (Terminal.D210);
       Crt.Init (Zoom => BDF_Font.Normal);
       Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);

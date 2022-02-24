@@ -81,7 +81,7 @@ begin
    Gtk.Main.Init;
    Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
-   Main_Window := Gui.Create_Window (Host_Arg, Trace_Script);
+   Main_Window := Gui.Create_Window (Host_Arg, Trace_Script, Trace_Xmodem);
    Main_Window.Show_All;
    Gtk.Main.Main;
    Gdk.Threads.Leave;

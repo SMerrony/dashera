@@ -31,7 +31,8 @@ package Redirector is
       Entry Set_Handler (Handlr : in Handler_T);
       Entry Handle_Data (C : in Character);
     end Router;
-    
+
+private    
    Destination : Connection_T;
    Handler     : Handler_T;
 

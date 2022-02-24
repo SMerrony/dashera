@@ -26,7 +26,7 @@ with Glib.Main;
 
 with BDF_Font;
 with Dasher_Codes;   use Dasher_Codes;
-with Display;
+with Display_P;      use Display_P;
 with Logger;
 with Mini_Expect;
 with Redirector;
@@ -80,8 +80,8 @@ package body Terminal is
       Op(1) := Dasher_Erase_Page;
       T.Process (Op);
       
-      T.Process (HRule1(1..Display.Disp.Visible_Cols));
-      T.Process (HRule2(1..Display.Disp.Visible_Cols));
+      T.Process (HRule1(1..Display.Get_Visible_Cols));
+      T.Process (HRule2(1..Display.Get_Visible_Cols));
 
       T.Process (NLine);
       T.Process (Chars);
@@ -119,7 +119,7 @@ package body Terminal is
       T.Process (Op);   
       T.Process (NL);
 
-      for L in 8 .. Display.Disp.Visible_Lines loop
+      for L in 8 .. Display.Get_Visible_Lines loop
          if L > 8  then
             T.Process (NL);
          end if;
@@ -181,8 +181,8 @@ package body Terminal is
             if T.New_X_Addr = 127 then 
                -- special case - x stays the same - see D410 User Manual p.3-25
                T.New_X_Addr := T.Cursor_X;
-            elsif T.New_X_Addr >= Display.Disp.Visible_Cols then
-               T.New_X_Addr := T.New_X_Addr - Display.Disp.Visible_Cols;
+            elsif T.New_X_Addr >= Display.Get_Visible_Cols then
+               T.New_X_Addr := T.New_X_Addr - Display.Get_Visible_Cols;
             end if;
             T.Getting_X_Addr := False;
             T.Getting_Y_Addr := True;
@@ -193,12 +193,12 @@ package body Terminal is
             T.New_Y_Addr := Natural(B_Int mod 127);
             if T.New_Y_Addr = 127 then
                T.New_Y_Addr := T.Cursor_Y;
-            elsif T.New_Y_Addr >= Display.Disp.Visible_Lines then
+            elsif T.New_Y_Addr >= Display.Get_Visible_Lines then
                -- see end of p.3-24 in D410 User Manual
                if T.Roll_Enabled then
-                  Display.Scroll_Up (T.New_Y_Addr - (Display.Disp.Visible_Lines - 1));
+                  Display.Scroll_Up (T.New_Y_Addr - (Display.Get_Visible_Lines - 1));
                end if;
-               T.New_Y_Addr := T.Cursor_Y - Display.Disp.Visible_Lines;
+               T.New_Y_Addr := T.Cursor_Y - Display.Get_Visible_Lines;
             end if;
             T.Set_Cursor (T.New_X_Addr, T.New_Y_Addr);
             T.Getting_Y_Addr := False;
@@ -245,16 +245,16 @@ package body Terminal is
                T.Blinking := False;
                T.Skip_Byte := True;  
             when Dasher_Blink_Enable =>
-               Display.Disp.Blink_Enabled := True;  -- Modifies Display
+               Display.Set_Blink_Enabled (True);  -- Modifies Display
                T.Skip_Byte := True;
             when Dasher_Blink_Disable =>
-               Display.Disp.Blink_Enabled := False; -- Modifies Display
+               Display.Set_Blink_Enabled (False); -- Modifies Display
                T.Skip_Byte := True;
             when Dasher_Command =>
                T.In_Command := True; -- next char will form (part of) a command
                T.Skip_Byte := True;
             when Dasher_Cursor_Down =>
-               if T.Cursor_Y < Display.Disp.Visible_Lines - 1 then
+               if T.Cursor_Y < Display.Get_Visible_Lines - 1 then
                   T.Cursor_Y := T.Cursor_Y + 1;
                else
                   T.Cursor_Y := 0;
@@ -264,20 +264,20 @@ package body Terminal is
                if T.Cursor_X > 0 then
                   T.Cursor_X := T.Cursor_X - 1;
                else  
-                  T.Cursor_X := Display.Disp.Visible_Cols - 1;
+                  T.Cursor_X := Display.Get_Visible_Cols - 1;
                   if T.Cursor_Y > 0 then
                      T.Cursor_Y := T.Cursor_Y - 1;
                   else
-                     T.Cursor_Y := Display.Disp.Visible_Lines - 1;
+                     T.Cursor_Y := Display.Get_Visible_Lines - 1;
                   end if;
                end if;
                T.Skip_Byte := True;
             when Dasher_Cursor_Right =>
-               if T.Cursor_X < Display.Disp.Visible_Cols - 1 then
+               if T.Cursor_X < Display.Get_Visible_Cols - 1 then
                   T.Cursor_X := T.Cursor_X + 1;
                else  
                   T.Cursor_X := 0;
-                  if T.Cursor_Y < Display.Disp.Visible_Lines - 1 then
+                  if T.Cursor_Y < Display.Get_Visible_Lines - 1 then
                      T.Cursor_Y := T.Cursor_Y + 1;
                   else
                      T.Cursor_Y := 0;
@@ -288,7 +288,7 @@ package body Terminal is
                if T.Cursor_Y > 0 then
                   T.Cursor_Y := T.Cursor_Y - 1;
                else
-                  T.Cursor_Y := Display.Disp.Visible_Lines - 1;
+                  T.Cursor_Y := Display.Get_Visible_Lines - 1;
                end if;
                T.Skip_Byte := True;
             when Dasher_Dim_On =>
@@ -298,12 +298,12 @@ package body Terminal is
                T.Dimmed := False;
                T.Skip_Byte := True;
             when Dasher_Erase_EOL =>
-               for Col in T.Cursor_X .. Display.Disp.Visible_Cols - 1 loop
-                  Display.Disp.Cells(T.Cursor_Y,col).Clear_To_Space;
+               for Col in T.Cursor_X .. Display.Get_Visible_Cols - 1 loop
+                  Display.Clear_Cell(T.Cursor_Y,col);
                end loop;
                T.Skip_Byte := True;
             when Dasher_Erase_Page =>
-               Display.Scroll_Up (Display.Disp.Visible_Lines);
+               Display.Scroll_Up (Display.Get_Visible_Lines);
                T.Set_Cursor (0, 0);
                T.Skip_Byte := True;
             when Dasher_Home =>
@@ -344,7 +344,7 @@ package body Terminal is
             when Dasher_Tab =>
                T.Cursor_X := T.Cursor_X + 1; -- always at least 1 column
                while (T.Cursor_X + 1) mod 8 /= 0 loop
-                  if T.Cursor_X >= Display.Disp.Visible_Cols - 1 then
+                  if T.Cursor_X >= Display.Get_Visible_Cols - 1 then
                      T.Cursor_X := 0; -- TODO What about Cursor_Y ???
                   else
                      T.Cursor_X := T.Cursor_X + 1;
@@ -363,9 +363,9 @@ package body Terminal is
          end if;
 
          -- wrap due to hitting margin or new line?
-         if T.Cursor_X = Display.Disp.Visible_Cols or B = Dasher_NL then
+         if T.Cursor_X = Display.Get_Visible_Cols or B = Dasher_NL then
             -- hit bottom of screen?
-            if T.Cursor_Y = Display.Disp.Visible_Lines - 1 then
+            if T.Cursor_Y = Display.Get_Visible_Lines - 1 then
                if T.Roll_Enabled then
                   Display.Scroll_Up (1);
                else
@@ -416,7 +416,7 @@ package body Terminal is
 
       <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);
-         Display.Prot.Set_Dirty;
+         Display.Set_Dirty;
       end loop;
    end Process;
 

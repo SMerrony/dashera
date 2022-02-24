@@ -15,7 +15,7 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 
 ## Major Elements
 
-* Cell - a single ASCII character and it's Dasher attributes
+* Cell - a single ASCII character and its Dasher attributes
 * Crt - handle the drawing of a Display in the application
 * Dashera - the main entry point
 * Display - holds a matrix of ASCII characters (Cells)

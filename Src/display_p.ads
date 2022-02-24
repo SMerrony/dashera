@@ -19,7 +19,7 @@
 
 with Cell;
 
-package Display is
+package Display_P is
 
    Default_Lines : constant Natural := 24;
    Default_Cols  : constant Natural := 80;
@@ -34,7 +34,7 @@ package Display is
 
    type Display_T is record
       Cells : Cell_Array;
-      Visible_Lines, Visible_Cols : Integer;
+      Visible_Lines, Visible_Cols : Positive;
       Cursor_X, Cursor_Y : Natural;
       Blink_Enabled : Boolean;
    end record;
@@ -44,35 +44,41 @@ package Display is
       First, Last : Natural;
    end record;
 
-   Disp, Saved_Disp   : Display_T;
-   History            : History_T;
-   Empty_History_Line : History_Line;
-   Scrolled_Back : Boolean;
-
-   procedure Init;
-   procedure Clear_Cell (Line, Col : in Integer);
-   procedure Clear_Line (Line : in Integer);
-   procedure Set_Cell (Line, Col : in Natural; Char : in Character;
-                       Blink, Dim, Rev, Under, Prot : in Boolean);
-   procedure Copy_Line (Src, Dest : in Integer);
-   procedure Set_Cursor (X, Y : in Natural);
-
-   procedure Add_To_History (HL : in out History_Line);
-   -- Inserts a line into the circular history buffer
-
-   procedure Scroll_Up (Lines : in Natural);
-
-   procedure Copy_Line_To_History (Src : in Integer);
-
-   procedure Scroll_Back (Start_Line : in Natural);
-   procedure Cancel_Scroll_Back;
-
-   protected Prot is
+   protected Display is
       procedure Set_Dirty;
       procedure Clear_Dirty;
-      function Is_Dirty return Boolean;
-   private
-      Dirty : Boolean;
-   end Prot;
+      function  Is_Dirty return Boolean;
+      procedure Init;
+      procedure Get_Cell (Line, Col : in Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
+      Procedure Clear_Cell (Line, Col : in Integer);
+      procedure Clear_Line (Line : in Integer);
+      procedure Set_Cell (Line, Col : in Natural; Char : in Character;
+                          Blink, Dim, Rev, Under, Prot : in Boolean);
+      procedure Set_Cursor (X, Y : in Natural); 
+      function  Get_Cursor_X return Natural;
+      function  Get_Cursor_Y return Natural;
+      procedure Copy (Src : in out Display_T; Dest : out Display_T); 
+      procedure Copy_Line (Src, Dest : in Integer);
+      procedure Copy_Line_To_History (Src : in Integer);
+      -- Inserts a line into the circular history buffer
+        
+      procedure Scroll_Up (Lines : in Natural);
 
-end Display;
+      procedure Set_Scrolled_Back (Back : in Boolean);
+      procedure Scroll_Back (Start_Line : in Natural);
+      procedure Cancel_Scroll_Back;
+      function  Get_Visible_Cols  return Positive;
+      function  Get_Visible_Lines return Positive;
+      procedure Set_Visible_Cols  (Cols : in  Positive);
+      procedure Set_Visible_Lines (Lines : in  Positive);
+      function  Is_Blink_Enabled return Boolean;
+      procedure Set_Blink_Enabled (Blink : in Boolean);
+   private
+      Disp, Saved_Disp   : Display_T;
+      History            : History_T;
+      Empty_History_Line : History_Line;
+      Scrolled_Back      : Boolean;
+      Dirty              : Boolean;
+   end Display;
+
+end Display_P;

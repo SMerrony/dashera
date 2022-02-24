@@ -19,12 +19,12 @@
 
 with Ada.Text_IO;
 
-with Cairo;               use Cairo;
+with Cairo;       use Cairo;
 
 with Gdk.Cairo;
 with Gdk.Window;
 
-with Display;
+with Display_P;   use Display_P;
 
 package body Crt is
 
@@ -34,13 +34,13 @@ package body Crt is
       pragma Unreferenced (DA);
    begin
       Tube.Blink_State := not Tube.Blink_State;
-      Display.Prot.Set_Dirty;
+      Display.Set_Dirty;
       return True;
    end Blink_Timeout_CB;
 
    function Redraw_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
    begin
-      if Display.Prot.Is_Dirty then
+      if Display.Is_Dirty then
          DA.Queue_Draw;
       end if;
       return True;
@@ -51,8 +51,8 @@ package body Crt is
       Ada.Text_IO.Put_Line ("DEBUG: Creating Crt");
       BDF_Font.Load_Font (Font_Filename, Zoom);
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
-      Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * Gint(Display.Disp.Visible_Cols), 
-                               BDF_Font.Decoded.Char_Height * Gint(Display.Disp.Visible_Lines));
+      Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * Gint(Display.Get_Visible_Cols), 
+                               BDF_Font.Decoded.Char_Height * Gint(Display.Get_Visible_Lines));
       Tube.Zoom := Zoom;
 
       -- Blink timer
@@ -112,18 +112,18 @@ package body Crt is
       -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt called");
       Cr := Cairo.Create (surface);
 
-      for Line in 0 .. Display.Disp.Visible_Lines-1 loop
+      for Line in 0 .. Display.Get_Visible_Lines-1 loop
 
          Char_Y  := Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height);
          
-         for Col in 0 .. Display.Disp.Visible_Cols-1 loop
+         for Col in 0 .. Display.Get_Visible_Cols-1 loop
             Char_X  := Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width);
 
-            Display.Disp.Cells(Line, Col).Get (Value, Blnk, Dm, Rv, Under, Prot);
+            Display.Get_Cell(Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
 
             Char_Ix := Character'Pos (Value);
 
-            if Display.Disp.Blink_Enabled and Tube.Blink_State and Blnk then
+            if Display.Is_Blink_Enabled and Tube.Blink_State and Blnk then
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                              Pixbuf => BDF_Font.Decoded.Font(32).Dim_Pix_Buf, 
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
@@ -154,8 +154,8 @@ package body Crt is
       end loop;
 
       -- Draw the cursor if it's on-screen
-      if Display.Disp.Cursor_X < Display.Disp.Visible_Cols and Display.Disp.Cursor_Y < Display.Disp.Visible_Lines then
-         Display.Disp.Cells(Display.Disp.Cursor_Y, Display.Disp.Cursor_X).Get (Value, Blnk, Dm, Rv, Under, Prot);
+      if Display.Get_Cursor_X < Display.Get_Visible_Cols and Display.Get_Cursor_Y < Display.Get_Visible_Lines then
+         Display.Get_Cell(Display.Get_Cursor_Y, Display.Get_Cursor_X, Value, Blnk, Dm, Rv, Under, Prot);
          Char_Ix := Character'Pos (Value);
          if Char_Ix = 0 then
             Char_Ix := 32;
@@ -163,19 +163,19 @@ package body Crt is
          if Rv then
             Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                          Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
-                                         Pixbuf_X => Gdouble(Gint(Display.Disp.Cursor_X) * BDF_Font.Decoded.Char_Width),
-                                         Pixbuf_Y => Gdouble(Gint(Display.Disp.Cursor_Y) * BDF_Font.Decoded.Char_Height));
+                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * BDF_Font.Decoded.Char_Width),
+                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * BDF_Font.Decoded.Char_Height));
          else
             Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
                                          Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf, 
-                                         Pixbuf_X => Gdouble(Gint(Display.Disp.Cursor_X) * BDF_Font.Decoded.Char_Width),
-                                         Pixbuf_Y => Gdouble(Gint(Display.Disp.Cursor_Y) * BDF_Font.Decoded.Char_Height));
+                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * BDF_Font.Decoded.Char_Width),
+                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * BDF_Font.Decoded.Char_Height));
          end if;
          Cairo.Paint (Cr);
       end if;
 
       Cairo.Destroy (Cr);
-      Display.Prot.Clear_Dirty;
+      Display.Clear_Dirty;
    end Draw_Crt;
 
    function Draw_CB

@@ -19,6 +19,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+
 with Ada.Directories;
 with Ada.Text_IO;
 
@@ -26,21 +27,12 @@ with Redirector; use Redirector;
 
 package body Xmodem is
 
-   function BA_To_String (BA : in Byte_Arr) return string is
-      Str : string (1..BA'Length);
-   begin
-      for Ix in Str'Range loop
-         Str(Ix) := Byte_To_Char (BA(Ix));
-      end loop;
-      return Str;
-   end BA_To_String;
-
-   function CRC_16 (BA : in Byte_Arr) return Unsigned_16 is
+   function CRC_16 (Data : in Vector) return Unsigned_16 is
       CRC : Unsigned_16 := 0;
       Part  : Unsigned_16;
    begin
-      for U8 of BA loop
-         Part := Unsigned_16(U8);
+      for C of Data loop
+         Part := Unsigned_16(Char_To_U8(C));
          CRC := CRC xor Shift_Left (Part, 8);
          for I in 0 .. 7 loop
             if (CRC and 16#8000#) > 0 then
@@ -53,14 +45,14 @@ package body Xmodem is
       return CRC;
    end CRC_16;
 
-   function CRC_16_Fixed_Len (BA : in Byte_Arr; FL : in Positive) return Unsigned_16 is
+   function CRC_16_Fixed_Len (Data : in Vector; FL : in Positive) return Unsigned_16 is
       CRC : Unsigned_16 := 0;
    begin
       -- the data part...
-      CRC := CRC_16 (BA);
+      CRC := CRC_16 (Data);
 
       -- the padding to the fixed length...
-      for C in 0 .. (FL - BA'Length - 1) loop
+      for C in 0 .. (FL - Positive(Data.Length) - 1) loop
          CRC := CRC xor 16#0400#;
          for I in 0 .. 7 loop
             if (CRC and 16#8000#) > 0 then
@@ -74,7 +66,7 @@ package body Xmodem is
       return CRC;
    end CRC_16_Fixed_Len;
 
-   procedure Send_Block (Data : in Byte_Arr; Block_Num : in Natural; Block_Size : in Packet_Size) is
+   procedure Send_Block (Data : in Vector; Block_Num : in Natural; Block_Size : in Packet_Size) is
       Start_Bytes : string (1..3);
       Block_Pos : constant Unsigned_8  := Unsigned_8(Block_Num mod 256);
       Block_Inv : constant Unsigned_8  := not Block_Pos;
@@ -95,12 +87,14 @@ package body Xmodem is
       Router.Send_Data (Start_Bytes);
 
       -- Send the actual data
-      Router.Send_Data (BA_To_String (Data));
+      for C of Data loop
+         Router.Send_Data ("" & C);
+      end loop;
 
       -- Pad out block
-      if Data'Length < Block_Size'Enum_Rep then
+      if Data.Length < Block_Size'Enum_Rep then
          Padding_String(1) := Ascii.EOT;
-         for Ix in Data'Length .. Block_Size'Enum_Rep loop
+         for Ix in Data.Length .. Block_Size'Enum_Rep loop
             Router.Send_Data (Padding_String);
          end loop;
       end if;
@@ -111,19 +105,26 @@ package body Xmodem is
 
    end Send_Block;
 
-   procedure Receive (Filename : in String) is
+   procedure Receive (Filename : in String; Trace_Flag : in Boolean) is
+      RX_File : File_Type;
+      RX_Stream : Stream_Access;
    begin
       if Ada.Directories.Exists (Filename) then
          raise Already_Exists;
          return;
       end if;
       Create (RX_File, Name => Filename);
-      Receiver_Task.Start;
+      RX_Stream := Stream(RX_File);
+      Ada.Text_IO.Put_Line ("DEBUG: Xmodem Created file: " & Filename);
+      Receiver_Task := new Receiver;
+      Router.Set_Handler (Handlr => File_Transfer);
+      Receiver_Task.Start (RX_Stream);
       loop
          select
             Receiver_Task.Done;
             Ada.Text_IO.Put_Line ("DEBUG: Xmodem Receive is complete");
-            -- TODO
+            Close (RX_File);
+            Router.Set_Handler (Handlr => Visual);
             exit;
          or
             delay 1.0;
@@ -136,25 +137,34 @@ package body Xmodem is
    task body Receiver is
       Finished    : Boolean;
       Packet_Size : Natural;
-      New_Packet  : Boolean;
       Packet_Count, Inverse_Packet_Count : Unsigned_8;
-      This_Packet_Len : Positive;
       Rxd_CRC, Calcd_CRC : Unsigned_16;
+      Write_Stream : Stream_Access;
+
+      File_Blob, Packet : Vector;
+
    begin
-      accept Start do
+      accept Start (RX_Stream : Stream_Access) do
+         Write_Stream := RX_Stream;
          Finished := False;
-         New_Packet := True;
+         File_Blob.Clear;
+         Packet.Clear;
       end Start;
+      Ada.Text_IO.Put_Line ("DEBUG: Xmodem Sending POLL");
       Router.Send_Data ("" & 'C'); -- POLL
       while not Finished loop -- per packet
+         Packet.Clear;
          accept Accept_Data (Char : in Character) do
             case Char is
-               when Ascii.EOT => 
+               when Ascii.EOT | Ascii.SUB => 
+                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got EOT (End of Transmission)");
                   Router.Send_Data ("" & Ascii.ACK); 
                   Finished := True;
                when Ascii.SOH =>
+                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got SOH (Short packets indicator)");
                   Packet_Size := 128; -- short packets
                when Ascii.STX =>
+                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got STX (Long packets indicator)");
                   Packet_Size := 1024; -- long packets
                when Ascii.CAN =>
                   raise Sender_Cancelled;
@@ -162,51 +172,64 @@ package body Xmodem is
                   raise Protocol_Error;
             end case;
          end Accept_Data;
-         if Finished then exit; end if;
+         if Finished then 
+            -- final packet may have trailing EOFs
+            while File_Blob(File_Blob.Last_Index) = Ascii.SUB loop
+               File_Blob.Delete_Last (1);
+            end loop;
+            for C of File_Blob loop
+               Character'Write (Write_Stream, C);
+            end loop;
+            accept Done;
+         end if;
 
          accept Accept_Data (Char : in Character) do
-            Packet_Count := Char_To_Byte (Char);
+            Packet_Count := Char_To_U8 (Char);
          end Accept_Data; 
+         Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got Packet Count " & Packet_Count'Image);
 
          accept Accept_Data (Char : in Character) do
-            Inverse_Packet_Count := Char_To_Byte (Char);
+            Inverse_Packet_Count := Char_To_U8 (Char);
          end Accept_Data; 
+         Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got Inverse Packet Count " & Inverse_Packet_Count'Image);
 
          if (not Packet_Count) /= Inverse_Packet_Count then
+            Ada.Text_IO.Put_Line ("DEBUG: Xmodem Packet counts not right - sending NAK");
             Router.Send_Data ("" & Ascii.NAK);
             goto Next_Packet;
          end if;
 
-         This_Packet_Len := Positive(Packet_Count);
+         for B in 1 .. Packet_Size loop
+            accept Accept_Data (Char : in Character) do
+               Packet.Append (Char);
+            end Accept_Data;
+         end loop;
+      
+         Ada.Text_IO.Put_Line ("DEBUG: Xmodem - Packet received");
 
-         declare
-            Packet : Byte_Arr(0 .. This_Packet_Len - 1);
-         begin
-            for B in Packet'Range loop
-               accept Accept_Data (Char : in Character) do
-                  Packet(B) := Char_To_Byte (Char);
-               end Accept_Data;
+         accept Accept_Data (Char : in Character) do
+            Rxd_CRC := Unsigned_16(Char_To_U8 (Char));
+         end Accept_Data;
+         Rxd_CRC := Shift_Left (Rxd_CRC, 8);
+         accept Accept_Data (Char : in Character) do
+            Rxd_CRC := Rxd_CRC + Unsigned_16(Char_To_U8 (Char));
+         end Accept_Data;
+         Ada.Text_IO.Put_Line ("DEBUG: Xmodem Received CRC is " & Rxd_CRC'Image);
+
+         Calcd_CRC := CRC_16 (Packet);
+         Ada.Text_IO.Put_Line ("DEBUG: Xmodem Calculated CRC is " & Calcd_CRC'Image);
+
+         if Rxd_CRC = Calcd_CRC then
+            Ada.Text_IO.Put_Line ("WARNING: Xmodem sending ACK");
+            Router.Send_Data ("" & Ascii.ACK);
+            for C of Packet loop
+               File_Blob.Append (C);
             end loop;
-         
+         else
+            Ada.Text_IO.Put_Line ("WARNING: Xmodem sending NAK due to CRC error");
+            Router.Send_Data ("" & Ascii.NAK);
 
-            accept Accept_Data (Char : in Character) do
-               Rxd_CRC := Unsigned_16(Char_To_Byte (Char));
-            end Accept_Data;
-            Rxd_CRC := Shift_Left (Rxd_CRC, 8);
-            accept Accept_Data (Char : in Character) do
-               Rxd_CRC := Rxd_CRC + Unsigned_16(Char_To_Byte (Char));
-            end Accept_Data;
-
-            Calcd_CRC := CRC_16 (Packet);
-
-            if Rxd_CRC = Calcd_CRC then
-               Router.Send_Data ("" & Ascii.ACK);
-            else
-               Router.Send_Data ("" & Ascii.NAK);
-               Ada.Text_IO.Put_Line ("WARNING: Xmodem sending ACK due to CRC error");
-            end if;
-
-         end;
+         end if;
 
          <<Next_Packet>>
       end loop;

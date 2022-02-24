@@ -17,6 +17,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Containers;             use Ada.Containers;
+with Ada.Containers.Vectors;
 with Ada.Streams.Stream_IO;      use Ada.Streams.Stream_IO;
 with Ada.Unchecked_Conversion;
 
@@ -27,8 +29,11 @@ package Xmodem is
    type Packet_Size is (Short, Long);
    for Packet_Size use (Short => 128, Long => 1024);
 
+   package Char_Vectors is new Ada.Containers.Vectors (Index_Type => Natural, Element_Type => Character);
+   use Char_Vectors;
+
    task type Receiver is
-		entry Start;
+		entry Start (RX_Stream : Stream_Access);
       entry Accept_Data (Char : in Character);
       entry Done;
       entry Stop;
@@ -37,7 +42,7 @@ package Xmodem is
 
    Receiver_Task : Receiver_Acc;
 
-   procedure Receive (Filename : in String);
+   procedure Receive (Filename : in String; Trace_Flag : in Boolean);
 
    -- procedure Send ( Pkt_Len : in Packet_Size);
 
@@ -47,24 +52,18 @@ package Xmodem is
 
 private
 
-   type Byte_Arr is array (Positive range<>) of Unsigned_8;
-
-
-   function Char_To_Byte        is new Ada.Unchecked_Conversion(Character, Unsigned_8);
-   function Byte_To_Char        is new Ada.Unchecked_Conversion(Unsigned_8, Character);
-
-   function BA_To_String (BA : in Byte_Arr) return string;
+   function Char_To_U8   is new Ada.Unchecked_Conversion(Character, Unsigned_8);
+   function Byte_To_Char is new Ada.Unchecked_Conversion(Unsigned_8, Character);
    
-   function CRC_16 (BA : in Byte_Arr) return Unsigned_16;
+   function CRC_16 (Data : in Vector) return Unsigned_16;
    -- Calculate the CRC-16 value of the provided block of data
 
-   function CRC_16_Fixed_Len (BA : in Byte_Arr; FL : in Positive) return Unsigned_16;
+   function CRC_16_Fixed_Len (Data : in Vector; FL : in Positive) return Unsigned_16;
    -- Calculate the CRC-16 Constant for the provided block of data
 
-   procedure Send_Block (Data : in Byte_Arr; Block_Num : in Natural; Block_Size : in Packet_Size);
+   procedure Send_Block (Data : in Vector; Block_Num : in Natural; Block_Size : in Packet_Size);
 
    Tracing : Boolean;
-   RX_File : File_Type;
 
 
 end Xmodem;

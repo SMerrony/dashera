@@ -76,9 +76,10 @@ package GUI is
    SB_Timeout  : Glib.Main.G_Source_ID := 0;
 
    -- Flags
-   Trace_Script : Boolean;
+   Trace_Script_Opt, Trace_Xmodem_Opt : Boolean;
 
    function Create_Window (Host_Arg     : in Unbounded_String;
-                           Trace_Expect : in Boolean) return Gtk_Window;
+                           Trace_Expect : in Boolean;
+                           Trace_Xmodem : in Boolean) return Gtk_Window;
 
 end GUI;
