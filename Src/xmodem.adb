@@ -143,6 +143,7 @@ package body Xmodem is
 
       File_Blob, Packet : Vector;
       Pkt_Hdr : Character;
+      Purged  : Boolean;
 
    begin
       accept Start (RX_Stream : Stream_Access) do
@@ -156,6 +157,7 @@ package body Xmodem is
       while not Finished loop -- per packet
          Packet.Clear;
 
+         Ada.Text_IO.Put_Line ("DEBUG: Xmodem Ready for Packet Header");
          accept Accept_Data (Char : in Character) do
             Pkt_Hdr := Char;
          end Accept_Data;
@@ -196,6 +198,10 @@ package body Xmodem is
             end Accept_Data; 
             Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got Packet Count " & Packet_Count'Image);
 
+            -- if Packet_Count = 13 then
+            --    accept Accept_Data (Char : in Character);
+            -- end if;
+
             accept Accept_Data (Char : in Character) do
                Inverse_Packet_Count := Char_To_U8 (Char);
             end Accept_Data; 
@@ -203,6 +209,15 @@ package body Xmodem is
 
             if (not Packet_Count) /= Inverse_Packet_Count then
                Ada.Text_IO.Put_Line ("DEBUG: Xmodem Packet counts not right - sending NAK");
+               Purged := False;
+               while not Purged loop
+                  select
+                     accept Accept_Data (Char : in Character);
+                  or
+                     delay 1.0;
+                        Purged := True;
+                  end select;
+               end loop;
                Router.Send_Data ("" & Ascii.NAK);
                goto Next_Packet;
             end if;
@@ -228,13 +243,22 @@ package body Xmodem is
             Ada.Text_IO.Put_Line ("DEBUG: Xmodem Calculated CRC is " & Calcd_CRC'Image);
 
             if Rxd_CRC = Calcd_CRC then
-               Ada.Text_IO.Put_Line ("WARNING: Xmodem sending ACK");
+               Ada.Text_IO.Put_Line ("DEBUG: Xmodem CRCs OK - sending ACK");
                Router.Send_Data ("" & Ascii.ACK);
                for C of Packet loop
                   File_Blob.Append (C);
                end loop;
             else
                Ada.Text_IO.Put_Line ("WARNING: Xmodem sending NAK due to CRC error");
+               Purged := False;
+               while not Purged loop
+                  select
+                     accept Accept_Data (Char : in Character);
+                  or
+                     delay 1.0;
+                        Purged := True;
+                  end select;
+               end loop;
                Router.Send_Data ("" & Ascii.NAK);
 
             end if;

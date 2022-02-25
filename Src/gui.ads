@@ -68,6 +68,7 @@ package GUI is
 
    -- Menu items for which we need access...
    Net_Connect_Item, Net_Disconnect_Item,
+   Xmodem_Rx_Item, Xmodem_Send_Item, Xmodem_Send1k_Item,
    Serial_Connect_Item, Serial_Disconnect_Item : Gtk_Menu_Item;
 
    -- Status Bar items...

@@ -508,6 +508,9 @@ package body GUI is
                Serial_Disconnect_Item.Set_Sensitive (True);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (False);
+               Xmodem_Rx_Item.Set_Sensitive (True);
+               Xmodem_Send_Item.Set_Sensitive (True);
+               Xmodem_Send1k_Item.Set_Sensitive (True);
             end;
          end if;
       end if;
@@ -523,6 +526,9 @@ package body GUI is
       Serial_Disconnect_Item.Set_Sensitive (False);
       Net_Connect_Item.Set_Sensitive (True);
       Net_Disconnect_Item.Set_Sensitive (False);
+      Xmodem_Rx_Item.Set_Sensitive (False);
+      Xmodem_Send_Item.Set_Sensitive (False);
+      Xmodem_Send1k_Item.Set_Sensitive (False);
    end Serial_Disconnect_CB;
 
    procedure Telnet_Connect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
@@ -641,9 +647,9 @@ package body GUI is
       File_Menu, Edit_Menu, Emulation_Menu, Serial_Menu, Network_Menu,
       Help_Menu : Gtk.Menu.Gtk_Menu;
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
-      Logging_Item, Expect_Item, Send_File_Item, Xmodem_Rx_Item,
+      Logging_Item, Expect_Item, Send_File_Item,
       D200_Item, D210_Item, Self_Test_Item, Load_Template_Item, Resize_Item,
-      Xmodem_Send_Item, Xmodem_Send1k_Item, Quit_Item,
+      Quit_Item,
       Paste_Item,
       About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
    begin
@@ -678,11 +684,14 @@ package body GUI is
       Send_File_Item.On_Activate (Send_Text_File_CB'Access);
 
       Gtk_New (Xmodem_Rx_Item, "XMODEM-CRC - Receive File");
+      Xmodem_Rx_Item.Set_Sensitive (False);
       File_Menu.Append (Xmodem_Rx_Item);
       Xmodem_Rx_Item.On_Activate (Xmodem_Rx_CB'Access);
       Gtk_New (Xmodem_Send_Item, "XMODEM-CRC - Send File");
+      Xmodem_Send_Item.Set_Sensitive (False);
       File_Menu.Append (Xmodem_Send_Item);
       Gtk_New (Xmodem_Send1k_Item, "XMODEM-CRC - Send File (1k packets");
+      Xmodem_Send1k_Item.Set_Sensitive (False);
       File_Menu.Append (Xmodem_Send1k_Item);
       Gtk_New (Sep_Item);
       File_Menu.Append (Sep_Item);
