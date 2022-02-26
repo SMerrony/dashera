@@ -88,9 +88,10 @@ package body Telnet is
    begin
       GNAT.Sockets.Shutdown_Socket (Sess.Conn);
       Keyboard_Sender_Task.Stop;
-   exception
-      when others =>
-         null;
+      Redirector.Router.Set_Destination (Redirector.Local);
+   -- exception
+   --    when others =>
+   --       null;
    end Close_Connection;
 
    task body Receiver is
