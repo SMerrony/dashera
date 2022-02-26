@@ -36,7 +36,7 @@ package Xmodem is
 		entry Start (RX_Stream : Stream_Access);
       entry Accept_Data (Char : in Character);
       entry Done;
-      entry Stop;
+      -- entry Stop;
 	end Receiver;
 	type Receiver_Acc is access Receiver;
 
