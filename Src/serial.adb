@@ -54,6 +54,7 @@ package body Serial is
       Ada.Text_IO.Put_Line ("DEBUG: Serial port opened and set-up");
       Receiver_Task := new Receiver;
       Receiver_Task.Start;
+      Redirector.Router.Set_Destination (Redirector.Async);
       Keyboard_Sender_Task := new Keyboard_Sender;
       Keyboard_Sender_Task.Start;
       Ada.Text_IO.Put_Line ("DEBUG: Serial port open complete");
@@ -63,6 +64,7 @@ package body Serial is
    begin
       Close (Port);
       Keyboard_Sender_Task.Stop;
+      Redirector.Router.Set_Destination (Redirector.Local);
    end Close;
 
    task body Receiver is

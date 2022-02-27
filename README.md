@@ -8,7 +8,7 @@ DasherA is a free terminal emulator for Data General DASHER series character-bas
 (This will be updated as features from DasherG are ported across...)
 
 * DASHER D200 & D210 Emulation
-* Serial interface support at 300, 1200, 2400, 9600 & 19200 baud, 7 or 8 data bits,
+* Serial interface support at 300, 1200, 2400, 9600, 19200 & 38400 baud, 7 or 8 data bits,
 no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * BREAK key support for serial interface - permits use as master console
 * Network Interface (Telnet) support
@@ -22,6 +22,7 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * Various terminal widths, heights and zoom-levels available
 * Support for mini-Expect scripts to automate some tasks [see Wiki](https://github.com/SMerrony/DasherG/wiki/DasherG-Mini-Expect-Scripts)
 * Paste from system Clipboard
+* XMODEM-CRC file receive with short (128) or long (1024) packets
   
 Here is the full [Implementation Chart](./Docs/implementationChart.md) for DasherA.
 

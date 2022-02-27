@@ -69,7 +69,7 @@ with Display_P; use Display_P;
 with Keyboard;
 with Mini_Expect;
 with Logger;
-with Redirector;
+with Redirector; use Redirector;
 with Serial;
 with Xmodem;
 
@@ -96,14 +96,22 @@ package body GUI is
    begin
       Ada.Text_IO.Put_Line ("DEBUG: Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
       Gtk.Main.Main_Quit;
-      -- Term.Connection := Terminal.Quitting;
    end Window_Close_CB;
 
    procedure Quit_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
+      Conn : Connection_T;
    begin
+      Router.Get_Destination (Conn);
+      case Conn is
+         when Local =>
+            null;
+         when Async =>
+            Serial.Close;
+         when Network =>
+            Telnet_Sess.Close_Connection;
+      end case;
       Gtk.Main.Main_Quit;
-      -- Term.Connection := Terminal.Quitting;
    end Quit_CB;
 
    procedure About_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
@@ -434,6 +442,7 @@ package body GUI is
       Baud_Combo.Append_Text ("2400");
       Baud_Combo.Append_Text ("9600");
       Baud_Combo.Append_Text ("19200");
+      Baud_Combo.Append_Text ("38400");
       Baud_Combo.Set_Active (3);
       Ser_Grid.Attach (Child => Baud_Combo, Left => 1, Top => 1);
 
@@ -486,6 +495,7 @@ package body GUI is
                   when 2 => Rate := B2400;
                   when 3 => Rate := B9600;
                   when 4 => Rate := B19200;
+                  when 5 => Rate := B38400;
                   when others => null; -- TODO raise exception;
                end case;
                case Bits_Combo.Get_Active is
