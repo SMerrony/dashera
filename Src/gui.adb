@@ -251,6 +251,9 @@ package body GUI is
                                BDF_Font.Decoded.Char_Height * New_Lines);
             Display.Set_Visible_Lines (Positive(New_Lines));
             Display.Set_Visible_Cols  (Positive(New_Cols));
+            -- Ask for window resize to smaller than we are - the effect
+            -- is to reduce window size to minimum that contains all content.
+            Main_Window.Resize (400, 400);
          end;
       end if;
       Dialog.Destroy;
