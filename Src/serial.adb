@@ -52,6 +52,7 @@ package body Serial is
       User_Parity    := Parity;
       User_Stop_Bits := Stop_Bits;
       Ada.Text_IO.Put_Line ("DEBUG: Serial port opened and set-up");
+      Port_US := To_Unbounded_String (Port_Str);
       Receiver_Task := new Receiver;
       Receiver_Task.Start;
       Redirector.Router.Set_Destination (Redirector.Async);

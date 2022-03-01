@@ -17,6 +17,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with GNAT.Serial_Communications; use GNAT.Serial_Communications;
 
 package Serial is
@@ -37,6 +39,7 @@ package Serial is
 	type Sender_Acc is access Keyboard_Sender;
 
 	Keyboard_Sender_Task : Sender_Acc;
+   Port_US : Unbounded_String;
 
    procedure Open (Port_Str  : in String;
                    Rate      : in Data_Rate;

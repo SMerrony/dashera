@@ -1043,6 +1043,7 @@ package body GUI is
             Host_Label.Set_Text ("(Disconnected)");
          when Redirector.Async =>   
             Online_Label.Set_Text ("Online (Serial)");
+            Host_Label.Set_Text (To_String (Serial.Port_US));
          when Redirector.Network => 
             Online_Label.Set_Text ("Online (Telnet)");
             Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
