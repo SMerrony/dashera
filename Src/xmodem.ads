@@ -44,11 +44,24 @@ package Xmodem is
 
    procedure Receive (Filename : in String; Trace_Flag : in Boolean);
 
-   -- procedure Send ( Pkt_Len : in Packet_Size);
+   task type Sender is
+      entry Start (TX_Stream : in Stream_Access; Pkt_Len : in Packet_Size);
+      entry Accept_Data (Char : in Character);
+      entry Done;
+   end Sender;
+   type Sender_Acc is access Sender;
 
-   Already_Exists, 
+   Sender_Task : Sender_Acc;
+
+   procedure Send (Filename : in String; Pkt_Len : in Packet_Size; Trace_Flag : in Boolean);
+
+   Already_Exists,
+   File_Does_Not_Exist, 
+   File_Access_Error,
    Protocol_Error,
-   Sender_Cancelled : exception;
+   Sender_Cancelled,
+   Timeout,
+   Too_Many_Retries             : exception;
 
 private
 
@@ -61,7 +74,7 @@ private
    function CRC_16_Fixed_Len (Data : in Vector; FL : in Positive) return Unsigned_16;
    -- Calculate the CRC-16 Constant for the provided block of data
 
-   procedure Send_Block (Data : in Vector; Block_Num : in Natural; Block_Size : in Packet_Size);
+   procedure Send_Block (Data : in out Vector; Block_Num : in Natural; Block_Size : in Packet_Size);
 
    Tracing : Boolean;
 

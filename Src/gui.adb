@@ -1,4 +1,4 @@
--- Copyright (C)2021,2022 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -295,7 +295,7 @@ package body GUI is
       Text_File : File_Type;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;                                                              
    begin
-      if Filename'Length > 1 then
+      if Filename'Length > 0 then
          Open (File => Text_File, Mode => In_File, Name => Filename); 
          while not End_Of_File (Text_File) loop
             Redirector.Router.Send_Data (Get_Line (Text_File));
@@ -638,6 +638,42 @@ package body GUI is
                                                           Title => "DasherA - Error");
    end Xmodem_Rx_CB;
 
+   procedure Xmodem_Tx_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA - Xmodem-CRC File Send", 
+                                                                        Dir_Only => False, 
+                                                                        Must_Exist => True);
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;  
+   begin
+      if Filename'Length > 0 then
+         Xmodem.Send (Filename => Filename, Pkt_Len => Xmodem.Short, Trace_Flag => Trace_Xmodem_Opt);
+      end if;
+   exception
+      when Xmodem.Protocol_Error =>
+         Unused_Buttons := Message_Dialog (Msg => "Xmodem Protocol Error", Title => "DasherA - Error");
+      when others =>
+         Unused_Buttons := Message_Dialog (Msg => "Could not open file to send: " & Filename, 
+                                           Title => "DasherA - Error");
+   end Xmodem_Tx_CB;   
+
+   procedure Xmodem_Tx_1k_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA - Xmodem-CRC 1k File Send", 
+                                                                        Dir_Only => False, 
+                                                                        Must_Exist => True);
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;  
+   begin
+      if Filename'Length > 0 then
+         Xmodem.Send (Filename => Filename, Pkt_Len => Xmodem.Long, Trace_Flag => Trace_Xmodem_Opt);
+      end if;
+   exception
+      when Xmodem.Protocol_Error =>
+         Unused_Buttons := Message_Dialog (Msg => "Xmodem Protocol Error", Title => "DasherA - Error");
+      when others =>
+         Unused_Buttons := Message_Dialog (Msg => "Could not open file to send: " & Filename, 
+                                           Title => "DasherA - Error");
+   end Xmodem_Tx_1k_CB; 
+
    function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key) 
       return Boolean  is
       pragma Unreferenced (Self);
@@ -702,8 +738,10 @@ package body GUI is
       Xmodem_Rx_Item.On_Activate (Xmodem_Rx_CB'Access);
       Gtk_New (Xmodem_Send_Item, "XMODEM-CRC - Send File");
       Xmodem_Send_Item.Set_Sensitive (False);
+      Xmodem_Send_Item.On_Activate (Xmodem_Tx_CB'Access);
       File_Menu.Append (Xmodem_Send_Item);
       Gtk_New (Xmodem_Send1k_Item, "XMODEM-CRC - Send File (1k packets");
+      Xmodem_Send_Item.On_Activate (Xmodem_Tx_1k_CB'Access);
       Xmodem_Send1k_Item.Set_Sensitive (False);
       File_Menu.Append (Xmodem_Send1k_Item);
       Gtk_New (Sep_Item);

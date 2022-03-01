@@ -22,7 +22,7 @@ package Redirector is
    pragma Elaborate_Body;
    
    type Connection_T is (Local, Async, Network);
-   type Handler_T is (Visual, File_Transfer);
+   type Handler_T is (Visual, Xmodem_Rx, Xmodem_Tx);
    
    task Router is
       Entry Set_Destination (Dest : in Connection_T);

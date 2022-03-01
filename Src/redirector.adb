@@ -53,8 +53,9 @@ package body Redirector is
          or
             accept Handle_Data (C : in Character) do
                case Handler is
-                  when Visual => Terminal.Processor_Task.Accept_Data ("" & C);
-                  when File_Transfer => Xmodem.Receiver_Task.Accept_Data (C);
+                  when Visual    => Terminal.Processor_Task.Accept_Data ("" & C);
+                  when Xmodem_Rx => Xmodem.Receiver_Task.Accept_Data (C);
+                  when Xmodem_Tx => Xmodem.Sender_Task.Accept_Data (C);
                end case;
             end Handle_Data;
          or

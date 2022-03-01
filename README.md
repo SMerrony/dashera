@@ -22,7 +22,7 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * Various terminal widths, heights and zoom-levels available
 * Support for mini-Expect scripts to automate some tasks [see Wiki](https://github.com/SMerrony/DasherG/wiki/DasherG-Mini-Expect-Scripts)
 * Paste from system Clipboard
-* XMODEM-CRC file receive with short (128) or long (1024) packets
+* XMODEM-CRC file send and receive with short (128) or long (1024) packets
   
 Here is the full [Implementation Chart](./Docs/implementationChart.md) for DasherA.
 
