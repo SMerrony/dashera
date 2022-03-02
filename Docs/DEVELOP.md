@@ -63,3 +63,12 @@ Ensure `ncurses-term` package is installed.
 `export TERM=d210-dg`
 
 You may have to `stty echo` if no characters appear when you type.
+
+N.B. There are bugs in the termcap database for (all) the DASHER terminals; not many allegedly termcap (ncurses) aware programs actually handle unusual terminal types.  The `htop` program does a fair job of behaving properly - even so, you will see a few glitches over time. Likewise with `iftop`.
+
+## Serial Port Test Setup (Linux)
+
+Install and then `insmod` `tty0tty`.
+
+Then `/dev/tnt0` is connected to `/dev/tnt1`, etc.
+

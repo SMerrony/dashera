@@ -160,6 +160,25 @@ package body Terminal is
       return False;
    end Beep;
 
+   procedure Send_Model_ID (T : in Terminal_T) is
+      Response : String(1..6);
+   begin
+      Response(1) := Character'Val(8#036#); -- Header 1
+      Response(1) := Character'Val(8#157#); -- Header 2
+      Response(3) := Character'Val(8#043#); -- Model Report Follows
+      case T.Emulation is
+         when D200 =>
+            Response(4) := Character'Val(8#041#);      -- D100/D200 
+            Response(5) := Character'Val(2#01011010#); -- see p.2-7 of D100/D200 User Manual (="Z")
+            Response(6) := Character'Val(8#003#);      -- Firmware Code 
+         when D210 =>
+            Response(4) := Character'Val(8#050#);      -- D210 
+            Response(5) := Character'Val(2#01010001#); -- See p.3-9 of D210/D211 User Manual
+            Response(6) := Character'Val(8#132#);      -- Firmware Code         
+      end case;
+      Redirector.Router.Send_Data (Response);
+   end Send_Model_ID;
+
    -- Process is to be called with a Byte_Arr whenever there is any data for 
    -- the terminal to display or otherwise handle.
    procedure Process (T : in out Terminal_T; Str : in String) is
@@ -213,7 +232,8 @@ package body Terminal is
          -- short DASHER commands
          if T.In_Command then
             case B is
-               -- when 'C' => -- TODO
+               when 'C' => 
+                  T.Send_Model_ID;
                when 'D' => 
                   T.Reversed := True;
                when 'E' => 

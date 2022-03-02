@@ -21,7 +21,7 @@
 | New Line                             | 012         | Ctrl-J                     | Y    | Y    | ~Enter/Return              |
 | Print Form                           | 001         | Ctrl-A or Shift-Local Print | -   | -    | TODO            |
 | Print Screen/Window                  | 021         | Ctrl-Q or Local Print      | N    | N    | TODO    |
-| Read Model ID                        | 036 103     | Cmd-Brk C                  |     |     |   TODO              |
+| Read Model ID                        | 036 103     | Cmd-Brk C                  | Y    | Y    |                 |
 | Read Cursor/Window Address           | 005         | Ctrl-E                     | Y    | Y    |                 |
 | Remote Test Enter                    | 036 101     |                            | N    | N    | *Will not implement in emulator* |
 | Remote Test Exit                     | 036 102     |                            | N    | N    | *Will not implement in emulator* |
