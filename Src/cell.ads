@@ -29,6 +29,8 @@ package Cell is
 
       procedure Clear_To_Space;
 
+      procedure Clear_If_Unprotected;
+
    private
       Char_Value                           : Character;
       Blink, Dim, Rev, Underscore, Protect : Boolean;

@@ -50,6 +50,13 @@ package body Cell is
          Underscore := false;
          Protect    := false;
       end Clear_To_Space;
+
+      procedure Clear_If_Unprotected is
+      begin
+         if not Protect then
+            Clear_To_Space;
+         end if;
+      end Clear_If_Unprotected;
   
    end Cell_T;
 

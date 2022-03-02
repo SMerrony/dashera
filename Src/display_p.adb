@@ -67,10 +67,15 @@ package body Display_P is
          Dest.Visible_Lines := Src.Visible_Lines;
       end Copy;
 
-      procedure Clear_Cell (Line, Col : in Integer) is
+      procedure Clear_Cell (Line, Col : in Natural) is
       begin
          Disp.Cells(Line, Col).Clear_To_Space;
       end Clear_Cell;
+
+      procedure Clear_Unprotected_Cell (Line, Col : in Natural) is
+      begin
+         Disp.Cells(Line, Col).Clear_If_Unprotected;
+      end Clear_Unprotected_Cell;
 
       procedure Get_Cell (Line, Col : in Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean) is
       begin
@@ -105,7 +110,6 @@ package body Display_P is
       end Copy_Line;
 
       procedure Copy_Line_To_History (Src : in Integer) is
-         HL : History_Line;
       begin
          History.Last := History.Last + 1;
          if History.Last = History_Lines then

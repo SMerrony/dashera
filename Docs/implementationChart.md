@@ -16,7 +16,7 @@
 | Dim Off                              | 035         | Ctrl-}                     | Y    | Y    |                   |
 | Dim On                               | 034         | Ctrl-\                     | Y    | Y    |                   |
 | Erase EOL                            | 013         | Ctrl-K or Erase EOL        | Y    | Y    | Erase from Cursor to End of Line |
-| Erase (Unprotected) to End of Screen | 036 106 106 | Cmd-Brk FF                 | -    |     |  TODO                       |
+| Erase (Unprotected) to End of Screen | 036 106 106 | Cmd-Brk FF                 | -    | Y    | Introduced in D210         |
 | Erase Page/Window                    | 014         | Ctrl-L or Erase Page       | Y    | Y    | ~Clear Screen on a D200    |
 | New Line                             | 012         | Ctrl-J                     | Y    | Y    | ~Enter/Return              |
 | Print Form                           | 001         | Ctrl-A or Shift-Local Print | -   | -    | TODO            |

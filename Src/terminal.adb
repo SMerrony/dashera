@@ -160,6 +160,8 @@ package body Terminal is
       return False;
    end Beep;
 
+
+
    procedure Send_Model_ID (T : in Terminal_T) is
       Response : String(1..6);
    begin
@@ -244,6 +246,27 @@ package body Terminal is
                   Ada.Text_IO.Put_Line ("WARNING: Unrecognised Break-CMD code:" & B_Int'Image);
             end case;
             T.In_Command := False;
+            goto Redraw_Tube;
+         end if;
+
+         -- D210 Command(s)
+         if T.In_Extended_Command then
+            case B is
+               when 'F' => -- erase unprotected to end of screen
+                  -- clear to end of current line
+                  for Col in T.Cursor_X .. (Display.Get_Visible_Cols - 1) loop
+                     Display.Clear_Unprotected_Cell (Line => T.Cursor_Y, Col => Col);
+                  end loop;
+                  -- clear all lines below
+                  for Line in (T.Cursor_Y + 1) .. (Display.Get_Visible_Lines - 1) loop
+                     for Col in 0 .. (Display.Get_Visible_Cols - 1) loop
+                        Display.Clear_Unprotected_Cell (Line => T.Cursor_Y, Col => Col);
+                     end loop;
+                  end loop;
+               when others =>
+                  Ada.Text_IO.Put_Line ("WARNING: Unrecognised Break-CMD F code:" & B_Int'Image);
+            end case;
+            T.In_Extended_Command := False;
             goto Redraw_Tube;
          end if;
 
