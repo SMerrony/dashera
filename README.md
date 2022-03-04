@@ -1,7 +1,7 @@
 # DasherA
 DasherA is a free terminal emulator for Data General DASHER series character-based terminals.  It is written in GNU Ada using the GtkAda toolkit and should run on all common platforms targeted by those tools.
 
-![Screenshot](./Screenshots/DasherA-20220130.png)
+![Screenshot](./Screenshots/DasherA-20220304.png)
 
 ## Key Features
 
