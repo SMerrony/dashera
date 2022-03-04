@@ -50,6 +50,7 @@ with Gtk.Message_Dialog;      use Gtk.Message_Dialog;
 with Gtk.Radio_Button;
 -- with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
 with Gtk.Scrollbar;           -- use Gtk.Scrollbar;
+with Gtk.Separator;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 -- with Gtk.Scrollbar;
 with Gtk.Stock;
@@ -839,6 +840,30 @@ package body GUI is
       return Menu_Bar;
    end Create_Menu_Bar;
 
+   procedure Local_Print_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
+      pragma Unreferenced (Btn);
+      use Gtk.File_Chooser;   use Gtk.File_Chooser_Dialog;
+      use Gtk.Stock;
+      FC_Dialog : Gtk_File_Chooser_Dialog;
+      Dummy_Button : Gtk_Widget;
+      Unused_Buttons : Message_Dialog_Buttons;
+   begin
+      FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Save Screen Image As...", 
+                                                Parent => Main_Window,
+                                                Action => Action_Save);
+      Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);  
+      Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
+      if FC_Dialog.Run = Gtk_Response_OK then
+NULL;
+      end if; 
+      FC_Dialog.Destroy; 
+   exception
+      when Xmodem.Already_Exists =>
+         FC_Dialog.Destroy; 
+         Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist", 
+                                                          Title => "DasherA - Error");
+   end Local_Print_Btn_CB;
+
    procedure Handle_Key_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
       use Redirector;
       Lab : constant String := Btn.Get_Label;
@@ -852,6 +877,14 @@ package body GUI is
          else
             Ada.Text_IO.Put_Line ("INFO: BREAK only implemented for Serial connections");
          end if;
+      elsif Lab = "C1" then
+         Keyboard.Handle_Key_Release (GDK_F31);  
+      elsif Lab = "C2" then
+         Keyboard.Handle_Key_Release (GDK_F32);  
+      elsif Lab = "C3" then
+         Keyboard.Handle_Key_Release (GDK_F33);  
+      elsif Lab = "C4" then
+         Keyboard.Handle_Key_Release (GDK_F34);                                    
       elsif Lab = "Er.Page" then
          Keyboard.Handle_Key_Release (GDK_3270_EraseEOF);
       elsif Lab = "Loc.Print" then
@@ -867,15 +900,37 @@ package body GUI is
 
    function Create_Keys_Box return Gtk.Box.Gtk_Box is
       Keys_Box :  Gtk.Box.Gtk_Box;
+      C1_Btn, C2_Btn, C3_Btn, C4_Btn,
       Break_Btn, Er_Pg_Btn, Loc_Pr_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
+      Sep : Gtk.Separator.Gtk_Vseparator;
    begin
       Gtk.Box.Gtk_New (Keys_Box, Orientation_Horizontal, 1);  
-      Keys_Box.Set_Homogeneous (True);
+      Keys_Box.Set_Homogeneous (False);
       Gtk.Button.Gtk_New (Break_Btn, "Break");
       Break_Btn.Set_Tooltip_Text ("Send BREAK signal on Serial Connection");
       Break_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Break_Btn);
-      Break_Btn.Set_Hexpand (True); -- because they are homegeneous, all will expand
+      --Break_Btn.Set_Hexpand (True); 
+
+      Gtk.Separator.Gtk_New_Vseparator (Sep);
+      Keys_Box.Add (Sep);
+      Sep.Set_Hexpand (True);
+
+      Gtk.Button.Gtk_New (C1_Btn, "C1");
+      C1_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
+      Keys_Box.Add (C1_Btn);
+
+      Gtk.Button.Gtk_New (C2_Btn, "C2");
+      C2_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
+      Keys_Box.Add (C2_Btn);
+
+      Gtk.Button.Gtk_New (C3_Btn, "C3");
+      C3_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
+      Keys_Box.Add (C3_Btn);
+
+      Gtk.Button.Gtk_New (C4_Btn, "C4");
+      C4_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
+      Keys_Box.Add (C4_Btn);
 
       Gtk.Button.Gtk_New (Er_Pg_Btn, "Er.Page");
       Er_Pg_Btn.On_Clicked (Handle_Key_Btn_CB'Access);

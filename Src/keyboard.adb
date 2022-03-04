@@ -46,8 +46,12 @@ package body Keyboard is
    function Modify (C : in Character) return Character is
       MC : Character := C;
    begin
-      if Shift_Pressed then MC := Character'Val(Character'Pos(MC) - 16); end if;
-      if Ctrl_Pressed  then MC := Character'Val(Character'Pos(MC) - 64); end if;
+      if C >= Dasher_C1 and C <= Dasher_C4 then
+         if Shift_Pressed then MC := Character'Val(Character'Pos(MC) - 4); end if;
+      else
+         if Shift_Pressed then MC := Character'Val(Character'Pos(MC) - 16); end if;
+         if Ctrl_Pressed  then MC := Character'Val(Character'Pos(MC) - 64); end if;
+      end if;
       return MC;
    end Modify;
 
@@ -102,7 +106,11 @@ package body Keyboard is
 
          -- Special codes from the virtual key buttons on the GUI
          when GDK_3270_EraseEOF => Enqueue_Key (Dasher_Erase_Page);
-         when GDK_3270_EraseInput => Enqueue_Key (Dasher_Erase_EOL);      
+         when GDK_3270_EraseInput => Enqueue_Key (Dasher_Erase_EOL);     
+         when GDK_F31 => Enqueue_Pair (Dasher_Command, Modify (Dasher_C1));
+         when GDK_F32 => Enqueue_Pair (Dasher_Command, Modify (Dasher_C2));
+         when GDK_F33 => Enqueue_Pair (Dasher_Command, Modify (Dasher_C3));
+         when GDK_F34 => Enqueue_Pair (Dasher_Command, Modify (Dasher_C4));
 
          when others =>
             if Key < 256 then
