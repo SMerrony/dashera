@@ -159,7 +159,6 @@ package body GUI is
       Gtk_New (Dialog);
       Dialog.Set_Destroy_With_Parent (True);
       Dialog.Set_Modal (True);
-      -- TODO: Dialog.Set_Logo
       Dialog.Set_Title (App_Title & " - Resize Terminal");
       Dlg_Box := Dialog.Get_Content_Area;
 
@@ -425,7 +424,6 @@ package body GUI is
       Gtk_New (Dialog);
       Dialog.Set_Destroy_With_Parent (True);
       Dialog.Set_Modal (True);
-      -- TODO: Dialog.Set_Logo
       Dialog.Set_Title (App_Title & " - Serial Port");
       Dlg_Box := Dialog.Get_Content_Area;
       Gtk.Grid.Gtk_New (Ser_Grid);
@@ -497,26 +495,26 @@ package body GUI is
                   when 3 => Rate := B9600;
                   when 4 => Rate := B19200;
                   when 5 => Rate := B38400;
-                  when others => null; -- TODO raise exception;
+                  when others => null; 
                end case;
                case Bits_Combo.Get_Active is
                   when 0 => Bits := CS7;
                   when 1 => Bits := CS8;
-                  when others => null; -- TODO raise exception;
+                  when others => null; 
                end case;
                case Parity_Combo.Get_Active is
                   when 0 => Parity := None;
                   when 1 => Parity := Even;
                   when 2 => Parity := Odd;
-                  when others => null; -- TODO raise exception;
+                  when others => null;
                end case;
                case Stop_Bits_Combo.Get_Active is
                   when 0 => Stop_Bits := One;
                   when 1 => Stop_Bits := Two;
-                  when others => null; -- TODO raise exception;
+                  when others => null;
                end case;
                Serial.Open (Port_Str, Rate, Bits, Parity, Stop_Bits);
-               -- TODO handle exceptions
+
                Redirector.Router.Set_Destination (Redirector.Async);
                Serial_Connect_Item.Set_Sensitive (False);
                Serial_Disconnect_Item.Set_Sensitive (True);
@@ -525,6 +523,10 @@ package body GUI is
                Xmodem_Rx_Item.Set_Sensitive (True);
                Xmodem_Send_Item.Set_Sensitive (True);
                Xmodem_Send1k_Item.Set_Sensitive (True);
+            exception
+               when others =>
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not open Serial Port", 
+                                                                   Title => "DasherA - Error");  
             end;
          end if;
       end if;
@@ -557,7 +559,6 @@ package body GUI is
       Gtk_New (Dialog);
       Dialog.Set_Destroy_With_Parent (True);
       Dialog.Set_Modal (True);
-      -- TODO: Dialog.Set_Logo
       Dialog.Set_Title (App_Title & " - Telnet Host");
       Dlg_Box := Dialog.Get_Content_Area;
       Gtk.Label.Gtk_New (Host_Label, "Host:");
@@ -589,7 +590,6 @@ package body GUI is
             begin
                Port_Num := Positive'Value (Port_Entry.Get_Text);
                Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num);
-               -- TODO handle exceptions
                Redirector.Router.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
@@ -597,6 +597,10 @@ package body GUI is
                Serial_Disconnect_Item.Set_Sensitive (False);
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Port_Entry.Get_Text);
+            exception
+               when others =>
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect", 
+                                                                   Title => "DasherA - Error");   
             end;
          end if;
       end if;
@@ -1211,7 +1215,6 @@ package body GUI is
 
       -- Virtual Keys, Function Keys and Template
       Main_Grid.Add (Create_Keys_Box);
-      -- TODO All the labels
       Template_Revealer := Create_Template_Labels_Revealer;
       Main_Grid.Add (Template_Revealer);
       Main_Grid.Add (Create_FKeys_Box);
@@ -1262,7 +1265,6 @@ package body GUI is
                Port_Num : constant Positive := Positive'Value (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
             begin
               Telnet_Sess := Telnet.New_Connection (Host_Str, Port_Num);
-               -- TODO handle exceptions
                Redirector.Router.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
@@ -1270,6 +1272,10 @@ package body GUI is
                Serial_Disconnect_Item.Set_Sensitive (False);
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
+            exception
+               when others =>
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect to host", 
+                                                                   Title => "DasherA - Error");  
             end;
          end if;
       end if;

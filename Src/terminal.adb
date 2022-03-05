@@ -58,7 +58,7 @@ package body Terminal is
 
       T.Updated := True;
 
-      Processor_Task := new Processor; -- TODO this is wonky...
+      Processor_Task := new Processor; 
       Processor_Task.Start (T);
       
       return T;
@@ -383,17 +383,18 @@ package body Terminal is
                T.Skip_Byte := True;
             when Dasher_Normal =>
                T.Underscored := False;
-               T.Skip_Byte := True;   
-            when Dasher_Tab =>
-               T.Cursor_X := T.Cursor_X + 1; -- always at least 1 column
-               while (T.Cursor_X + 1) mod 8 /= 0 loop
-                  if T.Cursor_X >= Display.Get_Visible_Cols - 1 then
-                     T.Cursor_X := 0; -- TODO What about Cursor_Y ???
-                  else
-                     T.Cursor_X := T.Cursor_X + 1;
-                  end if;
-               end loop; 
-               T.Skip_Byte := True;
+               T.Skip_Byte := True;  
+            -- TAB handling removed, according to the docs it is handled at the host end, not locally 
+            -- when Dasher_Tab =>
+            --    T.Cursor_X := T.Cursor_X + 1; -- always at least 1 column
+            --    while (T.Cursor_X + 1) mod 8 /= 0 loop
+            --       if T.Cursor_X >= Display.Get_Visible_Cols - 1 then
+            --          T.Cursor_X := 0; -- ??? What about Cursor_Y ???
+            --       else
+            --          T.Cursor_X := T.Cursor_X + 1;
+            --       end if;
+            --    end loop; 
+               -- T.Skip_Byte := True;
             when Dasher_Write_Window_Addr =>
                T.Getting_X_Addr := True;
                T.Skip_Byte := True;

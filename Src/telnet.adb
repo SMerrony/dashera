@@ -29,13 +29,13 @@ package body Telnet is
       Sess : aliased constant Session_Acc_T := new Session_T;
       Address : GNAT.Sockets.Sock_Addr_Type;
    begin
+      -- Exceptions should be handled by caller
       GNAT.Sockets.Create_Socket (Sess.Conn);
       Ada.Text_IO.Put_Line ("DEBUG: Host: " & Host_Str & ", Port: " & Port_Num'Image);
       Address.Addr := GNAT.Sockets.Addresses (GNAT.Sockets.Get_Host_By_Name (Host_Str), 1);
       Address.Port := GNAT.Sockets.Port_Type (Port_Num);
       GNAT.Sockets.Connect_Socket (Sess.Conn, Address);
       -- GNAT.Sockets.Set_Socket_Option (Socket => Sess.Conn, Option => (No_Delay, True));
-      -- TODO handle exceptions
       Sess.Host_Str := To_Unbounded_String (Host_Str);
       Sess.Port_Num := Port_Num;
       Receiver_Task := new Receiver;

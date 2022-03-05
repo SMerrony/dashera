@@ -7,7 +7,7 @@ Yank
 End\Para
 
 
-Exchge\Pt&Mk
+Exchge\Pt&amp;Mk
 
 
 
