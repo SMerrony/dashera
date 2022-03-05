@@ -15,7 +15,7 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * May specify ```-host=host:port``` on command line
 * Reverse video, blinking, dim and underlined characters
 * Pixel-for-pixel copy of D410 character set
-* 15 (plus Ctrl & Shift) DASHER Function keys, Erase Page, Erase EOL, Hold, Local Print and Break keys
+* 15 (plus Ctrl & Shift) DASHER Function keys, Erase Page, Erase EOL, Hold, and Break keys
 * C1, C2, C3 and C4 DASHER Custom keys (plus shifted versions)
 * Loadable function-key templates (BROWSE, SED and SMI provided as examples)
 * 1000-line scrollable terminal history

@@ -840,29 +840,29 @@ package body GUI is
       return Menu_Bar;
    end Create_Menu_Bar;
 
-   procedure Local_Print_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
-      pragma Unreferenced (Btn);
-      use Gtk.File_Chooser;   use Gtk.File_Chooser_Dialog;
-      use Gtk.Stock;
-      FC_Dialog : Gtk_File_Chooser_Dialog;
-      Dummy_Button : Gtk_Widget;
-      Unused_Buttons : Message_Dialog_Buttons;
-   begin
-      FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Save Screen Image As...", 
-                                                Parent => Main_Window,
-                                                Action => Action_Save);
-      Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);  
-      Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
-      if FC_Dialog.Run = Gtk_Response_OK then
-NULL;
-      end if; 
-      FC_Dialog.Destroy; 
-   exception
-      when Xmodem.Already_Exists =>
-         FC_Dialog.Destroy; 
-         Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist", 
-                                                          Title => "DasherA - Error");
-   end Local_Print_Btn_CB;
+--    procedure Local_Print_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
+--       pragma Unreferenced (Btn);
+--       use Gtk.File_Chooser;   use Gtk.File_Chooser_Dialog;
+--       use Gtk.Stock;
+--       FC_Dialog : Gtk_File_Chooser_Dialog;
+--       Dummy_Button : Gtk_Widget;
+--       Unused_Buttons : Message_Dialog_Buttons;
+--    begin
+--       FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Save Screen Image As...", 
+--                                                 Parent => Main_Window,
+--                                                 Action => Action_Save);
+--       Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);  
+--       Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
+--       if FC_Dialog.Run = Gtk_Response_OK then
+-- NULL;
+--       end if; 
+--       FC_Dialog.Destroy; 
+--    exception
+--       when Xmodem.Already_Exists =>
+--          FC_Dialog.Destroy; 
+--          Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist", 
+--                                                           Title => "DasherA - Error");
+--    end Local_Print_Btn_CB;
 
    procedure Handle_Key_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
       use Redirector;
@@ -887,8 +887,8 @@ NULL;
          Keyboard.Handle_Key_Release (GDK_F34);                                    
       elsif Lab = "Er.Page" then
          Keyboard.Handle_Key_Release (GDK_3270_EraseEOF);
-      elsif Lab = "Loc.Print" then
-         Keyboard.Handle_Key_Release (GDK_3270_PrintScreen);  -- TODO Local Print
+      -- elsif Lab = "Loc.Print" then
+      --    Keyboard.Handle_Key_Release (GDK_3270_PrintScreen);  -- TODO Local Print
       elsif Lab = "Er.EOL" then
          Keyboard.Handle_Key_Release (GDK_3270_EraseInput);   
       elsif Lab = "CR" then
@@ -901,7 +901,7 @@ NULL;
    function Create_Keys_Box return Gtk.Box.Gtk_Box is
       Keys_Box :  Gtk.Box.Gtk_Box;
       C1_Btn, C2_Btn, C3_Btn, C4_Btn,
-      Break_Btn, Er_Pg_Btn, Loc_Pr_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
+      Break_Btn, Er_Pg_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
       Sep : Gtk.Separator.Gtk_Vseparator;
    begin
       Gtk.Box.Gtk_New (Keys_Box, Orientation_Horizontal, 1);  
@@ -936,9 +936,9 @@ NULL;
       Er_Pg_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Er_Pg_Btn);
 
-      Gtk.Button.Gtk_New (Loc_Pr_Btn, "Loc.Print");
-      Loc_Pr_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
-      Keys_Box.Add (Loc_Pr_Btn);
+      -- Gtk.Button.Gtk_New (Loc_Pr_Btn, "Loc.Print");
+      -- Loc_Pr_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
+      -- Keys_Box.Add (Loc_Pr_Btn);
 
       Gtk.Button.Gtk_New (Er_EOL_Btn, "Er.EOL");
       Er_EOL_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
