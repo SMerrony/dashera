@@ -26,7 +26,7 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 * Telnet - handle the Telnet connection and protocol
 * Terminal - implements the Dasher behaviour
 
-### Tasks
+### Tasksq
 
 * Telnet.Keyboard_Sender
 * Telnet.Receiver
