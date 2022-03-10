@@ -13,7 +13,7 @@ I've wasted too much time taking a 'purist' approach to making things objects.
 DasherA is only ever going to be single-session, there will only ever be a single connection/terminal etc.
 Henceforth, try to use objects only where required, elsewhere a traditional Ada procedural approach works just fine.
 
-## Major Elements
+## Major Packages
 
 * Cell - a single ASCII character and its Dasher attributes
 * Crt - handle the drawing of a Display in the application
@@ -26,11 +26,17 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 * Telnet - handle the Telnet connection and protocol
 * Terminal - implements the Dasher behaviour
 
-### Tasksq
+### Tasks
 
+* Mini_Expect.Runner_Task (transient)
+* Redirector.Router
+* Serial.Keyboard_Sender
+* Serial.Receiver
 * Telnet.Keyboard_Sender
 * Telnet.Receiver
 * Terminal.Processor
+* Xmodem.Receiver (transient)
+* Xmodem.Sender (transient)
 
 ## Build and Clean
 
@@ -47,9 +53,8 @@ export GPR_PROJECT_PATH
 Create the `obj` directory if it does not exist.
 
 Then...
-
-* `gprbuild`
 * `gprclean`
+* `gprbuild`
 
 Default build is with debugging and without optimisation.  Append `-Xmode=release` for optimised build.
 
