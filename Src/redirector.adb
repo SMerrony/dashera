@@ -27,7 +27,7 @@ with Xmodem;
 
 package body Redirector is
 
-   task body Router is
+   task body Router_TT is
    begin
       loop
          select
@@ -62,6 +62,6 @@ package body Redirector is
             terminate; 
          end select;
       end loop;
-   end Router;
+   end Router_TT;
 
 end Redirector;

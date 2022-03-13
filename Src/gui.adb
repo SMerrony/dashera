@@ -1240,6 +1240,8 @@ package body GUI is
       Main_Window.Add (Main_Grid);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
+      Redirector.Router := new Redirector.Router_TT;
+
       Redirector.Router.Set_Destination (Redirector.Local);
       Redirector.Router.Set_Handler (Redirector.Visual);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);

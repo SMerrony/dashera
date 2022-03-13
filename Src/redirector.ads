@@ -19,21 +19,24 @@
 
 package Redirector is
      
-   pragma Elaborate_Body;
+   -- pragma Elaborate_Body;
    
    type Connection_T is (Local, Async, Network);
    type Handler_T is (Visual, Xmodem_Rx, Xmodem_Tx);
    
-   task Router is
+   task type Router_TT is
       Entry Set_Destination (Dest : in Connection_T);
       Entry Get_Destination (Dest : out Connection_T);
       Entry Send_Data (Data : in String);
       Entry Set_Handler (Handlr : in Handler_T);
       Entry Handle_Data (C : in Character);
-    end Router;
+    end Router_TT;
+    type Router_Acc is access Router_TT;
+
+    Router : Router_Acc;
 
 private    
-   Destination : Connection_T;
-   Handler     : Handler_T;
+   Destination : Connection_T := Local;
+   Handler     : Handler_T := Visual;
 
 end Redirector;
