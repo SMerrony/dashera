@@ -1,11 +1,13 @@
 # DasherA
-DasherA is a free terminal emulator for Data General DASHER series character-based terminals.  It is written in GNU Ada using the GtkAda toolkit and should run on all common platforms targeted by those tools.
+DasherA is a free terminal emulator for Data General DASHER series character-based terminals.
+
+It is written in GNU Ada using the GtkAda toolkit and should run on all common platforms targeted by those tools.  Other platforms satisfying the build requirements (see below) may also work - eg. it builds and runs successfully on Raspbian GNU/Linux version 11 32-bit.
 
 ![Screenshot](./Screenshots/DasherA-20220305.png)
 
-## Key Features
 
-(This will be updated as features from DasherG are ported across...)
+
+## Key Features
 
 * DASHER D200 & D210 Emulation
 * Serial interface support at 300, 1200, 2400, 9600, 19200 & 38400 baud, 7 or 8 data bits,
@@ -35,7 +37,7 @@ A binary version for 64-bit GNU/Linux *may* be available as part of a release.
 ## Build
 
 You will need the Ada compiler chain, and the GtkAda (libgtkada-dev) libraries installed.
-On modern (2022) Debian-based systems the `gnat` and `libgtkada19-dev` packages work just fine.
+On modern (2022) Debian-based systems the `gnat`, `gprbuild`, and `libgtkada19-dev` packages work just fine.
 
 * Unpack (or `git clone`) DasherA and `cd` into its directory
 * Create an `obj` directory if it does not already exist
@@ -47,6 +49,8 @@ The default build is with debugging and without optimisation.  Append `-Xmode=re
 `./dashera`
 
 Append `-h` to see all options.
+
+You need the DASHER font and icon to be in the same directory as the executable (for now).
 
 ## Operational Notes
 * The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the
