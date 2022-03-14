@@ -1100,6 +1100,10 @@ package body GUI is
          when Redirector.Local =>   
             Online_Label.Set_Text ("Local");
             Host_Label.Set_Text ("(Disconnected)");
+            Net_Connect_Item.Set_Sensitive (True);
+            Net_Disconnect_Item.Set_Sensitive (False);
+            Serial_Connect_Item.Set_Sensitive (True);
+            Serial_Disconnect_Item.Set_Sensitive (False);
          when Redirector.Async =>   
             Online_Label.Set_Text ("Online (Serial)");
             Host_Label.Set_Text (To_String (Serial.Port_US));

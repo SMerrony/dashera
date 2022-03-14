@@ -1,5 +1,9 @@
 {
     "editor.tabSize": 3,
     "ada.projectFile": "dashera.gpr",
-    "ada.enableDiagnostics": false
+    "ada.enableDiagnostics": false,
+    "cSpell.words": [
+        "iftop",
+        "stty"
+    ]
 }
