@@ -14,7 +14,7 @@ It is written in GNU Ada using the GtkAda toolkit and should run on all common p
 no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * BREAK key support for serial interface - permits use as master console
 * Network Interface (Telnet) support
-* May specify ```-host=host:port``` on command line
+* May specify ```-host host:port``` on command line
 * Reverse video, blinking, dim and underlined characters
 * Pixel-for-pixel copy of D410 character set
 * 15 (plus Ctrl & Shift) DASHER Function keys, Erase Page, Erase EOL, Hold, and Break keys
