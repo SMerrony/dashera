@@ -69,7 +69,7 @@ with Crt;
 with Display_P; use Display_P;
 with Keyboard;
 with Mini_Expect;
-with Logger;
+with Session_Logger;
 with Redirector; use Redirector;
 with Serial;
 with Xmodem;
@@ -364,8 +364,8 @@ package body GUI is
    procedure Logging_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
    begin
-      if Logger.Logging then
-         Logger.Stop_Logging;
+      if Session_Logger.Logging then
+         Session_Logger.Stop_Logging;
       else
          declare
             Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Log File", 
@@ -375,7 +375,7 @@ package body GUI is
             Message : aliased Gtk_Message_Dialog;
          begin
             if Filename'Length > 1 then
-               OK := Logger.Start_Logging (Filename);
+               OK := Session_Logger.Start_Logging (Filename);
                if not OK then 
                   Message := Gtk_Message_Dialog_New (Parent => Main_Window, 
                               Flags => Modal, 
@@ -1116,7 +1116,7 @@ package body GUI is
          when Terminal.D200 => Emul_Label.Set_Text ("D200");
          when Terminal.D210 => Emul_Label.Set_Text ("D210");
       end case;
-      if Logger.Logging then
+      if Session_Logger.Logging then
          Logging_Label.Set_Text ("Logging");
       else
          Logging_Label.Set_Text ("Not Logging");

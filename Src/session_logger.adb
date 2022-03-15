@@ -17,15 +17,28 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Ada.Text_IO; use Ada.Text_IO;
+package body Session_Logger is
 
-package Logger is
+   function Start_Logging (Filename : in String) return Boolean is
+   begin
+      Create (Log_File, Out_File, Filename);
+      Logging := True;
+      return True;
+   exception
+      when others =>
+         Put_Line ("WARNING: Could not open file for logging - " & Filename);
+         return False;
+   end Start_Logging;   
+   
+   procedure Stop_Logging is
+   begin
+      Logging := False;
+      Close (Log_File);
+   end Stop_Logging;
 
-   Logging : Boolean := False;
-   Log_File : File_Type;
+   procedure Log_Char (Char : in Character) is
+   begin
+      Put (Log_File, Char);
+   end Log_Char;   
 
-   function  Start_Logging (Filename : in String) return Boolean;
-   procedure Stop_Logging;
-   procedure Log_Char (Char : in Character);
-
-end Logger;
+end Session_Logger;

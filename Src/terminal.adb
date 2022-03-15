@@ -27,7 +27,7 @@ with Glib.Main;
 with BDF_Font;
 with Dasher_Codes;   use Dasher_Codes;
 with Display_P;      use Display_P;
-with Logger;
+with Session_Logger;
 with Mini_Expect;
 with Redirector;
 
@@ -228,8 +228,8 @@ package body Terminal is
          end if;
 
          -- Log it if required
-         if Logger.Logging then
-            Logger.Log_Char (Character'Val(B_Int));
+         if Session_Logger.Logging then
+            Session_Logger.Log_Char (Character'Val(B_Int));
          end if;
 
          -- short DASHER commands
