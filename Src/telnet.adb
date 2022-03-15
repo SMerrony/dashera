@@ -17,6 +17,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Ada.Exceptions;
 with Ada.Streams;	use Ada.Streams;
 with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
@@ -82,6 +83,11 @@ package body Telnet is
                                 -- Flags => Send_End_Of_Record
                                 );
       -- Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send sent No. Bytes: " & Bytes_Sent'Image);
+   exception
+      when E: others =>
+         Ada.Text_IO.Put_Line ("ERROR: Telnet.Send has Failed (disconnected?)");
+         Ada.Text_IO.Put_Line ("       " & Ada.Exceptions.Exception_Information(E)); 
+         raise Disconnected;
    end Send;
 
 	procedure Close_Connection (Sess : in out Session_T) is
@@ -89,9 +95,9 @@ package body Telnet is
       GNAT.Sockets.Shutdown_Socket (Sess.Conn);
       Keyboard_Sender_Task.Stop;
       Redirector.Router.Set_Destination (Redirector.Local);
-   -- exception
-   --    when others =>
-   --       null;
+   exception
+      when SOCKET_ERROR =>
+         Ada.Text_IO.Put_Line ("WARNING: Error closing socket (already disconnected?)");
    end Close_Connection;
 
    task body Receiver is

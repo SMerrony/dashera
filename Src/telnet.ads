@@ -75,4 +75,6 @@ package Telnet is
 
 	Keyboard_Sender_Task : Sender_Acc;
 
+	Disconnected : exception;
+
 end Telnet;

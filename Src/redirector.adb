@@ -47,6 +47,10 @@ package body Redirector is
                   when Async => Serial.Keyboard_Sender_Task.Accept_Data (Data);
                   when Network => Telnet.Keyboard_Sender_Task.Accept_Data (Data);
                end case;
+            exception 
+               when Telnet.Disconnected =>
+                  Destination := Local;
+                  Handler     := Visual;
             end Send_Data;
          or
             accept Set_Handler (Handlr : in Handler_T) do
