@@ -146,6 +146,7 @@ package body Terminal is
             terminate;
          end select;
       end loop;
+      Ada.Text_IO.Put_Line ("ERROR: Terminal Processor has exited"); 
    end Processor;
 
    procedure Set_Cursor (T : in out Terminal_T; X, Y : in Natural) is
@@ -219,7 +220,7 @@ package body Terminal is
                if T.Roll_Enabled then
                   Display.Scroll_Up (T.New_Y_Addr - (Display.Get_Visible_Lines - 1));
                end if;
-               T.New_Y_Addr := T.Cursor_Y - Display.Get_Visible_Lines;
+               T.New_Y_Addr := T.New_Y_Addr - Display.Get_Visible_Lines;
             end if;
             T.Set_Cursor (T.New_X_Addr, T.New_Y_Addr);
             T.Getting_Y_Addr := False;

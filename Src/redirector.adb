@@ -18,6 +18,8 @@
 -- THE SOFTWARE.
 
 -- with Ada.Text_IO;  use Ada.Text_IO;
+with Ada.Exceptions;
+with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
 with Serial;
@@ -62,6 +64,10 @@ package body Redirector is
             terminate; 
          end select;
       end loop;
+   exception
+      when E : others =>
+         Ada.Text_IO.Put_Line ("ERROR: Redirector Router task has Exception");
+         Ada.Text_IO.Put_Line ("       " & Ada.Exceptions.Exception_Information(E));
    end Router_TT;
 
 end Redirector;
