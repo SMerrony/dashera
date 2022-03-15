@@ -1,4 +1,4 @@
--- Copyright (C)2022 Steve Merrony
+-- Copyright ©2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.IO_Exceptions;
 with Ada.Streams;	   use Ada.Streams;
-with Ada.Text_IO;
 
+with Logging;        use Logging;
 with Redirector;
 
 package body Serial is
@@ -51,14 +51,14 @@ package body Serial is
       User_Bits      := Bits;
       User_Parity    := Parity;
       User_Stop_Bits := Stop_Bits;
-      Ada.Text_IO.Put_Line ("DEBUG: Serial port opened and set-up");
+      Log (DEBUG, "Serial port opened and set-up");
       Port_US := To_Unbounded_String (Port_Str);
       Receiver_Task := new Receiver;
       Receiver_Task.Start;
       Redirector.Router.Set_Destination (Redirector.Async);
       Keyboard_Sender_Task := new Keyboard_Sender;
       Keyboard_Sender_Task.Start;
-      Ada.Text_IO.Put_Line ("DEBUG: Serial port open complete");
+      Log (DEBUG, "Serial port open complete");
    end Open;
 
    procedure Close is
@@ -72,7 +72,7 @@ package body Serial is
       B : Character;
    begin
       accept Start do
-         Ada.Text_IO.Put_Line ("DEBUG: Serial Receiver Started");
+         Log (DEBUG, "Serial Receiver Started");
       end Start;
       loop
          begin
@@ -85,15 +85,15 @@ package body Serial is
       end loop;
    exception
       when Error: others =>
-      Ada.Text_IO.Put_Line (Exception_Information (Error));
-      Ada.Text_IO.Put_Line ("INFO: Serial Receiver loop exited");
+      Log (WARNING, Exception_Information (Error));
+      Log (INFO,  "Serial Receiver loop exited");
       Close;
    end Receiver;
 
    task body Keyboard_Sender is
    begin
       accept Start do
-         Ada.Text_IO.Put_Line ("DEBUG: Serial Keyboard_Sender Started");
+         Log (DEBUG, "Serial Keyboard_Sender Started");
       end Start;
       loop
          select 
@@ -122,7 +122,7 @@ package body Serial is
             end Send_Break;
          or
             accept Stop;
-               Ada.Text_IO.Put_Line ("DEBUG: Serial Keyboard_Sender Stopped");
+               Log (DEBUG, "Serial Keyboard_Sender Stopped");
                exit;
          or 
             terminate;

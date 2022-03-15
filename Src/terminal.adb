@@ -17,7 +17,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Ada.Text_IO; 
 with Ada.Characters.Latin_1;
 with Ada.Strings.Fixed;
 
@@ -27,6 +26,7 @@ with Glib.Main;
 with BDF_Font;
 with Dasher_Codes;   use Dasher_Codes;
 with Display_P;      use Display_P;
+with Logging;        use Logging;
 with Session_Logger;
 with Mini_Expect;
 with Redirector;
@@ -146,7 +146,7 @@ package body Terminal is
             terminate;
          end select;
       end loop;
-      Ada.Text_IO.Put_Line ("ERROR: Terminal Processor has exited"); 
+      Log (ERROR, "Terminal Processor has exited"); 
    end Processor;
 
    procedure Set_Cursor (T : in out Terminal_T; X, Y : in Natural) is
@@ -244,7 +244,7 @@ package body Terminal is
                when 'F' => 
                   T.In_Extended_Command := True;
                when others =>
-                  Ada.Text_IO.Put_Line ("WARNING: Unrecognised Break-CMD code:" & B_Int'Image);
+                  Log (WARNING, "Unrecognised Break-CMD code:" & B_Int'Image);
             end case;
             T.In_Command := False;
             goto Redraw_Tube;
@@ -265,7 +265,7 @@ package body Terminal is
                      end loop;
                   end loop;
                when others =>
-                  Ada.Text_IO.Put_Line ("WARNING: Unrecognised Break-CMD F code:" & B_Int'Image);
+                  Log (WARNING, "Unrecognised Break-CMD F code:" & B_Int'Image);
             end case;
             T.In_Extended_Command := False;
             goto Redraw_Tube;
@@ -280,7 +280,7 @@ package body Terminal is
                begin
                   Dummy_ID := Glib.Main.Idle_Add (Beep'Access);
                end;
-               Ada.Text_IO.Put_Line ("*** BEEP! ***" & Ada.Characters.Latin_1.BEL); -- on running terminal...
+               Log (INFO, "*** BEEP! ***" & Ada.Characters.Latin_1.BEL); -- on running terminal...
                T.Skip_Byte := True;
             when Dasher_Blink_On =>
                T.Blinking := True;

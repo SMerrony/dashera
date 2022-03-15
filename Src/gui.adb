@@ -64,13 +64,14 @@ with Gtkada.File_Selection;
 
 with Text_IO.Unbounded_IO;
 
-with BDF_Font;  use BDF_Font;
+with BDF_Font;       use BDF_Font;
 with Crt;
-with Display_P; use Display_P;
+with Display_P;      use Display_P;
 with Keyboard;
+with Logging;        use Logging;
 with Mini_Expect;
 with Session_Logger;
-with Redirector; use Redirector;
+with Redirector;     use Redirector;
 with Serial;
 with Xmodem;
 
@@ -95,7 +96,7 @@ package body GUI is
    procedure Window_Close_CB (Window : access Gtk_Widget_Record'Class) is
       pragma Unreferenced (Window);
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
+      Log (DEBUG, "Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
       Gtk.Main.Main_Quit;
    end Window_Close_CB;
 
@@ -318,7 +319,7 @@ package body GUI is
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       if Filename'Length > 1 then
-         Ada.Text_IO.Put_Line ("DEBUG: Chose template file: " & Filename);
+         Log (DEBUG, "Chose template file: " & Filename);
          -- clear the labels
          for K in 1 .. 17 loop
             for R in 1 .. 4 loop
@@ -342,7 +343,7 @@ package body GUI is
          Ada.Text_IO.Close (Templ_File);
          Template_Revealer.Set_Reveal_Child (True);
       else
-         Ada.Text_IO.Put_Line ("DEBUG: No Template file chosen");
+         Log (INFO, "No Template file chosen");
       end if;
    exception
       when others =>
@@ -357,7 +358,7 @@ package body GUI is
                                                                         Must_Exist => True);
    begin
       if Filename'Length > 1 then
-         Mini_Expect.Prepare (Filename, Trace_Script_Opt);
+         Mini_Expect.Prepare (Filename);
       end if;
    end Expect_CB;
 
@@ -632,7 +633,7 @@ package body GUI is
       Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);  
       Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
       if FC_Dialog.Run = Gtk_Response_OK then
-         Ada.Text_IO.Put_Line ("DEBUG: Chosen file for Xmodem Rx: " & FC_Dialog.Get_Filename);
+         Log (DEBUG, "Chosen file for Xmodem Rx: " & FC_Dialog.Get_Filename);
          Xmodem.Receive (String(FC_Dialog.Get_Filename), Trace_Xmodem_Opt);
       end if; 
       FC_Dialog.Destroy; 
@@ -707,7 +708,7 @@ package body GUI is
       Paste_Item,
       About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Menu_Bar");
+      Log (DEBUG, "Starting to Create_Menu_Bar");
       Gtk_New (Menu_Bar);
 
       -- File
@@ -879,7 +880,7 @@ package body GUI is
          if Dest = Async then
             Serial.Keyboard_Sender_Task.Send_Break;
          else
-            Ada.Text_IO.Put_Line ("INFO: BREAK only implemented for Serial connections");
+            Log (INFO, "BREAK only implemented for Serial connections");
          end if;
       elsif Lab = "C1" then
          Keyboard.Handle_Key_Release (GDK_F31);  
@@ -962,7 +963,7 @@ package body GUI is
    procedure Handle_FKey_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
       Lab : constant String := Btn.Get_Label;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Handle_FKey_Btn_CB called for " & Lab);
+      Log (DEBUG, "Handle_FKey_Btn_CB called for " & Lab);
       if Lab = "F1" then
          Keyboard.Handle_Key_Release (GDK_F1);
       elsif Lab = "F1" then
@@ -1030,7 +1031,7 @@ package body GUI is
       Template_Rev.Add (Template_Grid);
       Dummy := FProvider.Load_From_Data (CSS, Error'Access);
       if not Dummy then
-         Ada.Text_IO.Put_Line ("ERROR: Loading CSS from data");
+         Log (Logging.ERROR, "Loading CSS from data");
       end if;
       Apply_Css (Widget => Template_Grid, Provider => +FProvider);
       Template_Rev.Set_Reveal_Child (False);
@@ -1061,7 +1062,7 @@ package body GUI is
       FKeys_Box.Set_Homogeneous (True);
       Dummy := FProvider.Load_From_Data (CSS, Error'Access);
       if not Dummy then
-         Ada.Text_IO.Put_Line ("ERROR: Loading CSS from data");
+         Log (Logging.ERROR, "Loading CSS from data");
       end if;
       for N in FKeys'Range loop
          declare
@@ -1134,7 +1135,6 @@ package body GUI is
    procedure Adj_Changed_CB (Self : access Gtk.Adjustment.Gtk_Adjustment_Record'Class) is
       Posn : constant Natural := Natural(Self.Get_Value);
    begin
-      -- Ada.Text_IO.Put_Line ("DEBUG: Adj changed to " & Posn'Image);
       if Posn = Display_P.History_Lines then
          Display_P.Display.Cancel_Scroll_Back;
       else
@@ -1193,19 +1193,17 @@ package body GUI is
    end Create_Status_Box;
 
    function Create_Window (Host_Arg     : in Unbounded_String;
-                           Trace_Expect : in Boolean;
                            Trace_Xmodem : in Boolean) return Gtk.Window.Gtk_Window is
       H_Grid : Gtk.Grid.Gtk_Grid;
       Error : aliased Glib.Error.GError;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Starting to Create_Window");
-      Trace_Script_Opt := Trace_Expect;
+      Log (DEBUG, "Starting to Create_Window");
       Trace_Xmodem_Opt := Trace_Xmodem;
 
       -- Gtk.Window.Initialize (Main_Window);
       Gtk.Window.Gtk_New (Main_Window);
-      Ada.Text_IO.Put_Line ("DEBUG: New Window Created");
+      Log (DEBUG, "New Window Created");
       Main_Window.Set_Title (App_Title);
       Main_Window.On_Destroy (Window_Close_CB'Access);
 
@@ -1253,12 +1251,12 @@ package body GUI is
 
       Gdk.Pixbuf.Gdk_New_From_File (Pixbuf => Icon_PB, Filename => App_Icon, Error => Error);
       if Error /= null then
-         Ada.Text_IO.Put_Line ("WARNING: Could not find/load icon file: " & App_Icon);
+         Log (WARNING, "Could not find/load icon file: " & App_Icon);
       else
          Main_Window.Set_Icon (Icon_PB);
       end if;
 
-      Ada.Text_IO.Put_Line ("DEBUG: Main Window Built");
+      Log (DEBUG, "Main Window Built");
 
       if Host_Arg /= Null_Unbounded_String then
          if Count (Host_Arg, ":") /= 1 then

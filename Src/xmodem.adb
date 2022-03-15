@@ -21,8 +21,8 @@
 
 
 with Ada.Directories;
-with Ada.Text_IO;
 
+with Logging;    use Logging;
 with Redirector; use Redirector;
 
 package body Xmodem is
@@ -82,8 +82,8 @@ package body Xmodem is
       Start_Bytes(2) := Character'Val(Block_Pos);
       Start_Bytes(3) := Character'Val(Block_Inv);
       if Tracing then
-         Ada.Text_IO.Put_Line ("DEBUG: X-Modem sending start byte and block number: " & Block_Pos'Image);
-         Ada.Text_IO.Put_Line ("DEBUG: X-Modem ... Actual data length: " & Data.Length'Image);
+         Log (DEBUG, "X-Modem sending start byte and block number: " & Block_Pos'Image);
+         Log (DEBUG, "X-Modem ... Actual data length: " & Data.Length'Image);
       end if;
       Router.Send_Data (Start_Bytes);
 
@@ -95,7 +95,7 @@ package body Xmodem is
       -- Pad out block
       if Data.Length < Block_Size'Enum_Rep then
          if Tracing then
-            Ada.Text_IO.Put_Line ("DEBUG: X-Modem ... Padding packet to full size");
+            Log (DEBUG, "X-Modem ... Padding packet to full size");
          end if;
          Padding_String(1) := Ascii.EOT;
          for Ix in Data.Length + 1 .. Block_Size'Enum_Rep loop
@@ -103,7 +103,7 @@ package body Xmodem is
             Data.Append (Ascii.EOT);
          end loop;
          if Tracing then
-            Ada.Text_IO.Put_Line ("DEBUG: X-Modem ... Packet size now: " & Data.Length'Image);
+            Log (DEBUG, "X-Modem ... Packet size now: " & Data.Length'Image);
          end if;
       end if;
 
@@ -111,7 +111,7 @@ package body Xmodem is
       CRC_Str(1) := Byte_To_Char (Unsigned_8(Shift_Right (CRC and 16#ff00#, 8)));
       CRC_Str(2) := Byte_To_Char (Unsigned_8(CRC and 16#00ff#));
       if Tracing then
-         Ada.Text_IO.Put_Line ("DEBUG: X-Modem checksum: " & CRC'Image & ", sending: " & CRC_Str);
+         Log (DEBUG, "X-Modem checksum: " & CRC'Image & ", sending: " & CRC_Str);
       end if;
       Router.Send_Data (CRC_Str);
 
@@ -128,21 +128,21 @@ package body Xmodem is
       end if;
       Create (RX_File, Name => Filename);
       RX_Stream := Stream (RX_File);
-      Ada.Text_IO.Put_Line ("INFO: Xmodem Created file: " & Filename);
+      Log (INFO, "Xmodem Created file: " & Filename);
       Router.Set_Handler (Handlr => Xmodem_Rx);
       Receiver_Task := new Receiver;
       Receiver_Task.Start (RX_Stream);
       loop
          select
             Receiver_Task.Done;
-            Ada.Text_IO.Put_Line ("INFO: Xmodem Receive is complete");
+            Log (INFO, "Xmodem Receive is complete");
             Close (RX_File);
             Router.Set_Handler (Handlr => Visual);
             exit;
          or
             delay 1.0;
             if Tracing then
-               Ada.Text_IO.Put_Line ("DEBUG: Xmodem waiting for Receive to complete");
+               Log (DEBUG, "Xmodem waiting for Receive to complete");
             end if;
          end select;
       end loop;
@@ -165,14 +165,14 @@ package body Xmodem is
          Packet.Clear;
       end Start;
       if Tracing then
-         Ada.Text_IO.Put_Line ("DEBUG: Xmodem Sending POLL");
+         Log (DEBUG, "Xmodem Sending POLL");
       end if;
       Router.Send_Data ("" & 'C'); -- POLL
       while not Finished loop -- per packet
          Packet.Clear;
 
          if Tracing then
-            Ada.Text_IO.Put_Line ("DEBUG: Xmodem Ready for Packet Header");
+            Log (DEBUG, "Xmodem Ready for Packet Header");
          end if;
          accept Accept_Data (Char : in Character) do
             Pkt_Hdr := Char;
@@ -181,21 +181,21 @@ package body Xmodem is
          case Pkt_Hdr is
             when Ascii.EOT | Ascii.SUB => 
                if Tracing then
-                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got EOT (End of Transmission)");
+                  Log (DEBUG, "Xmodem Got EOT (End of Transmission)");
                end if;
                Router.Send_Data ("" & Ascii.ACK); 
                if Tracing then
-                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Sent final ACK");
+                  Log (DEBUG, "Xmodem Sent final ACK");
                end if;
                Finished := True;
             when Ascii.SOH =>
                if Tracing then
-                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got SOH (Short packets indicator)");
+                  Log (DEBUG, "Xmodem Got SOH (Short packets indicator)");
                end if;
                Packet_Size := 128; -- short packets
             when Ascii.STX =>
                if Tracing then
-                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got STX (Long packets indicator)");
+                  Log (DEBUG, "Xmodem Got STX (Long packets indicator)");
                end if;
                Packet_Size := 1024; -- long packets
             when Ascii.CAN =>
@@ -221,19 +221,19 @@ package body Xmodem is
                Packet_Count := Char_To_U8 (Char);
             end Accept_Data; 
             if Tracing then
-               Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got Packet Count " & Packet_Count'Image);
+               Log (DEBUG, "Xmodem Got Packet Count " & Packet_Count'Image);
             end if;
 
             accept Accept_Data (Char : in Character) do
                Inverse_Packet_Count := Char_To_U8 (Char);
             end Accept_Data; 
             if Tracing then
-               Ada.Text_IO.Put_Line ("DEBUG: Xmodem Got Inverse Packet Count " & Inverse_Packet_Count'Image);
+               Log (DEBUG, "Xmodem Got Inverse Packet Count " & Inverse_Packet_Count'Image);
             end if;
 
             if (not Packet_Count) /= Inverse_Packet_Count then
                if Tracing then
-                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem Packet counts not right - sending NAK");
+                  Log (DEBUG, "Xmodem Packet counts not right - sending NAK");
                end if;
                Purged := False;
                while not Purged loop
@@ -257,7 +257,7 @@ package body Xmodem is
             end loop;
          
             if Tracing then
-               Ada.Text_IO.Put_Line ("DEBUG: Xmodem - Packet received");
+               Log (DEBUG, "Xmodem - Packet received");
             end if;
 
             accept Accept_Data (Char : in Character) do
@@ -268,24 +268,24 @@ package body Xmodem is
                Rxd_CRC := Rxd_CRC + Unsigned_16(Char_To_U8 (Char));
             end Accept_Data;
             if Tracing then
-               Ada.Text_IO.Put_Line ("DEBUG: Xmodem Received CRC is " & Rxd_CRC'Image);
+               Log (DEBUG, "Xmodem Received CRC is " & Rxd_CRC'Image);
             end if;
 
             Calcd_CRC := CRC_16 (Packet);
             if Tracing then
-               Ada.Text_IO.Put_Line ("DEBUG: Xmodem Calculated CRC is " & Calcd_CRC'Image);
+               Log (DEBUG, "Xmodem Calculated CRC is " & Calcd_CRC'Image);
             end if;
 
             if Rxd_CRC = Calcd_CRC then
                if Tracing then
-                  Ada.Text_IO.Put_Line ("DEBUG: Xmodem CRCs OK - sending ACK");
+                  Log (DEBUG, "Xmodem CRCs OK - sending ACK");
                end if;
                Router.Send_Data ("" & Ascii.ACK);
                for C of Packet loop
                   File_Blob.Append (C);
                end loop;
             else
-               Ada.Text_IO.Put_Line ("WARNING: Xmodem sending NAK due to CRC error");
+               Log (WARNING, "Xmodem sending NAK due to CRC error");
                Purged := False;
                while not Purged loop
                   select
@@ -326,7 +326,7 @@ package body Xmodem is
          Retries       := 1;
       end Start;
       if Tracing then
-         Ada.Text_IO.Put_Line ("INFO: Xmodem Sender waiting for POLL");
+         Log (INFO, "Xmodem Sender waiting for POLL");
       end if;
       select
          accept Accept_Data (Char : in Character) do
@@ -336,7 +336,7 @@ package body Xmodem is
                   raise Protocol_Error with "Did not get POLL character";
                end if;
                if Tracing then
-                  Ada.Text_IO.Put_Line ("INFO: Xmodem Sender did not get POLL - retrying");
+                  Log (INFO, "Xmodem Sender did not get POLL - retrying");
                end if;
             else
                Retries := 0;
@@ -350,7 +350,7 @@ package body Xmodem is
                      raise Protocol_Error with "Did not get POLL character";
                   end if;
                   if Tracing then
-                     Ada.Text_IO.Put_Line ("INFO: Xmodem Sender did not get POLL - retrying");
+                     Log (INFO, "Xmodem Sender did not get POLL - retrying");
                   end if;
                else
                   Retries := 0;
@@ -359,7 +359,7 @@ package body Xmodem is
          end loop;
 
          if Tracing then
-            Ada.Text_IO.Put_Line ("DEBUG: Xmodem Sender got POLLed");
+            Log (DEBUG, "Xmodem Sender got POLLed");
          end if;
          This_Block_No := 1; -- 1st block is #1, not 0
 
@@ -391,7 +391,7 @@ package body Xmodem is
                         when Ascii.ACK =>
                            This_Block_No := This_Block_No + 1;
                            if Tracing then
-                              Ada.Text_IO.Put_Line ("DEBUG: Xmodem Sent block ACKed");
+                              Log (DEBUG, "Xmodem Sent block ACKed");
                            end if;
                            Sent_OK := True;
                            if This_Block_No = 256 then
@@ -399,7 +399,7 @@ package body Xmodem is
                            end if;
                         when Ascii.NAK =>
                            if Tracing then
-                              Ada.Text_IO.Put_Line ("DEBUG: Xmodem Sent block NAKed");
+                              Log (DEBUG, "Xmodem Sent block NAKed");
                            end if;
                            Sent_OK := False;
                            Retries := Retries + 1;
@@ -443,14 +443,14 @@ package body Xmodem is
       loop
          select
             Sender_Task.Done;
-            Ada.Text_IO.Put_Line ("INFO: Xmodem Transmit is complete");
+            Log (INFO, "Xmodem Transmit is complete");
             Close (TX_File);
             Router.Set_Handler (Handlr => Visual);
             exit;
          or
             delay 1.0;
             if Tracing then
-               Ada.Text_IO.Put_Line ("DEBUG: Xmodem waiting for Transmission to complete");
+               Log (DEBUG, "Xmodem waiting for Transmission to complete");
             end if;
          end select;
       end loop;

@@ -17,14 +17,13 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Ada.Text_IO;
-
 with Cairo;       use Cairo;
 
 with Gdk.Cairo;
 with Gdk.Window;
 
 with Display_P;   use Display_P;
+with Logging;     use Logging;
 
 package body Crt is
 
@@ -48,7 +47,7 @@ package body Crt is
 
    procedure Init (Zoom : in BDF_Font.Zoom_T) is
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Creating Crt");
+      Log (DEBUG, "Creating Crt");
       BDF_Font.Load_Font (Font_Filename, Zoom);
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
       Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * Gint(Display.Get_Visible_Cols), 
@@ -83,7 +82,7 @@ package body Crt is
    is
       pragma Unreferenced (Event);
    begin
-      Ada.Text_IO.Put_Line ("DEBUG: Entering Configure_Event_CB");
+      Log (DEBUG, "Entering Configure_Event_CB");
       if surface /= Cairo.Null_Surface then
          Cairo.Surface_Destroy (surface);
       end if;
@@ -109,7 +108,6 @@ package body Crt is
       Blnk, Dm, Rv, Under, Prot : Boolean;
       use Glib;
    begin
-      -- Ada.Text_IO.Put_Line ("DEBUG: Draw_Crt called");
       Cr := Cairo.Create (surface);
 
       for Line in 0 .. Display.Get_Visible_Lines-1 loop
@@ -185,7 +183,6 @@ package body Crt is
    is
       pragma Unreferenced (Self);
    begin
-      -- Ada.Text_IO.Put_Line ("DEBUG: Entering Draw_CB");
       Draw_Crt;
       Cairo.Set_Source_Surface (Cr, surface, 0.0, 0.0);
       Cairo.Paint (Cr);

@@ -17,11 +17,10 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
--- with Ada.Text_IO;  use Ada.Text_IO;
 with Ada.Exceptions;
-with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
+with Logging;  use Logging;
 with Serial;
 with Telnet;
 with Terminal;
@@ -70,8 +69,8 @@ package body Redirector is
       end loop;
    exception
       when E : others =>
-         Ada.Text_IO.Put_Line ("ERROR: Redirector Router task has Exception");
-         Ada.Text_IO.Put_Line ("       " & Ada.Exceptions.Exception_Information(E));
+         Log (ERROR, "Redirector Router task has Exception");
+         Log (ERROR, Ada.Exceptions.Exception_Information(E));
    end Router_TT;
 
 end Redirector;

@@ -30,6 +30,7 @@ with Gtk.Main;
 with Gtk.Window;  use Gtk.Window;
 
 with GUI;
+with Logging; use Logging;
 
 procedure Dashera is
 
@@ -41,7 +42,6 @@ procedure Dashera is
    -- program args etc.
    Arg_Ix : Natural := 1;
    Host_Arg : Unbounded_String := Null_Unbounded_String;
-   Trace_Script : Boolean := false;
    Trace_Xmodem : Boolean := false;
 
    -- Builder : Gtkada.Builder.Gtkada_Builder;
@@ -51,6 +51,7 @@ procedure Dashera is
    begin
       Ada.Text_IO.Put_Line ("Usage of dashera:");
       Ada.Text_IO.Put_Line ("  -host <host:port> Host to connect with via Telnet");
+      Ada.Text_IO.Put_Line ("  -debug            Print debugging information on STDOUT");
       Ada.Text_IO.Put_Line ("  -tracescript      Print trace of Mini-Expect script on STDOUT");
       Ada.Text_IO.Put_Line ("  -tracexmodem      Show details of XMODEM file transfers on STDOUT");
       Ada.Text_IO.Put_Line ("  -version          show the version number of dashera and exit");
@@ -65,8 +66,10 @@ begin
       elsif Argument (Arg_Ix) = "-host" then
          Host_Arg := To_Unbounded_String (Argument (Arg_Ix + 1));
          Arg_Ix := Arg_Ix + 1;
+      elsif Argument (Arg_Ix) = "-debug" then 
+         Set_Level (DEBUG);  
       elsif Argument (Arg_Ix) = "-tracescript" then
-         Trace_Script := true;
+         Set_Level (TRACE);
       elsif Argument (Arg_Ix) = "-tracexmodem" then
          Trace_Xmodem := true;   
       elsif Argument (Arg_Ix) = "-h" or Argument (Arg_Ix) = "-help" then
@@ -79,9 +82,9 @@ begin
    Gdk.Threads.G_Init;
    Gdk.Threads.Init;
    Gtk.Main.Init;
-   Ada.Text_IO.Put_Line ( "DEBUG: Preparing to enter Main GTK event loop...");
+   Log (DEBUG, "Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
-   Main_Window := Gui.Create_Window (Host_Arg, Trace_Script, Trace_Xmodem);
+   Main_Window := Gui.Create_Window (Host_Arg, Trace_Xmodem);
    Main_Window.Show_All;
    Gtk.Main.Main;
    Gdk.Threads.Leave;

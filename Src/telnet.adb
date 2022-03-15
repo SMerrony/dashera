@@ -1,4 +1,4 @@
--- Copyright (C)2021,2022 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -19,9 +19,9 @@
 
 with Ada.Exceptions;
 with Ada.Streams;	use Ada.Streams;
-with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
+with Logging;     use Logging;
 with Redirector;
 
 package body Telnet is
@@ -32,7 +32,7 @@ package body Telnet is
    begin
       -- Exceptions should be handled by caller
       GNAT.Sockets.Create_Socket (Sess.Conn);
-      Ada.Text_IO.Put_Line ("DEBUG: Host: " & Host_Str & ", Port: " & Port_Num'Image);
+      Log (DEBUG, "Host: " & Host_Str & ", Port: " & Port_Num'Image);
       Address.Addr := GNAT.Sockets.Addresses (GNAT.Sockets.Get_Host_By_Name (Host_Str), 1);
       Address.Port := GNAT.Sockets.Port_Type (Port_Num);
       GNAT.Sockets.Connect_Socket (Sess.Conn, Address);
@@ -61,7 +61,7 @@ package body Telnet is
             end Accept_Data;
          or
             accept Stop;
-               Ada.Text_IO.Put_Line ("DEBUG: Telnet Keyboard_Sender task stopping");
+               Log (DEBUG, "Telnet Keyboard_Sender task stopping");
                exit;
          or 
             terminate;
@@ -73,7 +73,7 @@ package body Telnet is
       SEA : Ada.Streams.Stream_Element_Array (1..Str'Length);
       Dummy_Bytes_Sent : Ada.Streams.Stream_Element_Offset;
    begin
-      -- Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send called with No. bytes: " & Str'Length'Image);
+      -- Log (DEBUG, "Telnet.Send called with No. bytes: " & Str'Length'Image);
       for I in 1 .. Str'Length loop
          SEA(Ada.Streams.Stream_Element_Offset(I)) := Ada.Streams.Stream_Element(Character'Pos(Str(I)));
       end loop;
@@ -82,11 +82,11 @@ package body Telnet is
                                 Last => Dummy_Bytes_Sent 
                                 -- Flags => Send_End_Of_Record
                                 );
-      -- Ada.Text_IO.Put_Line ("DEBUG: Telnet.Send sent No. Bytes: " & Bytes_Sent'Image);
+      -- Log (DEBUG, "Telnet.Send sent No. Bytes: " & Bytes_Sent'Image);
    exception
       when E: others =>
-         Ada.Text_IO.Put_Line ("ERROR: Telnet.Send has Failed (disconnected?)");
-         Ada.Text_IO.Put_Line ("       " & Ada.Exceptions.Exception_Information(E)); 
+         Log (WARNING, "Telnet.Send has Failed (disconnected?)");
+         Log (WARNING, Ada.Exceptions.Exception_Information(E)); 
          raise Disconnected;
    end Send;
 
@@ -97,7 +97,7 @@ package body Telnet is
       Redirector.Router.Set_Destination (Redirector.Local);
    exception
       when SOCKET_ERROR =>
-         Ada.Text_IO.Put_Line ("WARNING: Error closing socket (already disconnected?)");
+         Log (WARNING, "Error closing socket (already disconnected?)");
    end Close_Connection;
 
    task body Receiver is
@@ -111,27 +111,27 @@ package body Telnet is
    begin
       accept Start (Sess : in Session_Acc_T) do
          Session := Sess;
-         Ada.Text_IO.Put_Line ("DEBUG: Telnet Receiver Started");
+         Log (DEBUG, "Telnet Receiver Started");
       end Start;
       loop
-         -- Ada.Text_IO.Put_Line ("DEBUG: Telnet Receive waiting for data...");
+         -- Log (DEBUG, "Telnet Receive waiting for data...");
          GNAT.Sockets.Receive_Socket (Session.Conn, Block, Offset);
-         -- Ada.Text_IO.Put_Line ("DEBUG: ...Telnet Receiver got data from host - No. Bytes:" & Offset'Image);
+         -- Log (DEBUG, "...Telnet Receiver got data from host - No. Bytes:" & Offset'Image);
          if Offset = 0 then
-            Ada.Text_IO.Put_Line ("WARNING: Telnet Receiver Stopping due to empty message from host");
+            Log (WARNING, "Telnet Receiver Stopping due to empty message from host");
             goto Halt;
          end if;
          for I in 1..Offset loop
             One_Byte := Character'Val(Block(I)); 
-            -- Ada.Text_IO.Put_Line ("DEBUG: ...Telnet Receiver handling byte: " & One_Byte'Image);
+            -- Log (DEBUG, "...Telnet Receiver handling byte: " & One_Byte'Image);
             if One_Byte = Cmd_IAC then
                if In_Telnet_Cmd then
                   -- special case - the host really wants to send a 255 - let it through
-                  Ada.Text_IO.Put_Line ("DEBUG: Telnet - Passing through IAC character");
+                  Log (DEBUG, "Telnet - Passing through IAC character");
                   In_Telnet_Cmd := False;
                else
                   In_Telnet_Cmd := True;
-                  Ada.Text_IO.Put_Line ("DEBUG: Telnet - got IAC command indicator");
+                  Log (DEBUG, "Telnet - got IAC command indicator");
                   goto continue;
                end  if;
             end if;
@@ -140,15 +140,15 @@ package body Telnet is
                case One_Byte is
                   when Cmd_DO =>
                      Got_DO := True;
-                     Ada.Text_IO.Put_Line ("DEBUG: Telnet - Got DO request");
+                     Log (DEBUG, "Telnet - Got DO request");
                      goto continue;
                   when Cmd_WILL =>
                      Got_WILL := True;
-                     Ada.Text_IO.Put_Line ("DEBUG: Telnet - Got WILL request");
+                     Log (DEBUG, "Telnet - Got WILL request");
                      goto continue;
                   when Cmd_AO | Cmd_AYT | Cmd_BRK | Cmd_DM | Cmd_DONT |
                      Cmd_EC | Cmd_EL  | Cmd_IP  | Cmd_NOP | Cmd_SB | Cmd_SE =>
-                     Ada.Text_IO.Put_Line ("DEBUG: Telnet - Ignoring Telnet instruction:" & One_Byte'Image);
+                     Log (DEBUG, "Telnet - Ignoring Telnet instruction:" & One_Byte'Image);
                      goto continue;
                   when others =>
                      null;
@@ -162,7 +162,7 @@ package body Telnet is
                Three_Bytes(2) := Cmd_WONT;
                Three_Bytes(3) := One_Byte;
                Send (Session, Three_Bytes);
-               Ada.Text_IO.Put_Line ("DEBUG: Telnet - Denying DO request for: " & One_Byte'Image);
+               Log (DEBUG, "Telnet - Denying DO request for: " & One_Byte'Image);
                Got_DO := False;
                In_Telnet_Cmd := False;
                -- TESTING --
@@ -177,7 +177,7 @@ package body Telnet is
                Three_Bytes(2) := Cmd_DONT;
                Three_Bytes(3) := One_Byte;
                Send (Session, Three_Bytes);
-               Ada.Text_IO.Put_Line ("DEBUG: Telnet - Denying WILL request for: " & One_Byte'Image);
+               Log (DEBUG, "Telnet - Denying WILL request for: " & One_Byte'Image);
                Got_WILL := False;
                In_Telnet_Cmd := False;
                goto continue;
@@ -189,7 +189,7 @@ package body Telnet is
          end loop;
       end loop;
       <<Halt>>
-      Ada.Text_IO.Put_Line ("DEBUG: Telnet Receiver loop exited");
+      Log (DEBUG, "Telnet Receiver loop exited");
       Session.Close_Connection;
    end Receiver;
 

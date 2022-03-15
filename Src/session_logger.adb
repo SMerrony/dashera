@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -17,6 +17,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+with Logging; use Logging;
+
 package body Session_Logger is
 
    function Start_Logging (Filename : in String) return Boolean is
@@ -26,7 +28,7 @@ package body Session_Logger is
       return True;
    exception
       when others =>
-         Put_Line ("WARNING: Could not open file for logging - " & Filename);
+         Log (WARNING, "Could not open file for logging - " & Filename);
          return False;
    end Start_Logging;   
    

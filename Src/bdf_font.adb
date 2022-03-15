@@ -1,4 +1,4 @@
--- Copyright (C) 2021 Steve Merrony
+-- Copyright ©2021,2022 Steve Merrony
 
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -17,8 +17,10 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Ada.Text_IO;       use Ada.Text_IO;
-with Interfaces;        use Interfaces;
+with Ada.Text_IO; use Ada.Text_IO;
+with Interfaces;  use Interfaces;
+
+with Logging;     use Logging;
 
 package body BDF_Font is
 
@@ -98,14 +100,14 @@ package body BDF_Font is
 
       loop
          Get_Line (Font_File, Font_Line, Font_Line_Length);
-         -- Put_Line ("DEBUG: " & Font_Line (1 .. Font_Line_Length));
+         -- Log (DEBUG, "" & Font_Line (1 .. Font_Line_Length));
          exit when Font_Line (1 .. Font_Line_Length) = "ENDPROPERTIES";
       end loop;
       Get_Line (Font_File, Font_Line, Font_Line_Length);
       if Font_Line (1 .. 5) /= "CHARS" then
          raise BDF_DECODE with "ERROR: BDF_Font - CHARS line not found";
       end if;
-      Put_Line ("DEBUG: BDF Font " & Font_Line (1 .. Font_Line_Length));
+      Log (INFO, "BDF Font " & Font_Line (1 .. Font_Line_Length));
 
       Char_Count := Positive'Value (Font_Line (7 .. Font_Line_Length));
 
@@ -121,7 +123,7 @@ package body BDF_Font is
       Fill (Black_Pix_Buf, 16#000000ff#);
 
       for CC in 0 .. Char_Count - 1 loop
-         -- Put_Line ("DEBUG: Loading char No. " & Integer'Image(CC));
+         -- Log (DEBUG, "Loading char No. " & Integer'Image(CC));
 
          loop
             Get_Line (Font_File, Font_Line, Font_Line_Length);
@@ -133,7 +135,7 @@ package body BDF_Font is
            raise BDF_DECODE with "ERROR: BDF_Font - ENCODING line not found";
          end if;
          ASCII_Code := Natural'Value (Font_Line (10 .. Font_Line_Length));
-         -- Put_Line ("DEBUG: ... ASCII Code: " & ASCII_Code'Image);
+         -- Log (DEBUG, "... ASCII Code: " & ASCII_Code'Image);
 
          -- skip 2 lines
          Get_Line (Font_File, Font_Line, Font_Line_Length);

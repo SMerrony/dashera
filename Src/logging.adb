@@ -17,26 +17,20 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded; 
-with Ada.Text_IO;           use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
-package Mini_Expect is
+package body Logging is
 
-   task type Runner_T;
-   type Runner_Acc is access Runner_T;
+   procedure Set_Level (Level : in Level_T) is
+   begin
+      Current_Level := Level;
+   end Set_Level;
 
-   procedure Prepare (Filename : in String);
-   -- Try to open a DasherA mini-Expect script.
-   -- Could also sanity-check it in the future...
+   procedure Log (Level : in Level_T; Message : in String) is 
+   begin
+      if Level >= Current_Level then
+         Put_Line (Level'Image & ": " & Message);
+      end if;
+   end Log;
 
-   procedure Handle_Char (Ch : in Character; Done : out Boolean);
-
-   Expect_File : File_Type;
-   Runner_Task : Runner_Acc;
-   Expecting   : Boolean;
-   Search_Str, 
-   Host_Str    : Unbounded_String;
-
-   Already_Expecting : exception;
-
-end Mini_Expect;
+end Logging;
