@@ -360,7 +360,11 @@ package body Terminal is
                   B3_Arr(1) := Character'Val(31);
                   B3_Arr(2) := Character'Val(T.Cursor_X);
                   B3_Arr(3) := Character'Val(T.Cursor_Y);
-                  Redirector.Router.Send_Data (B3_Arr);
+                  select 
+                     Redirector.Router.Send_Data (B3_Arr);
+                  or
+                     delay 0.5;
+                  end select;
                end;
                T.Skip_Byte := True;
             when Dasher_Rev_On =>
