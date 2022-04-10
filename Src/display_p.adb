@@ -50,6 +50,11 @@ package body Display_P is
          for C in Empty_History_Line'Range loop
             Empty_History_Line(C).Clear_To_Space;
          end loop;
+         for HL in History.Lines'Range loop
+            for Col in 0 .. Total_Cols - 1 loop
+               History.Lines(HL)(Col).Clear_To_Space;
+            end loop;
+         end loop;
          Set_Scrolled_Back (False);
       end Init;
 
@@ -164,6 +169,9 @@ package body Display_P is
          end loop;
       end Scroll_Up;
       
+      function Is_Scrolled_Back return Boolean is
+         (Scrolled_Back);
+
       procedure Set_Scrolled_Back (Back : in Boolean) is
       begin
          Scrolled_Back := Back;

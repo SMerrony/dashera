@@ -48,10 +48,10 @@ package body Crt is
    procedure Init (Zoom : in BDF_Font.Zoom_T) is
    begin
       Log (DEBUG, "Creating Crt");
-      BDF_Font.Load_Font (Font_Filename, Zoom);
+      BDF_Font.Font.Load_Font (Font_Filename, Zoom);
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
-      Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * Gint(Display.Get_Visible_Cols), 
-                               BDF_Font.Decoded.Char_Height * Gint(Display.Get_Visible_Lines));
+      Tube.DA.Set_Size_Request(BDF_Font.Font.Get_Char_Width * Gint(Display.Get_Visible_Cols), 
+                               BDF_Font.Font.Get_Char_Height * Gint(Display.Get_Visible_Lines));
       Tube.Zoom := Zoom;
 
       -- Blink timer
@@ -106,45 +106,50 @@ package body Crt is
       Char_X, Char_Y, Char_UL : Gdouble;
       Value : Character; 
       Blnk, Dm, Rv, Under, Prot : Boolean;
+      Decoded_Height : constant Gint := BDF_Font.Font.Get_Char_Height;
+      Decoded_Width  : constant Gint := BDF_Font.Font.Get_Char_Width;
       use Glib;
    begin
       Cr := Cairo.Create (surface);
 
       for Line in 0 .. Display.Get_Visible_Lines-1 loop
 
-         Char_Y  := Gdouble(Gint(Line) * BDF_Font.Decoded.Char_Height);
+         Char_Y  := Gdouble(Gint(Line) * Decoded_Height);
          
          for Col in 0 .. Display.Get_Visible_Cols-1 loop
-            Char_X  := Gdouble(Gint(Col) * BDF_Font.Decoded.Char_Width);
+            Char_X  := Gdouble(Gint(Col) * Decoded_Width);
 
             Display.Get_Cell(Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
 
             Char_Ix := Character'Pos (Value);
+            -- if not BDF_Font.Font.Is_Loaded (Char_IX) then
+            --    raise Unloaded_Character with "Line:" & Line'Image & " Col:" & Col'Image & " Index :" & Char_Ix'Image;
+            -- end if;
 
             if Display.Is_Blink_Enabled and Tube.Blink_State and Blnk then
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Decoded.Font(32).Dim_Pix_Buf, 
+                                             Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(32), 
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
             elsif Dm then
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Dim_Pix_Buf, 
+                                             Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(Char_Ix), 
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
             elsif Rv then
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf,
+                                             Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf(Char_Ix),
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
             else
                Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
+                                             Pixbuf => BDF_Font.Font.Get_Pixbuf(Char_Ix), 
                                              Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
             end if;
             Cairo.Paint (Cr);
 
             -- Underlined?
             if Under then
-               Char_UL := (Gdouble(Gint(Line + 1) * BDF_Font.Decoded.Char_Height)) - 1.0;
+               Char_UL := (Gdouble(Gint(Line + 1) * Decoded_Height)) - 1.0;
                Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
-               Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(BDF_Font.Decoded.Char_Width), 1.0);
+               Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(Decoded_Width), 1.0);
                Cairo.Fill (Cr);
             end if;
 
@@ -160,14 +165,14 @@ package body Crt is
          end if;
          if Rv then
             Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                         Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Pix_Buf, 
-                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * BDF_Font.Decoded.Char_Width),
-                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * BDF_Font.Decoded.Char_Height));
+                                         Pixbuf => BDF_Font.Font.Get_Pixbuf(Char_Ix), 
+                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * Decoded_Width),
+                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * Decoded_Height));
          else
             Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                         Pixbuf => BDF_Font.Decoded.Font(Char_Ix).Reverse_Pix_Buf, 
-                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * BDF_Font.Decoded.Char_Width),
-                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * BDF_Font.Decoded.Char_Height));
+                                         Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf(Char_Ix), 
+                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * Decoded_Width),
+                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * Decoded_Height));
          end if;
          Cairo.Paint (Cr);
       end if;

@@ -55,4 +55,6 @@ package Crt is
      (Self : access Gtk.Widget.Gtk_Widget_Record'Class;
       Cr   : Cairo.Cairo_Context)
       return Boolean;
+
+   Unloaded_Character : exception;
 end Crt;

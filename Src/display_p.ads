@@ -49,7 +49,7 @@ package Display_P is
       procedure Clear_Dirty;
       function  Is_Dirty return Boolean;
       procedure Init;
-      procedure Get_Cell (Line, Col : in Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
+      procedure Get_Cell (Line, Col : in N   atural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
       procedure Clear_Cell (Line, Col : in Natural);
       procedure Clear_Unprotected_Cell (Line, Col : in Natural);
       procedure Clear_Line (Line : in Integer);
@@ -65,6 +65,7 @@ package Display_P is
         
       procedure Scroll_Up (Lines : in Natural);
 
+      function  Is_Scrolled_Back return Boolean;
       procedure Set_Scrolled_Back (Back : in Boolean);
       procedure Scroll_Back (Start_Line : in Natural);
       procedure Cancel_Scroll_Back;

@@ -241,7 +241,7 @@ package body GUI is
             else New_Zoom := Tiny;
             end if;
             if New_Zoom /= Crt.Tube.Zoom then
-               Load_Font (Crt.Font_Filename, New_Zoom);
+               Font.Load_Font (Crt.Font_Filename, New_Zoom);
                Crt.Tube.Zoom := New_Zoom;
             end if;
             -- resize
@@ -256,8 +256,8 @@ package body GUI is
             elsif C132.Get_Active then New_Cols := 132;
             else New_Cols := 135;
             end if;
-            Crt.Tube.DA.Set_Size_Request(BDF_Font.Decoded.Char_Width * New_Cols, 
-                               BDF_Font.Decoded.Char_Height * New_Lines);
+            Crt.Tube.DA.Set_Size_Request(BDF_Font.Font.Get_Char_Width * New_Cols, 
+                               BDF_Font.Font.Get_Char_Height * New_Lines);
             Display.Set_Visible_Lines (Positive(New_Lines));
             Display.Set_Visible_Cols  (Positive(New_Cols));
             -- Ask for window resize to smaller than we are - the effect

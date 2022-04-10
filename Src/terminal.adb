@@ -189,7 +189,11 @@ package body Terminal is
       B_Int : Integer;
       C : Character;
    begin
-      
+
+      if Display.Is_Scrolled_Back then
+         Display.Cancel_Scroll_Back;
+      end if;
+
       for Ix in Str'Range loop
          B := Str(Ix);
          B_Int := Character'Pos(B);
@@ -452,10 +456,8 @@ package body Terminal is
 
          -- Finally! Put the character in the displayable matrix
          C := Character'Val(127); -- the 'unknown character' character
-         if B >= Dasher_Space and B_Int < BDF_Font.Max_Chars then
-            if BDF_Font.Decoded.Font(B_Int).Loaded then
-               C := B;
-            end if;
+         if BDF_Font.Font.Is_Loaded(B_Int) then
+            C := B;
          end if;
 
          Display.Set_Cell(Line => T.Cursor_Y, Col => T.Cursor_X, Char => C, Blink => T.Blinking, Dim => T.Dimmed, 

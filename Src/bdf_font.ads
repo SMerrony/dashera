@@ -45,11 +45,18 @@ package BDF_Font is
       Char_Width, Char_Height : Gint;
    end record;
 
-   Decoded : Decoded_T;
+   protected Font is
+      procedure Load_Font (File_Name : String; Zoom : Zoom_T);
 
-   -- function Load_Font (File_Name : String; Zoom : Zoom_T)
-   --    return Decoded_Acc_T;
-   procedure Load_Font (File_Name : String; Zoom : Zoom_T);
+      function Get_Char_Width  return Gint;
+      function Get_Char_Height return Gint;
+      function Is_Loaded      (Ix : in Natural) return Boolean;
+      function Get_Dim_Pixbuf (Ix : in Natural) return Gdk_Pixbuf;
+      function Get_Rev_Pixbuf (Ix : in Natural) return Gdk_Pixbuf;
+      function Get_Pixbuf     (Ix : in Natural) return Gdk_Pixbuf;
+   private
+      Decoded : Decoded_T;
+   end Font;
 
    OPEN_FAILURE,
    BDF_DECODE : exception;
