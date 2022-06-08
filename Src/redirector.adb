@@ -18,7 +18,6 @@
 -- THE SOFTWARE.
 
 with Ada.Exceptions;
-with Ada.Unchecked_Conversion;
 
 with Logging;  use Logging;
 with Serial;
