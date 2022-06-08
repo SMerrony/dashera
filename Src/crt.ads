@@ -45,7 +45,7 @@ package Crt is
    surface : Cairo.Cairo_Surface;
    Blink_TO, Redraw_TO : Glib.Main.G_Source_ID;
 
-   procedure Init (Zoom : in BDF_Font.Zoom_T);
+   procedure Init (Zoom : BDF_Font.Zoom_T);
 
    function Configure_Event_CB
      (Self  : access Gtk.Widget.Gtk_Widget_Record'Class;

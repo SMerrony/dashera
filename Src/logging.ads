@@ -21,8 +21,8 @@ package Logging is
 
    type Level_T is (DEBUG, TRACE, INFO, WARNING, ERROR);
 
-   procedure Set_Level (Level : in Level_T);
-   procedure Log (Level : in Level_T; Message : in String);
+   procedure Set_Level (Level : Level_T);
+   procedure Log (Level : Level_T; Message : String);
 
 private
 

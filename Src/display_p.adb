@@ -26,10 +26,10 @@ package body Display_P is
       function  Is_Dirty return Boolean is (Dirty);
       function  Get_Visible_Cols  return Positive is (Disp.Visible_Cols);
       function  Get_Visible_Lines return Positive is (Disp.Visible_Lines);
-      procedure Set_Visible_Cols  (Cols : in Positive)  is begin Disp.Visible_Cols := Cols;   end Set_Visible_Cols;
-      procedure Set_Visible_Lines (Lines : in Positive) is begin Disp.Visible_Lines := Lines; end Set_Visible_Lines;
+      procedure Set_Visible_Cols  (Cols : Positive)  is begin Disp.Visible_Cols := Cols;   end Set_Visible_Cols;
+      procedure Set_Visible_Lines (Lines : Positive) is begin Disp.Visible_Lines := Lines; end Set_Visible_Lines;
       function  Is_Blink_Enabled return Boolean is (Disp.Blink_Enabled);
-      procedure Set_Blink_Enabled (Blink : in Boolean) is begin Disp.Blink_Enabled := Blink; end Set_Blink_Enabled;
+      procedure Set_Blink_Enabled (Blink : Boolean) is begin Disp.Blink_Enabled := Blink; end Set_Blink_Enabled;
       function  Get_Cursor_X return Natural is (Disp.Cursor_X);
       function  Get_Cursor_Y return Natural is (Disp.Cursor_Y);
 
@@ -72,49 +72,49 @@ package body Display_P is
          Dest.Visible_Lines := Src.Visible_Lines;
       end Copy;
 
-      procedure Clear_Cell (Line, Col : in Natural) is
+      procedure Clear_Cell (Line, Col : Natural) is
       begin
          Disp.Cells(Line, Col).Clear_To_Space;
       end Clear_Cell;
 
-      procedure Clear_Unprotected_Cell (Line, Col : in Natural) is
+      procedure Clear_Unprotected_Cell (Line, Col : Natural) is
       begin
          Disp.Cells(Line, Col).Clear_If_Unprotected;
       end Clear_Unprotected_Cell;
 
-      procedure Get_Cell (Line, Col : in Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean) is
+      procedure Get_Cell (Line, Col : Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean) is
       begin
          Disp.Cells(Line,Col).Get (Value => Value, Blnk => Blnk, Dm => Dm, Rv => Rv, Under => Under, Prot => Prot);
       end Get_Cell;
       
-      procedure Set_Cell (Line, Col : in Natural; Char : in Character;
-                        Blink, Dim, Rev, Under, Prot : in Boolean) is
+      procedure Set_Cell (Line, Col : Natural; Char : Character;
+                        Blink, Dim, Rev, Under, Prot : Boolean) is
       begin
          Disp.Cells(Line,Col).Set (Value => Char, Blnk => Blink, Dm => Dim, 
                                  Rv => Rev, Under => Under, Prot => Prot);
       end Set_Cell;
       
-      procedure Set_Cursor (X, Y : in Natural) is
+      procedure Set_Cursor (X, Y : Natural) is
       begin
          Disp.Cursor_X := X;
          Disp.Cursor_Y := Y;
       end Set_Cursor;
 
-      procedure Clear_Line (Line : in Integer) is
+      procedure Clear_Line (Line : Integer) is
       begin
          for Col in 0 .. Total_Cols - 1 loop
             Disp.Cells(Line, Col).Clear_To_Space;
          end loop;
       end Clear_Line;
       
-      procedure Copy_Line (Src, Dest : in Integer) is
+      procedure Copy_Line (Src, Dest : Integer) is
       begin
          for Col in 0 .. Total_Cols - 1 loop
             Cell.Copy (Src => Disp.Cells(Src,Col), Dest => Disp.Cells(Dest,Col));
          end loop;
       end Copy_Line;
 
-      procedure Copy_Line_To_History (Src : in Integer) is
+      procedure Copy_Line_To_History (Src : Integer) is
       begin
          History.Last := History.Last + 1;
          if History.Last = History_Lines then
@@ -134,7 +134,7 @@ package body Display_P is
          end loop;
       end Copy_Line_To_History;
 
-      procedure Copy_Line_From_History (Src, Dest : in Natural) is
+      procedure Copy_Line_From_History (Src, Dest : Natural) is
          HL : History_Line;
          Ix : Integer;
       begin
@@ -157,7 +157,7 @@ package body Display_P is
          end loop;
       end Copy_Line_From_History;
 
-      procedure Scroll_Up (Lines : in Natural) is
+      procedure Scroll_Up (Lines : Natural) is
       begin
          for L in 1 .. Lines loop
             Copy_Line_To_History (0);
@@ -172,12 +172,12 @@ package body Display_P is
       function Is_Scrolled_Back return Boolean is
          (Scrolled_Back);
 
-      procedure Set_Scrolled_Back (Back : in Boolean) is
+      procedure Set_Scrolled_Back (Back : Boolean) is
       begin
          Scrolled_Back := Back;
       end Set_Scrolled_Back;
 
-      procedure Scroll_Back (Start_Line : in Natural) is
+      procedure Scroll_Back (Start_Line : Natural) is
       begin
          if not Scrolled_Back then
             Copy (Src => Disp, Dest => Saved_Disp);

@@ -45,7 +45,7 @@ package body Crt is
       return True;
    end Redraw_Timeout_CB;
 
-   procedure Init (Zoom : in BDF_Font.Zoom_T) is
+   procedure Init (Zoom : BDF_Font.Zoom_T) is
    begin
       Log (DEBUG, "Creating Crt");
       BDF_Font.Font.Load_Font (Font_Filename, Zoom);

@@ -37,11 +37,11 @@ with Redirector;
 
 package body Serial is
 
-   procedure Open (Port_Str  : in String;
-                   Rate      : in Data_Rate;
-                   Bits      : in Data_Bits;
-                   Parity    : in Parity_Check;
-                   Stop_Bits : in Stop_Bits_Number) is
+   procedure Open (Port_Str  : String;
+                   Rate      : Data_Rate;
+                   Bits      : Data_Bits;
+                   Parity    : Parity_Check;
+                   Stop_Bits : Stop_Bits_Number) is
    
    begin
       GNAT.Serial_Communications.Open (Port, Port_Name(Port_Str));
@@ -97,7 +97,7 @@ package body Serial is
       end Start;
       loop
          select 
-            accept Accept_Data (Data : in String) do
+            accept Accept_Data (Data : String) do
                declare
                   SEA : Stream_Element_Array (1..Data'Length);
                begin

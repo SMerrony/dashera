@@ -23,9 +23,9 @@ package Keyboard is
 
    Ctrl_Pressed, Shift_Pressed : Boolean := False;
 
-   procedure Handle_Key_Press   (Key  : in Gdk_Key_Type);
+   procedure Handle_Key_Press   (Key  : Gdk_Key_Type);
 
-   procedure Handle_Key_Release (Key  : in Gdk_Key_Type);
+   procedure Handle_Key_Release (Key  : Gdk_Key_Type);
    -- Handle_Key_Release maps PC-style keys to DASHER ones.
 
 end Keyboard;

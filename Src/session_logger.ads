@@ -24,8 +24,8 @@ package Session_Logger is
    Logging : Boolean := False;
    Log_File : File_Type;
 
-   function  Start_Logging (Filename : in String) return Boolean;
+   function  Start_Logging (Filename : String) return Boolean;
    procedure Stop_Logging;
-   procedure Log_Char (Char : in Character);
+   procedure Log_Char (Char : Character);
 
 end Session_Logger;

@@ -274,7 +274,7 @@ package body GUI is
       Term.Self_Test;
    end Self_Test_CB;
 
-   function Label_To_Markup (L : in Unbounded_String) return Unbounded_String is
+   function Label_To_Markup (L : Unbounded_String) return Unbounded_String is
       M : Unbounded_String := Null_Unbounded_String;
    begin
       for Ix in 1 .. Length(L) loop
@@ -285,7 +285,7 @@ package body GUI is
          end if;
       end loop;
       return M;
-   end;
+   end Label_To_Markup;
 
    procedure Send_Text_File_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
@@ -1192,8 +1192,8 @@ package body GUI is
       return Status_Box;
    end Create_Status_Box;
 
-   function Create_Window (Host_Arg     : in Unbounded_String;
-                           Trace_Xmodem : in Boolean) return Gtk.Window.Gtk_Window is
+   function Create_Window (Host_Arg     : Unbounded_String;
+                           Trace_Xmodem : Boolean) return Gtk.Window.Gtk_Window is
       H_Grid : Gtk.Grid.Gtk_Grid;
       Error : aliased Glib.Error.GError;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;

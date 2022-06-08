@@ -25,11 +25,11 @@ package Redirector is
    type Handler_T is (Visual, Xmodem_Rx, Xmodem_Tx);
    
    task type Router_TT is
-      Entry Set_Destination (Dest : in Connection_T);
-      Entry Get_Destination (Dest : out Connection_T);
-      Entry Send_Data (Data : in String);
-      Entry Set_Handler (Handlr : in Handler_T);
-      Entry Handle_Data (C : in Character);
+      entry Set_Destination (Dest : Connection_T);
+      entry Get_Destination (Dest : out Connection_T);
+      entry Send_Data (Data : String);
+      entry Set_Handler (Handlr : Handler_T);
+      entry Handle_Data (C : Character);
     end Router_TT;
     type Router_Acc is access Router_TT;
 

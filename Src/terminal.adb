@@ -34,7 +34,7 @@ with Redirector;
 
 package body Terminal is
 
-   function Create (Emul : in Emulation_T) return Terminal_Acc_T is
+   function Create (Emul : Emulation_T) return Terminal_Acc_T is
       T : aliased constant Terminal_Acc_T := new Terminal_T;
    begin
       T.Emulation := Emul;
@@ -132,12 +132,12 @@ package body Terminal is
    task body Processor is
       TA : Terminal_Acc_T;
    begin
-      accept Start (Termin : in Terminal_Acc_T) do
+      accept Start (Termin : Terminal_Acc_T) do
          TA := Termin;
       end Start;
       loop
          select
-            accept Accept_Data (Str : in String) do
+            accept Accept_Data (Str : String) do
                TA.Process (Str);
             end Accept_Data;
          or
@@ -150,7 +150,7 @@ package body Terminal is
       Log (ERROR, "Terminal Processor has exited"); 
    end Processor;
 
-   procedure Set_Cursor (T : in out Terminal_T; X, Y : in Natural) is
+   procedure Set_Cursor (T : in out Terminal_T; X, Y : Natural) is
    begin
       T.Cursor_X := X;
       T.Cursor_Y := Y;
@@ -164,7 +164,7 @@ package body Terminal is
 
 
 
-   procedure Send_Model_ID (T : in Terminal_T) is
+   procedure Send_Model_ID (T : Terminal_T) is
       Response : String(1..6);
    begin
       Response(1) := Character'Val(8#036#); -- Header 1
@@ -185,7 +185,7 @@ package body Terminal is
 
    -- Process is to be called with a Byte_Arr whenever there is any data for 
    -- the terminal to display or otherwise handle.
-   procedure Process (T : in out Terminal_T; Str : in String) is
+   procedure Process (T : in out Terminal_T; Str : String) is
       B : Character;
       B_Int : Integer;
       C : Character;

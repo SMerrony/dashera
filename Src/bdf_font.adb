@@ -25,8 +25,8 @@ with Logging;     use Logging;
 package body BDF_Font is
 
    procedure Parse_BBX
-     (Font_Line             : in String; 
-      Font_Line_Length      : in Positive;
+     (Font_Line             : String; 
+      Font_Line_Length      : Positive;
       Pix_Width, Pix_Height : out Integer; 
       X_Offset, Y_Offset    : out Integer)
    is
@@ -201,16 +201,16 @@ package body BDF_Font is
       function Get_Char_Height return Gint is
          (Decoded.Char_Height);
 
-      function Is_Loaded (Ix : in Natural) return Boolean is 
+      function Is_Loaded (Ix : Natural) return Boolean is 
          (Decoded.Font(Ix).Loaded);
 
-      function Get_Dim_Pixbuf (Ix : in Natural) return Gdk_Pixbuf is
+      function Get_Dim_Pixbuf (Ix : Natural) return Gdk_Pixbuf is
          (Decoded.Font(Ix).Dim_Pix_Buf);
 
-      function Get_Rev_Pixbuf (Ix : in Natural) return Gdk_Pixbuf is
+      function Get_Rev_Pixbuf (Ix : Natural) return Gdk_Pixbuf is
          (Decoded.Font(Ix).Reverse_Pix_Buf);
 
-      function Get_Pixbuf (Ix : in Natural) return Gdk_Pixbuf is
+      function Get_Pixbuf (Ix : Natural) return Gdk_Pixbuf is
          (Decoded.Font(Ix).Pix_Buf);   
 
    end Font;

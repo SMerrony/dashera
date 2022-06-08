@@ -32,7 +32,7 @@ package body Redirector is
    begin
       loop
          select
-            accept Set_Destination (Dest : in Connection_T) do
+            accept Set_Destination (Dest : Connection_T) do
                Destination := Dest;
             end Set_Destination;
          or
@@ -40,7 +40,7 @@ package body Redirector is
                Dest := Destination;
             end Get_Destination;
          or
-            accept Send_Data (Data : in String) do
+            accept Send_Data (Data : String) do
                case Destination is
                   when Local => Terminal.Processor_Task.Accept_Data (Data);
                   when Async => Serial.Keyboard_Sender_Task.Accept_Data (Data);
@@ -52,11 +52,11 @@ package body Redirector is
                   Handler     := Visual;
             end Send_Data;
          or
-            accept Set_Handler (Handlr : in Handler_T) do
+            accept Set_Handler (Handlr : Handler_T) do
                Handler := Handlr;
             end Set_Handler;
          or
-            accept Handle_Data (C : in Character) do
+            accept Handle_Data (C : Character) do
                case Handler is
                   when Visual    => Terminal.Processor_Task.Accept_Data ("" & C);
                   when Xmodem_Rx => Xmodem.Receiver_Task.Accept_Data (C);

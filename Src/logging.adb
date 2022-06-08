@@ -21,12 +21,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Logging is
 
-   procedure Set_Level (Level : in Level_T) is
+   procedure Set_Level (Level : Level_T) is
    begin
       Current_Level := Level;
    end Set_Level;
 
-   procedure Log (Level : in Level_T; Message : in String) is 
+   procedure Log (Level : Level_T; Message : String) is 
    begin
       if Level >= Current_Level then
          Put_Line (Level'Image & ": " & Message);

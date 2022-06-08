@@ -25,11 +25,11 @@ package Mini_Expect is
    task type Runner_T;
    type Runner_Acc is access Runner_T;
 
-   procedure Prepare (Filename : in String);
+   procedure Prepare (Filename : String);
    -- Try to open a DasherA mini-Expect script.
    -- Could also sanity-check it in the future...
 
-   procedure Handle_Char (Ch : in Character; Done : out Boolean);
+   procedure Handle_Char (Ch : Character; Done : out Boolean);
 
    Expect_File : File_Type;
    Runner_Task : Runner_Acc;

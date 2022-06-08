@@ -21,7 +21,7 @@ with Logging; use Logging;
 
 package body Session_Logger is
 
-   function Start_Logging (Filename : in String) return Boolean is
+   function Start_Logging (Filename : String) return Boolean is
    begin
       Create (Log_File, Out_File, Filename);
       Logging := True;
@@ -38,7 +38,7 @@ package body Session_Logger is
       Close (Log_File);
    end Stop_Logging;
 
-   procedure Log_Char (Char : in Character) is
+   procedure Log_Char (Char : Character) is
    begin
       Put (Log_File, Char);
    end Log_Char;   

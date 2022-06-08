@@ -49,32 +49,32 @@ package Display_P is
       procedure Clear_Dirty;
       function  Is_Dirty return Boolean;
       procedure Init;
-      procedure Get_Cell (Line, Col : in Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
-      procedure Clear_Cell (Line, Col : in Natural);
-      procedure Clear_Unprotected_Cell (Line, Col : in Natural);
-      procedure Clear_Line (Line : in Integer);
-      procedure Set_Cell (Line, Col : in Natural; Char : in Character;
-                          Blink, Dim, Rev, Under, Prot : in Boolean);
-      procedure Set_Cursor (X, Y : in Natural); 
+      procedure Get_Cell (Line, Col : Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
+      procedure Clear_Cell (Line, Col : Natural);
+      procedure Clear_Unprotected_Cell (Line, Col : Natural);
+      procedure Clear_Line (Line : Integer);
+      procedure Set_Cell (Line, Col : Natural; Char : Character;
+                          Blink, Dim, Rev, Under, Prot : Boolean);
+      procedure Set_Cursor (X, Y : Natural); 
       function  Get_Cursor_X return Natural;
       function  Get_Cursor_Y return Natural;
       procedure Copy (Src : in out Display_T; Dest : out Display_T); 
-      procedure Copy_Line (Src, Dest : in Integer);
-      procedure Copy_Line_To_History (Src : in Integer);
+      procedure Copy_Line (Src, Dest : Integer);
+      procedure Copy_Line_To_History (Src : Integer);
       -- Inserts a line into the circular history buffer
         
-      procedure Scroll_Up (Lines : in Natural);
+      procedure Scroll_Up (Lines : Natural);
 
       function  Is_Scrolled_Back return Boolean;
-      procedure Set_Scrolled_Back (Back : in Boolean);
-      procedure Scroll_Back (Start_Line : in Natural);
+      procedure Set_Scrolled_Back (Back : Boolean);
+      procedure Scroll_Back (Start_Line : Natural);
       procedure Cancel_Scroll_Back;
       function  Get_Visible_Cols  return Positive;
       function  Get_Visible_Lines return Positive;
-      procedure Set_Visible_Cols  (Cols : in  Positive);
-      procedure Set_Visible_Lines (Lines : in  Positive);
+      procedure Set_Visible_Cols  (Cols  : Positive);
+      procedure Set_Visible_Lines (Lines : Positive);
       function  Is_Blink_Enabled return Boolean;
-      procedure Set_Blink_Enabled (Blink : in Boolean);
+      procedure Set_Blink_Enabled (Blink : Boolean);
    private
       Disp, Saved_Disp   : Display_T;
       History            : History_T;

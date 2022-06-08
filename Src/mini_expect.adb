@@ -28,7 +28,7 @@ package body Mini_Expect is
 
    -- protected body Runner is
 
-      procedure Prepare (Filename : in String) is
+      procedure Prepare (Filename : String) is
       begin
          if Expecting then
             raise Already_Expecting with "Cannot run mini-Expect script while another is still active";
@@ -38,7 +38,7 @@ package body Mini_Expect is
          Runner_Task := new Runner_T;
       end Prepare;
 
-      function Convert_Line (Script_Line : in String) return String is
+      function Convert_Line (Script_Line : String) return String is
       -- Remove leading and trailing double-quotes, convert \n to Dasher NL
          Src_Start : constant Positive := Index (Script_Line, """", Forward) + 1;
          Src_End   : constant Positive := Index (Script_Line, """", Backward);
@@ -72,7 +72,7 @@ package body Mini_Expect is
          return Result(1 .. Out_Ix-1);
       end Convert_Line;
 
-      procedure Handle_Char (Ch : in Character; Done : out Boolean) is
+      procedure Handle_Char (Ch : Character; Done : out Boolean) is
       begin
          if Ch = Dasher_NL or Ch = Dasher_CR then
             -- Reset the search on every new line

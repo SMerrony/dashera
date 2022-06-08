@@ -1,0 +1,15 @@
+-- pragma Profile (Ravenscar);
+-- pragma Profile (Jorvik);
+-- pragma Restrictions (No_Task_Hierarchy);
+-- pragma Partition_Elaboration_Policy (Sequential);
+pragma Detect_Blocking;
+-- pragma License (GPL);
+-- pragma Restrictions (No_Direct_Boolean_Operators);
+pragma Restrictions (No_Implicit_Dynamic_Code);
+pragma Style_Checks ("r"); -- require consistency of identifier casing
+pragma Style_Checks ("B"); -- Check Boolean operators
+pragma Style_Checks ("e"); -- Check end/exit labels.
+pragma Style_Checks ("I"); -- check mode IN keywords.
+pragma Style_Checks ("k"); -- All keywords must be in lower case
+pragma Style_Checks ("n"); -- Check casing of entities in Standard.
+pragma Style_Checks ("x"); -- Check extra parentheses.

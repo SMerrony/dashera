@@ -50,10 +50,10 @@ package BDF_Font is
 
       function Get_Char_Width  return Gint;
       function Get_Char_Height return Gint;
-      function Is_Loaded      (Ix : in Natural) return Boolean;
-      function Get_Dim_Pixbuf (Ix : in Natural) return Gdk_Pixbuf;
-      function Get_Rev_Pixbuf (Ix : in Natural) return Gdk_Pixbuf;
-      function Get_Pixbuf     (Ix : in Natural) return Gdk_Pixbuf;
+      function Is_Loaded      (Ix : Natural) return Boolean;
+      function Get_Dim_Pixbuf (Ix : Natural) return Gdk_Pixbuf;
+      function Get_Rev_Pixbuf (Ix : Natural) return Gdk_Pixbuf;
+      function Get_Pixbuf     (Ix : Natural) return Gdk_Pixbuf;
    private
       Decoded : Decoded_T;
    end Font;

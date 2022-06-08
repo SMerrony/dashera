@@ -21,7 +21,7 @@ package body Cell is
 
    protected body Cell_T is
 
-      procedure Set (Value : in Character; Blnk, Dm, Rv, Under, Prot : in Boolean) is
+      procedure Set (Value : Character; Blnk, Dm, Rv, Under, Prot : Boolean) is
       begin
          Char_Value := Value;
          Blink      := Blnk;

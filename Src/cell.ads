@@ -23,7 +23,7 @@ package Cell is
 
    protected type Cell_T is
 
-      procedure Set (Value : in Character; Blnk, Dm, Rv, Under, Prot : in Boolean);
+      procedure Set (Value : Character; Blnk, Dm, Rv, Under, Prot : Boolean);
 
       procedure Get (Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
 

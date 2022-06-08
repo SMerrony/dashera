@@ -26,7 +26,7 @@ with Redirector;
 
 package body Keyboard is
 
-   procedure Handle_Key_Press (Key  : in Gdk_Key_Type) is
+   procedure Handle_Key_Press (Key  : Gdk_Key_Type) is
    begin
       case Key is 
          when GDK_Control_L | GDK_Control_R => Ctrl_Pressed  := True;
@@ -35,7 +35,7 @@ package body Keyboard is
       end case;
    end Handle_Key_Press;
 
-   procedure Enqueue_Key (Ch : in Character) is 
+   procedure Enqueue_Key (Ch : Character) is 
       Str : String(1..1);
    begin
       Str(1) := Ch;
@@ -43,7 +43,7 @@ package body Keyboard is
    end Enqueue_Key;
 
 
-   function Modify (C : in Character) return Character is
+   function Modify (C : Character) return Character is
       MC : Character := C;
    begin
       if C >= Dasher_C1 and C <= Dasher_C4 then
@@ -55,7 +55,7 @@ package body Keyboard is
       return MC;
    end Modify;
 
-   procedure Enqueue_Pair (C1, C2 : in Character) is
+   procedure Enqueue_Pair (C1, C2 : Character) is
       Str2 : String(1..2);
    begin
       Str2(1) := C1;
@@ -63,7 +63,7 @@ package body Keyboard is
       Redirector.Router.Send_Data (Str2);
    end Enqueue_Pair;
 
-   procedure Handle_Key_Release (Key  : in Gdk_Key_Type) is
+   procedure Handle_Key_Release (Key  : Gdk_Key_Type) is
       Char : Character;
    begin
       -- Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image); 

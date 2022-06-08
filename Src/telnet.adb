@@ -26,7 +26,7 @@ with Redirector;
 
 package body Telnet is
 
-	function New_Connection (Host_Str : in String; Port_Num : in Integer) return Session_Acc_T is
+	function New_Connection (Host_Str : String; Port_Num : Integer) return Session_Acc_T is
       Sess : aliased constant Session_Acc_T := new Session_T;
       Address : GNAT.Sockets.Sock_Addr_Type;
    begin
@@ -51,12 +51,12 @@ package body Telnet is
    task body Keyboard_Sender is
       Sess : Session_Acc_T;
    begin
-      accept Start (S : in Session_Acc_T) do
+      accept Start (S : Session_Acc_T) do
          Sess := S;
       end Start;
       loop
          select
-            accept Accept_Data (Str : in String) do
+            accept Accept_Data (Str : String) do
                Send (Sess, Str);
             end Accept_Data;
          or
@@ -69,7 +69,7 @@ package body Telnet is
       end loop;
    end Keyboard_Sender;
 
-   procedure Send (Sess : in Session_Acc_T; Str : in String) is
+   procedure Send (Sess : Session_Acc_T; Str : String) is
       SEA : Ada.Streams.Stream_Element_Array (1..Str'Length);
       Dummy_Bytes_Sent : Ada.Streams.Stream_Element_Offset;
    begin
@@ -109,7 +109,7 @@ package body Telnet is
       In_Telnet_Cmd, Got_DO, Got_WILL : Boolean := False;
 
    begin
-      accept Start (Sess : in Session_Acc_T) do
+      accept Start (Sess : Session_Acc_T) do
          Session := Sess;
          Log (DEBUG, "Telnet Receiver Started");
       end Start;

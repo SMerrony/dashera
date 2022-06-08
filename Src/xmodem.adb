@@ -27,7 +27,7 @@ with Redirector; use Redirector;
 
 package body Xmodem is
 
-   function CRC_16 (Data : in Vector) return Unsigned_16 is
+   function CRC_16 (Data : Vector) return Unsigned_16 is
       CRC : Unsigned_16 := 0;
       Part  : Unsigned_16;
    begin
@@ -45,7 +45,7 @@ package body Xmodem is
       return CRC;
    end CRC_16;
 
-   function CRC_16_Fixed_Len (Data : in Vector; FL : in Positive) return Unsigned_16 is
+   function CRC_16_Fixed_Len (Data : Vector; FL : Positive) return Unsigned_16 is
       CRC : Unsigned_16 := 0;
    begin
       -- the data part...
@@ -66,7 +66,7 @@ package body Xmodem is
       return CRC;
    end CRC_16_Fixed_Len;
 
-   procedure Send_Block (Data : in out Vector; Block_Num : in Natural; Block_Size : in Packet_Size) is
+   procedure Send_Block (Data : in out Vector; Block_Num : Natural; Block_Size : Packet_Size) is
       Start_Bytes : string (1..3);
       Block_Pos : constant Unsigned_8  := Unsigned_8(Block_Num mod 256);
       Block_Inv : constant Unsigned_8  := not Block_Pos;
@@ -117,7 +117,7 @@ package body Xmodem is
 
    end Send_Block;
 
-   procedure Receive (Filename : in String; Trace_Flag : in Boolean) is
+   procedure Receive (Filename : String; Trace_Flag : Boolean) is
       RX_File   : File_Type;
       RX_Stream : Stream_Access;
    begin
@@ -174,7 +174,7 @@ package body Xmodem is
          if Tracing then
             Log (DEBUG, "Xmodem Ready for Packet Header");
          end if;
-         accept Accept_Data (Char : in Character) do
+         accept Accept_Data (Char : Character) do
             Pkt_Hdr := Char;
          end Accept_Data;
 
@@ -217,14 +217,14 @@ package body Xmodem is
 
          else
 
-            accept Accept_Data (Char : in Character) do
+            accept Accept_Data (Char : Character) do
                Packet_Count := Char_To_U8 (Char);
             end Accept_Data; 
             if Tracing then
                Log (DEBUG, "Xmodem Got Packet Count " & Packet_Count'Image);
             end if;
 
-            accept Accept_Data (Char : in Character) do
+            accept Accept_Data (Char : Character) do
                Inverse_Packet_Count := Char_To_U8 (Char);
             end Accept_Data; 
             if Tracing then
@@ -238,7 +238,7 @@ package body Xmodem is
                Purged := False;
                while not Purged loop
                   select
-                     accept Accept_Data (Char : in Character) do
+                     accept Accept_Data (Char : Character) do
                         pragma Unreferenced (Char);
                      end Accept_Data;
                   or
@@ -251,7 +251,7 @@ package body Xmodem is
             end if;
 
             for B in 1 .. Packet_Size loop
-               accept Accept_Data (Char : in Character) do
+               accept Accept_Data (Char : Character) do
                   Packet.Append (Char);
                end Accept_Data;
             end loop;
@@ -260,11 +260,11 @@ package body Xmodem is
                Log (DEBUG, "Xmodem - Packet received");
             end if;
 
-            accept Accept_Data (Char : in Character) do
+            accept Accept_Data (Char : Character) do
                Rxd_CRC := Unsigned_16(Char_To_U8 (Char));
             end Accept_Data;
             Rxd_CRC := Shift_Left (Rxd_CRC, 8);
-            accept Accept_Data (Char : in Character) do
+            accept Accept_Data (Char : Character) do
                Rxd_CRC := Rxd_CRC + Unsigned_16(Char_To_U8 (Char));
             end Accept_Data;
             if Tracing then
@@ -289,7 +289,7 @@ package body Xmodem is
                Purged := False;
                while not Purged loop
                   select
-                     accept Accept_Data (Char : in Character) do
+                     accept Accept_Data (Char : Character) do
                         pragma Unreferenced (Char);
                      end Accept_Data;
                   or
@@ -318,7 +318,7 @@ package body Xmodem is
       Sent_OK       : Boolean;
       Finished      : Boolean;
    begin
-      accept Start (TX_Stream : in Stream_Access; Pkt_Len : in Packet_Size) do
+      accept Start (TX_Stream : Stream_Access; Pkt_Len : Packet_Size) do
          Read_Stream   := TX_Stream;
          Packet_Sz     := Pkt_Len;
          Packet_Length := Pkt_Len'Enum_Rep;
@@ -329,7 +329,7 @@ package body Xmodem is
          Log (INFO, "Xmodem Sender waiting for POLL");
       end if;
       select
-         accept Accept_Data (Char : in Character) do
+         accept Accept_Data (Char : Character) do
             if Char /= 'C' then
                Retries := Retries + 1;
                if Retries > 8 then
@@ -343,7 +343,7 @@ package body Xmodem is
             end if;
          end Accept_Data;
          while Retries /= 0 loop
-            accept Accept_Data (Char : in Character) do
+            accept Accept_Data (Char : Character) do
                if Char /= 'C' then
                   Retries := Retries + 1;
                   if Retries > 8 then
@@ -386,7 +386,7 @@ package body Xmodem is
             while not Sent_OK and Retries < 9 loop
                Send_Block (Data => Block, Block_Num => This_Block_No, Block_Size => Packet_Sz);
                select
-                  accept Accept_Data (Char : in Character) do
+                  accept Accept_Data (Char : Character) do
                      case Char is
                         when Ascii.ACK =>
                            This_Block_No := This_Block_No + 1;
@@ -426,7 +426,7 @@ package body Xmodem is
    end Sender;
 
 
-   procedure Send (Filename : in String; Pkt_Len : in Packet_Size; Trace_Flag : in Boolean) is
+   procedure Send (Filename : String; Pkt_Len : Packet_Size; Trace_Flag : Boolean) is
       TX_File   : File_Type;
       TX_Stream : Stream_Access;
    begin

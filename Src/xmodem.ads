@@ -34,7 +34,7 @@ package Xmodem is
 
    task type Receiver is
 		entry Start (RX_Stream : Stream_Access);
-      entry Accept_Data (Char : in Character);
+      entry Accept_Data (Char : Character);
       entry Done;
       -- entry Stop;
 	end Receiver;
@@ -42,18 +42,18 @@ package Xmodem is
 
    Receiver_Task : Receiver_Acc;
 
-   procedure Receive (Filename : in String; Trace_Flag : in Boolean);
+   procedure Receive (Filename : String; Trace_Flag : Boolean);
 
    task type Sender is
-      entry Start (TX_Stream : in Stream_Access; Pkt_Len : in Packet_Size);
-      entry Accept_Data (Char : in Character);
+      entry Start (TX_Stream : Stream_Access; Pkt_Len : Packet_Size);
+      entry Accept_Data (Char : Character);
       entry Done;
    end Sender;
    type Sender_Acc is access Sender;
 
    Sender_Task : Sender_Acc;
 
-   procedure Send (Filename : in String; Pkt_Len : in Packet_Size; Trace_Flag : in Boolean);
+   procedure Send (Filename : String; Pkt_Len : Packet_Size; Trace_Flag : Boolean);
 
    Already_Exists,
    File_Does_Not_Exist, 
@@ -61,22 +61,21 @@ package Xmodem is
    Protocol_Error,
    Sender_Cancelled,
    Timeout,
-   Too_Many_Retries             : exception;
+   Too_Many_Retries  : exception;
 
 private
 
    function Char_To_U8   is new Ada.Unchecked_Conversion(Character, Unsigned_8);
    function Byte_To_Char is new Ada.Unchecked_Conversion(Unsigned_8, Character);
    
-   function CRC_16 (Data : in Vector) return Unsigned_16;
+   function CRC_16 (Data : Vector) return Unsigned_16;
    -- Calculate the CRC-16 value of the provided block of data
 
-   function CRC_16_Fixed_Len (Data : in Vector; FL : in Positive) return Unsigned_16;
+   function CRC_16_Fixed_Len (Data : Vector; FL : Positive) return Unsigned_16;
    -- Calculate the CRC-16 Constant for the provided block of data
 
-   procedure Send_Block (Data : in out Vector; Block_Num : in Natural; Block_Size : in Packet_Size);
+   procedure Send_Block (Data : in out Vector; Block_Num : Natural; Block_Size : Packet_Size);
 
    Tracing : Boolean;
-
 
 end Xmodem;
