@@ -82,6 +82,21 @@ package body Display_P is
          Disp.Cells(Line, Col).Clear_If_Unprotected;
       end Clear_Unprotected_Cell;
 
+      function Cell_Is_Dirty (Line, Col : Natural) return Boolean is
+         (Disp.Cells(Line,Col).Is_Dirty);
+
+      procedure Cell_Clear_Dirty (Line, Col : Natural) is
+      begin
+         Disp.Cells(Line, Col).Clear_Dirty;
+      end Cell_Clear_Dirty;
+
+      procedure Cell_Set_Dirty_If_Blinking (Line, Col : Natural) is
+      begin
+         if Disp.Cells(Line, Col).Is_Blinking then
+            Disp.Cells(Line, Col).Set_Dirty;
+         end if;
+      end Cell_Set_Dirty_If_Blinking;
+
       procedure Get_Cell (Line, Col : Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean) is
       begin
          Disp.Cells(Line,Col).Get (Value => Value, Blnk => Blnk, Dm => Dm, Rv => Rv, Under => Under, Prot => Prot);

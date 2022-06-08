@@ -29,6 +29,7 @@ package body Cell is
          Rev        := Rv;
          Underscore := Under;
          Protect    := Prot;
+         Dirty      := true;
       end Set;
 
       procedure Get (Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean) is
@@ -49,6 +50,7 @@ package body Cell is
          Rev        := false;
          Underscore := false;
          Protect    := false;
+         Dirty      := true;
       end Clear_To_Space;
 
       procedure Clear_If_Unprotected is
@@ -57,6 +59,22 @@ package body Cell is
             Clear_To_Space;
          end if;
       end Clear_If_Unprotected;
+
+      function Is_Blinking return Boolean is
+         (Blink);
+
+      function Is_Dirty return Boolean is 
+         (Dirty);
+
+      procedure Clear_Dirty is
+      begin
+         Dirty := false;
+      end Clear_Dirty;
+
+      procedure Set_Dirty is
+      begin
+         Dirty := true;
+      end Set_Dirty;
   
    end Cell_T;
 

@@ -33,6 +33,11 @@ package body Crt is
       pragma Unreferenced (DA);
    begin
       Tube.Blink_State := not Tube.Blink_State;
+      for Line in 0 .. Display.Get_Visible_Lines-1 loop
+         for Col in 0 .. Display.Get_Visible_Cols-1 loop
+            Display.Cell_Set_Dirty_If_Blinking (Line, Col);
+         end loop;
+      end loop;
       Display.Set_Dirty;
       return True;
    end Blink_Timeout_CB;
@@ -119,40 +124,43 @@ package body Crt is
          for Col in 0 .. Display.Get_Visible_Cols-1 loop
             Char_X  := Gdouble(Gint(Col) * Decoded_Width);
 
-            Display.Get_Cell(Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
+            if Display.Cell_Is_Dirty(Line, Col) then
 
-            Char_Ix := Character'Pos (Value);
-            -- if not BDF_Font.Font.Is_Loaded (Char_IX) then
-            --    raise Unloaded_Character with "Line:" & Line'Image & " Col:" & Col'Image & " Index :" & Char_Ix'Image;
-            -- end if;
+               Display.Get_Cell(Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
 
-            if Display.Is_Blink_Enabled and Tube.Blink_State and Blnk then
-               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(32), 
-                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
-            elsif Dm then
-               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(Char_Ix), 
-                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
-            elsif Rv then
-               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf(Char_Ix),
-                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
-            else
-               Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                             Pixbuf => BDF_Font.Font.Get_Pixbuf(Char_Ix), 
-                                             Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+               Char_Ix := Character'Pos (Value);
+               -- if not BDF_Font.Font.Is_Loaded (Char_IX) then
+               --    raise Unloaded_Character with "Line:" & Line'Image & " Col:" & Col'Image & " Index :" & Char_Ix'Image;
+               -- end if;
+
+               if Display.Is_Blink_Enabled and Tube.Blink_State and Blnk then
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                                Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(32), 
+                                                Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+               elsif Dm then
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                                Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(Char_Ix), 
+                                                Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+               elsif Rv then
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                                Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf(Char_Ix),
+                                                Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
+               else
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
+                                                Pixbuf => BDF_Font.Font.Get_Pixbuf(Char_Ix), 
+                                                Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
+               end if;
+               Cairo.Paint (Cr);
+
+               -- Underlined?
+               if Under then
+                  Char_UL := (Gdouble(Gint(Line + 1) * Decoded_Height)) - 1.0;
+                  Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
+                  Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(Decoded_Width), 1.0);
+                  Cairo.Fill (Cr);
+               end if;
+               Display.Cell_Clear_Dirty (Line, Col);
             end if;
-            Cairo.Paint (Cr);
-
-            -- Underlined?
-            if Under then
-               Char_UL := (Gdouble(Gint(Line + 1) * Decoded_Height)) - 1.0;
-               Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
-               Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(Decoded_Width), 1.0);
-               Cairo.Fill (Cr);
-            end if;
-
          end loop;
       end loop;
 

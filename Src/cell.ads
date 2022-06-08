@@ -31,9 +31,18 @@ package Cell is
 
       procedure Clear_If_Unprotected;
 
+      function Is_Blinking return Boolean;
+
+      function Is_Dirty return Boolean;
+
+      procedure Clear_Dirty;
+
+      procedure Set_Dirty;
+
    private
       Char_Value                           : Character;
       Blink, Dim, Rev, Underscore, Protect : Boolean;
+      Dirty                                : Boolean;
 
    end Cell_T;
 

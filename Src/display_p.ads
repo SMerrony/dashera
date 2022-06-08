@@ -49,6 +49,9 @@ package Display_P is
       procedure Clear_Dirty;
       function  Is_Dirty return Boolean;
       procedure Init;
+      function  Cell_Is_Dirty (Line, Col : Natural) return Boolean;
+      procedure Cell_Clear_Dirty (Line, Col : Natural);
+      procedure Cell_Set_Dirty_If_Blinking (Line, Col : Natural);
       procedure Get_Cell (Line, Col : Natural; Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
       procedure Clear_Cell (Line, Col : Natural);
       procedure Clear_Unprotected_Cell (Line, Col : Natural);
