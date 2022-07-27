@@ -34,10 +34,13 @@ with Gtk.Revealer;
 with Gtk.Widget;
 with Gtk.Window;              use Gtk.Window;
 
+with Resources;
+
 with Telnet;
 with Terminal;
 
 package GUI is
+   package Dashera_Resources is new Resources ("dashera");
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
    package SB_Timeout_P is new Glib.Main.Generic_Sources (Gtk.Box.Gtk_Box);
 
@@ -46,7 +49,7 @@ package GUI is
    App_Comment      : constant String := "A Data General DASHER terminal emulator";
    App_Author       : constant String := "Stephen Merrony";
    App_Copyright    : constant String := "Copyright ©2022 S.Merrony";
-   App_Icon         : constant String := "DGlogoOrange.ico";
+   App_Icon         : constant String := "/DGlogoOrange.ico";
    App_Website      : constant String := "https://github.com/SMerrony/dashera";
 
    History_Lines    : constant Natural := 1000;

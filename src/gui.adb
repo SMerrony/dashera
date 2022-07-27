@@ -1249,7 +1249,7 @@ package body GUI is
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 
-      Gdk.Pixbuf.Gdk_New_From_File (Pixbuf => Icon_PB, Filename => App_Icon, Error => Error);
+      Gdk.Pixbuf.Gdk_New_From_File (Pixbuf => Icon_PB, Filename => Dashera_Resources.Resource_Path & App_Icon, Error => Error);
       if Error /= null then
          Log (WARNING, "Could not find/load icon file: " & App_Icon);
       else
