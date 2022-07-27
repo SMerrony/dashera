@@ -1,3 +1,7 @@
 /obj/*
 /resources
 dashera
+/obj/
+/bin/
+/alire/
+/config/

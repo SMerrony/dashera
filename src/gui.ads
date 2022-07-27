@@ -41,7 +41,7 @@ package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
    package SB_Timeout_P is new Glib.Main.Generic_Sources (Gtk.Box.Gtk_Box);
 
-   App_SemVer       : constant String := "v0.11.6";  -- TODO Update Version each release!
+   App_SemVer       : constant String := "0.12,0";  -- TODO Update Version each release!
    App_Title        : constant String := "DasherA";
    App_Comment      : constant String := "A Data General DASHER terminal emulator";
    App_Author       : constant String := "Stephen Merrony";

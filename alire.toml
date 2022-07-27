@@ -1,0 +1,11 @@
+name = "dashera"
+description = "DASHER Terminal Emulator"
+version = "0.12.0-dev"
+
+authors = ["Stephen Merrony"]
+maintainers = ["Stephen Merrony <merrony@gmail.com>"]
+maintainers-logins = ["SMerrony"]
+
+executables = ["dashera"]
+[[depends-on]]
+gtkada = "^21.0.0"
