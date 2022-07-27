@@ -9,3 +9,5 @@ maintainers-logins = ["SMerrony"]
 executables = ["dashera"]
 [[depends-on]]
 gtkada = "^21.0.0"
+[[depends-on]]
+resources = "~0.1.0"

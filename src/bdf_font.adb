@@ -91,11 +91,11 @@ package body BDF_Font is
          end case;
 
          begin
-            Open (File => Font_File, Mode => In_File, Name => File_Name);
+            Open (File => Font_File, Mode => In_File, Name => Dashera_Resources.Resource_Path & "/" & File_Name);
 
          exception
             when others =>
-               raise OPEN_FAILURE with "ERROR: Cannot open the file '" & File_Name &
+               raise OPEN_FAILURE with "ERROR: Cannot open the file '" & Dashera_Resources.Resource_Path & "/" & File_Name &
                   "'. Does it exist?";
          end;
 
