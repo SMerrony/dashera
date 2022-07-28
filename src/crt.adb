@@ -1,21 +1,21 @@
--- Copyright ©2021,2022 Steve Merrony
-
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
--- The above copyright notice and this permission notice shall be included in
--- all copies or substantial portions of the Software.
-
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- THE SOFTWARE.
+--  Copyright ©2021,2022 Steve Merrony
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a copy
+--  of this software and associated documentation files (the "Software"), to deal
+--  in the Software without restriction, including without limitation the rights
+--  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--  copies of the Software, and to permit persons to whom the Software is
+--  furnished to do so, subject to the following conditions:
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+--  THE SOFTWARE.
 
 with Cairo;       use Cairo;
 
@@ -33,8 +33,8 @@ package body Crt is
       pragma Unreferenced (DA);
    begin
       Tube.Blink_State := not Tube.Blink_State;
-      for Line in 0 .. Display.Get_Visible_Lines-1 loop
-         for Col in 0 .. Display.Get_Visible_Cols-1 loop
+      for Line in 0 .. Display.Get_Visible_Lines - 1 loop
+         for Col in 0 .. Display.Get_Visible_Cols - 1 loop
             Display.Cell_Set_Dirty_If_Blinking (Line, Col);
          end loop;
       end loop;
@@ -55,16 +55,16 @@ package body Crt is
       Log (DEBUG, "Creating Crt");
       BDF_Font.Font.Load_Font (Font_Filename, Zoom);
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
-      Tube.DA.Set_Size_Request(BDF_Font.Font.Get_Char_Width * Gint(Display.Get_Visible_Cols), 
-                               BDF_Font.Font.Get_Char_Height * Gint(Display.Get_Visible_Lines));
+      Tube.DA.Set_Size_Request (BDF_Font.Font.Get_Char_Width * Gint (Display.Get_Visible_Cols),
+                                BDF_Font.Font.Get_Char_Height * Gint (Display.Get_Visible_Lines));
       Tube.Zoom := Zoom;
 
-      -- Blink timer
+      --  Blink timer
       if Blink_TO = 0 then
          Blink_TO := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, Tube.DA);
       end if;
 
-      -- TESTING = Redraw timer...
+      --  TESTING = Redraw timer...
       if Redraw_TO = 0 then
          Redraw_TO := Redraw_Timeout.Timeout_Add (50, Redraw_Timeout_CB'Access, Tube.DA);
       end if;
@@ -97,19 +97,19 @@ package body Crt is
             Cairo.Cairo_Content_Color,
             Self.Get_Allocated_Width,
             Self.Get_Allocated_Height);
-      -- Initialize the surface
+      --  Initialize the surface
       Clear_Surface;
 
-      -- We've handled the configure event, no need for further processing.
+      --  We've handled the configure event, no need for further processing.
       return True;
    end Configure_Event_CB;
 
-   -- Draw_Crt is called from within a Callback - so it's safe to use PixBufs etc.
+   --  Draw_Crt is called from within a Callback - so it's safe to use PixBufs etc.
    procedure Draw_Crt is
       Cr             : Cairo.Cairo_Context;
       Char_Ix        : Natural;
       Char_X, Char_Y, Char_UL : Gdouble;
-      Value : Character; 
+      Value : Character;
       Blnk, Dm, Rv, Under, Prot : Boolean;
       Decoded_Height : constant Gint := BDF_Font.Font.Get_Char_Height;
       Decoded_Width  : constant Gint := BDF_Font.Font.Get_Char_Width;
@@ -117,46 +117,46 @@ package body Crt is
    begin
       Cr := Cairo.Create (surface);
 
-      for Line in 0 .. Display.Get_Visible_Lines-1 loop
+      for Line in 0 .. Display.Get_Visible_Lines - 1 loop
 
-         Char_Y  := Gdouble(Gint(Line) * Decoded_Height);
-         
-         for Col in 0 .. Display.Get_Visible_Cols-1 loop
-            Char_X  := Gdouble(Gint(Col) * Decoded_Width);
+         Char_Y  := Gdouble (Gint (Line) * Decoded_Height);
 
-            if Display.Cell_Is_Dirty(Line, Col) then
+         for Col in 0 .. Display.Get_Visible_Cols - 1 loop
+            Char_X  := Gdouble (Gint (Col) * Decoded_Width);
 
-               Display.Get_Cell(Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
+            if Display.Cell_Is_Dirty (Line, Col) then
+
+               Display.Get_Cell (Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
 
                Char_Ix := Character'Pos (Value);
-               -- if not BDF_Font.Font.Is_Loaded (Char_IX) then
-               --    raise Unloaded_Character with "Line:" & Line'Image & " Col:" & Col'Image & " Index :" & Char_Ix'Image;
-               -- end if;
+               --  if not BDF_Font.Font.Is_Loaded (Char_IX) then
+               --     raise Unloaded_Character with "Line:" & Line'Image & " Col:" & Col'Image & " Index :" & Char_Ix'Image;
+               --  end if;
 
-               if Display.Is_Blink_Enabled and Tube.Blink_State and Blnk then
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                                Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(32), 
+               if Display.Is_Blink_Enabled and then Tube.Blink_State and then Blnk then
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
+                                                Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf (32),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                elsif Dm then
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                                Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf(Char_Ix), 
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
+                                                Pixbuf => BDF_Font.Font.Get_Dim_Pixbuf (Char_Ix),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                elsif Rv then
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                                Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf(Char_Ix),
-                                                Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);                              
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
+                                                Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf (Char_Ix),
+                                                Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                else
-                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                                Pixbuf => BDF_Font.Font.Get_Pixbuf(Char_Ix), 
+                  Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
+                                                Pixbuf => BDF_Font.Font.Get_Pixbuf (Char_Ix),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                end if;
                Cairo.Paint (Cr);
 
-               -- Underlined?
+               --  Underlined?
                if Under then
-                  Char_UL := (Gdouble(Gint(Line + 1) * Decoded_Height)) - 1.0;
+                  Char_UL := (Gdouble (Gint (Line + 1) * Decoded_Height)) - 1.0;
                   Cairo.Set_Source_Rgb (Cr, 0.0, 1.0, 0.0);
-                  Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble(Decoded_Width), 1.0);
+                  Cairo.Rectangle (Cr, Char_X, Char_UL, Gdouble (Decoded_Width), 1.0);
                   Cairo.Fill (Cr);
                end if;
                Display.Cell_Clear_Dirty (Line, Col);
@@ -164,23 +164,23 @@ package body Crt is
          end loop;
       end loop;
 
-      -- Draw the cursor if it's on-screen
-      if Display.Get_Cursor_X < Display.Get_Visible_Cols and Display.Get_Cursor_Y < Display.Get_Visible_Lines then
-         Display.Get_Cell(Display.Get_Cursor_Y, Display.Get_Cursor_X, Value, Blnk, Dm, Rv, Under, Prot);
+      --  Draw the cursor if it's on-screen
+      if Display.Get_Cursor_X < Display.Get_Visible_Cols and then Display.Get_Cursor_Y < Display.Get_Visible_Lines then
+         Display.Get_Cell (Display.Get_Cursor_Y, Display.Get_Cursor_X, Value, Blnk, Dm, Rv, Under, Prot);
          Char_Ix := Character'Pos (Value);
          if Char_Ix = 0 then
             Char_Ix := 32;
          end if;
          if Rv then
-            Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                         Pixbuf => BDF_Font.Font.Get_Pixbuf(Char_Ix), 
-                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * Decoded_Width),
-                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * Decoded_Height));
+            Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
+                                         Pixbuf => BDF_Font.Font.Get_Pixbuf (Char_Ix),
+                                         Pixbuf_X => Gdouble (Gint (Display.Get_Cursor_X) * Decoded_Width),
+                                         Pixbuf_Y => Gdouble (Gint (Display.Get_Cursor_Y) * Decoded_Height));
          else
-            Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr, 
-                                         Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf(Char_Ix), 
-                                         Pixbuf_X => Gdouble(Gint(Display.Get_Cursor_X) * Decoded_Width),
-                                         Pixbuf_Y => Gdouble(Gint(Display.Get_Cursor_Y) * Decoded_Height));
+            Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
+                                         Pixbuf => BDF_Font.Font.Get_Rev_Pixbuf (Char_Ix),
+                                         Pixbuf_X => Gdouble (Gint (Display.Get_Cursor_X) * Decoded_Width),
+                                         Pixbuf_Y => Gdouble (Gint (Display.Get_Cursor_Y) * Decoded_Height));
          end if;
          Cairo.Paint (Cr);
       end if;

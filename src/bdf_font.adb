@@ -1,21 +1,21 @@
--- Copyright ©2021,2022 Steve Merrony
-
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
--- The above copyright notice and this permission notice shall be included in
--- all copies or substantial portions of the Software.
-
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- THE SOFTWARE.
+--  Copyright ©2021,2022 Steve Merrony
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a copy
+--  of this software and associated documentation files (the "Software"), to deal
+--  in the Software without restriction, including without limitation the rights
+--  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--  copies of the Software, and to permit persons to whom the Software is
+--  furnished to do so, subject to the following conditions:
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+--  THE SOFTWARE.
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Interfaces;  use Interfaces;
@@ -25,14 +25,14 @@ with Logging;     use Logging;
 package body BDF_Font is
 
    procedure Parse_BBX
-     (Font_Line             : String; 
+     (Font_Line             : String;
       Font_Line_Length      : Positive;
-      Pix_Width, Pix_Height : out Integer; 
+      Pix_Width, Pix_Height : out Integer;
       X_Offset, Y_Offset    : out Integer)
    is
       Start_Pos, End_Pos : Positive;
    begin
-      Start_Pos := 5; -- "BBX n..."
+      Start_Pos := 5; --  "BBX n..."
       End_Pos   := Start_Pos;
       while Font_Line (End_Pos) /= ' ' loop
          End_Pos := End_Pos + 1;
@@ -62,7 +62,7 @@ package body BDF_Font is
    protected body Font is
 
       procedure Load_Font (File_Name : String; Zoom : Zoom_T) is
-         -- Font                                              : aliased Decoded_Acc_T := new Decoded_T;
+         --  Font                                              : aliased Decoded_Acc_T := new Decoded_T;
          Char_Count                                        : Positive;
          Font_File                                         : File_Type;
          Font_Line                                         : String (1 .. 80);
@@ -105,7 +105,7 @@ package body BDF_Font is
 
          loop
             Get_Line (Font_File, Font_Line, Font_Line_Length);
-            -- Log (DEBUG, "" & Font_Line (1 .. Font_Line_Length));
+            --  Log (DEBUG, "" & Font_Line (1 .. Font_Line_Length));
             exit when Font_Line (1 .. Font_Line_Length) = "ENDPROPERTIES";
          end loop;
          Get_Line (Font_File, Font_Line, Font_Line_Length);
@@ -128,7 +128,7 @@ package body BDF_Font is
          Fill (Black_Pix_Buf, 16#000000ff#);
 
          for CC in 0 .. Char_Count - 1 loop
-            Log (DEBUG, "Loading char No. " & Integer'Image(CC));
+            Log (DEBUG, "Loading char No. " & Integer'Image (CC));
 
             loop
                Get_Line (Font_File, Font_Line, Font_Line_Length);
@@ -137,22 +137,22 @@ package body BDF_Font is
 
             Get_Line (Font_File, Font_Line, Font_Line_Length);
             if Font_Line (1 .. 8) /= "ENCODING" then
-            raise BDF_DECODE with "ERROR: BDF_Font - ENCODING line not found";
+               raise BDF_DECODE with "ERROR: BDF_Font - ENCODING line not found";
             end if;
             ASCII_Code := Natural'Value (Font_Line (10 .. Font_Line_Length));
             Log (DEBUG, "... ASCII Code: " & ASCII_Code'Image);
 
-            -- skip 2 lines
+            --  skip 2 lines
             Get_Line (Font_File, Font_Line, Font_Line_Length);
             Get_Line (Font_File, Font_Line, Font_Line_Length);
 
             Get_Line (Font_File, Font_Line, Font_Line_Length);
             Parse_BBX (Font_Line, Font_Line_Length, Pix_Width, Pix_Height, X_Offset, Y_Offset);
 
-            -- skip the BITMAP line
+            --  skip the BITMAP line
             Get_Line (Font_File, Font_Line, Font_Line_Length);
 
-         -- load the actual bitmap for this char a row at a time from the top down
+         --  load the actual bitmap for this char a row at a time from the top down
             Fill (Tmp_Pix_Buf, 0);
             Fill (Tmp_Dim_Pix_Buf, 0);
             Fill (Tmp_Reverse_Pix_Buf, 16#00FF_0000#);
@@ -161,33 +161,33 @@ package body BDF_Font is
                Line_Byte := Unsigned_8'Value ("16#" & Font_Line (1 .. 2) & "#");
                for I in 0 .. Pix_Width - 1 loop
                   if (Line_Byte and 16#80#) /= 0 then
-                     X := Gint(X_Offset + I);
-                     Y := Gint(Bitmap_Line + 12 - Pix_Height - Y_Offset);
-                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Green_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1, 
+                     X := Gint (X_Offset + I);
+                     Y := Gint (Bitmap_Line + 12 - Pix_Height - Y_Offset);
+                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Green_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1,
                                           Dest_Pixbuf => Tmp_Pix_Buf, Dest_X => X, Dest_Y => Y);
-                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Dim_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1, 
+                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Dim_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1,
                                           Dest_Pixbuf => Tmp_Dim_Pix_Buf, Dest_X => X, Dest_Y => Y);
-                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Black_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1, 
+                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Black_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1,
                                           Dest_Pixbuf => Tmp_Reverse_Pix_Buf, Dest_X => X, Dest_Y => Y);
-                     -- Decoded.Font(ASCII_Code).Pixels (X_Offset + I, Y_Offset + Bitmap_Line) := True;
+                     --  Decoded.Font(ASCII_Code).Pixels (X_Offset + I, Y_Offset + Bitmap_Line) := True;
                   end if;
                   Line_Byte := Shift_Left (Line_Byte, 1);
                end loop;
             end loop;
 
-            Decoded.Font(ASCII_Code).Pix_Buf         := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf, 
-                                                         Dest_Width => Decoded.Char_Width, 
-                                                         Dest_Height => Decoded.Char_Height, 
+            Decoded.Font (ASCII_Code).Pix_Buf         := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Pix_Buf,
+                                                         Dest_Width => Decoded.Char_Width,
+                                                         Dest_Height => Decoded.Char_Height,
                                                          Inter_Type => Interp_Bilinear);
-            Decoded.Font(ASCII_Code).Dim_Pix_Buf     := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Dim_Pix_Buf, 
-                                                         Dest_Width => Decoded.Char_Width, 
-                                                         Dest_Height => Decoded.Char_Height, 
+            Decoded.Font (ASCII_Code).Dim_Pix_Buf     := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Dim_Pix_Buf,
+                                                         Dest_Width => Decoded.Char_Width,
+                                                         Dest_Height => Decoded.Char_Height,
                                                          Inter_Type => Interp_Bilinear);
-            Decoded.Font(ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Reverse_Pix_Buf, 
-                                                         Dest_Width => Decoded.Char_Width, 
-                                                         Dest_Height => Decoded.Char_Height, 
+            Decoded.Font (ASCII_Code).Reverse_Pix_Buf := Gdk.Pixbuf.Scale_Simple (Src => Tmp_Reverse_Pix_Buf,
+                                                         Dest_Width => Decoded.Char_Width,
+                                                         Dest_Height => Decoded.Char_Height,
                                                          Inter_Type => Interp_Bilinear);
-            Decoded.Font(ASCII_Code).Loaded  := true;
+            Decoded.Font (ASCII_Code).Loaded  := True;
 
          end loop;
 
@@ -201,17 +201,17 @@ package body BDF_Font is
       function Get_Char_Height return Gint is
          (Decoded.Char_Height);
 
-      function Is_Loaded (Ix : Natural) return Boolean is 
-         (Decoded.Font(Ix).Loaded);
+      function Is_Loaded (Ix : Natural) return Boolean is
+         (Decoded.Font (Ix).Loaded);
 
       function Get_Dim_Pixbuf (Ix : Natural) return Gdk_Pixbuf is
-         (Decoded.Font(Ix).Dim_Pix_Buf);
+         (Decoded.Font (Ix).Dim_Pix_Buf);
 
       function Get_Rev_Pixbuf (Ix : Natural) return Gdk_Pixbuf is
-         (Decoded.Font(Ix).Reverse_Pix_Buf);
+         (Decoded.Font (Ix).Reverse_Pix_Buf);
 
       function Get_Pixbuf (Ix : Natural) return Gdk_Pixbuf is
-         (Decoded.Font(Ix).Pix_Buf);   
+         (Decoded.Font (Ix).Pix_Buf);
 
    end Font;
 
