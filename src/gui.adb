@@ -1,28 +1,28 @@
--- Copyright ©2021,2022 Steve Merrony
-
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
--- The above copyright notice and this permission notice shall be included in
--- all copies or substantial portions of the Software.
-
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
--- THE SOFTWARE.
+--  Copyright ©2021,2022 Steve Merrony
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a copy
+--  of this software and associated documentation files (the "Software"), to deal
+--  in the Software without restriction, including without limitation the rights
+--  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--  copies of the Software, and to permit persons to whom the Software is
+--  furnished to do so, subject to the following conditions:
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+--  THE SOFTWARE.
 
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
 with GNAT.Serial_Communications; use GNAT.Serial_Communications;
 
-with Gdk.Event;               -- use Gdk.Event;
+with Gdk.Event;               --  use Gdk.Event;
 with Gdk.Threads;
 with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
 
@@ -45,18 +45,14 @@ with Gtk.Frame;
 with Gtk.Main;
 with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
--- with Gtk.Menu_Button;         -- use Gtk.Menu_Button;
 with Gtk.Message_Dialog;      use Gtk.Message_Dialog;
 with Gtk.Radio_Button;
--- with Gtk.Radio_Menu_Item;     -- use Gtk.Radio_Menu_Item;
-with Gtk.Scrollbar;           -- use Gtk.Scrollbar;
+with Gtk.Scrollbar;           --  use Gtk.Scrollbar;
 with Gtk.Separator;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
--- with Gtk.Scrollbar;
 with Gtk.Stock;
 with Gtk.Style_Context;
 with Gtk.Style_Provider;
--- with Gtk.Table;
 with Gtk.Widget; use Gtk.Widget;
 
 with Gtkada.Dialogs;          use Gtkada.Dialogs;
@@ -75,13 +71,13 @@ with Redirector;     use Redirector;
 with Serial;
 with Xmodem;
 
-package body GUI is  
+package body GUI is
 
    package FA is new Gtk.Container.Forall_User_Data (Gtk.Style_Provider.Gtk_Style_Provider);
 
    procedure Apply_Css (Widget   : not null access Gtk.Widget.Gtk_Widget_Record'Class;
                         Provider : Gtk.Style_Provider.Gtk_Style_Provider) is
-   -- Apply the given CSS to the widget (which may be a container)
+   --  Apply the given CSS to the widget (which may be a container)
    begin
       Gtk.Style_Context.Get_Style_Context (Widget).Add_Provider (Provider, Glib.Guint'Last);
       if Widget.all in Gtk.Container.Gtk_Container_Record'Class then
@@ -163,18 +159,18 @@ package body GUI is
       Dialog.Set_Title (App_Title & " - Resize Terminal");
       Dlg_Box := Dialog.Get_Content_Area;
 
-      Gtk.Box.Gtk_New (HB1, Orientation => Orientation_Horizontal, Spacing =>6);
+      Gtk.Box.Gtk_New (HB1, Orientation => Orientation_Horizontal, Spacing => 6);
       Gtk.Label.Gtk_New (Lab, "Lines");
-      HB1.Pack_Start (Child =>Lab, Expand => False, Fill => False, Padding => 1);
-      L24 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "24" );
+      HB1.Pack_Start (Child => Lab, Expand => False, Fill => False, Padding => 1);
+      L24 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "24");
       HB1.Pack_Start (Child => L24, Expand => False, Fill => False, Padding => 1);
-      L25 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "25" );
+      L25 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "25");
       HB1.Pack_Start (Child => L25, Expand => False, Fill => False, Padding => 1);
-      L36 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "36" );
+      L36 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "36");
       HB1.Pack_Start (Child => L36, Expand => False, Fill => False, Padding => 1);
-      L48 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "48" );
+      L48 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "48");
       HB1.Pack_Start (Child => L48, Expand => False, Fill => False, Padding => 1);
-      L66 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "66" );
+      L66 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => L24, Label => "66");
       HB1.Pack_Start (Child => L66, Expand => False, Fill => False, Padding => 1);
       Dlg_Box.Pack_Start (Child => HB1, Expand => False, Fill => False, Padding => 1);
       case Display.Get_Visible_Lines is
@@ -183,19 +179,19 @@ package body GUI is
          when 36 => L36.Set_Active (True);
          when 48 => L48.Set_Active (True);
          when 66 => L66.Set_Active (True);
-         when others => null;                                 
+         when others => null;
       end case;
 
-      Gtk.Box.Gtk_New (HB2, Orientation => Orientation_Horizontal, Spacing =>6);
+      Gtk.Box.Gtk_New (HB2, Orientation => Orientation_Horizontal, Spacing => 6);
       Gtk.Label.Gtk_New (Lab, "Columns");
-      HB2.Pack_Start (Child =>Lab, Expand => False, Fill => False, Padding => 1);
-      C80 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "80" );
+      HB2.Pack_Start (Child => Lab, Expand => False, Fill => False, Padding => 1);
+      C80 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "80");
       HB2.Pack_Start (Child => C80, Expand => False, Fill => False, Padding => 1);
-      C81 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "81" );
+      C81 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "81");
       HB2.Pack_Start (Child => C81, Expand => False, Fill => False, Padding => 1);
-      C132 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "132" );
+      C132 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "132");
       HB2.Pack_Start (Child => C132, Expand => False, Fill => False, Padding => 1);
-      C135 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "135" );
+      C135 := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => C80, Label => "135");
       HB2.Pack_Start (Child => C135, Expand => False, Fill => False, Padding => 1);
       Dlg_Box.Pack_Start (Child => HB2, Expand => False, Fill => False, Padding => 1);
       case Display.Get_Visible_Cols is
@@ -206,62 +202,75 @@ package body GUI is
          when others => null;
       end case;
 
-      Gtk.Box.Gtk_New (HB3, Orientation => Orientation_Horizontal, Spacing =>6);
+      Gtk.Box.Gtk_New (HB3, Orientation => Orientation_Horizontal, Spacing => 6);
       Gtk.Label.Gtk_New (Lab, "Zoom");
-      HB3.Pack_Start (Child =>Lab, Expand => False, Fill => False, Padding => 1);
-      ZL := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "Large" );
+      HB3.Pack_Start (Child => Lab, Expand => False, Fill => False, Padding => 1);
+      ZL := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => null, Label => "Large");
       HB3.Pack_Start (Child => ZL, Expand => False, Fill => False, Padding => 1);
-      ZN := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Normal" );
+      ZN := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Normal");
       HB3.Pack_Start (Child => ZN, Expand => False, Fill => False, Padding => 1);
-      ZS := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Small" );
+      ZS := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Small");
       HB3.Pack_Start (Child => ZS, Expand => False, Fill => False, Padding => 1);
-      ZT := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Tiny" );
+      ZT := Gtk.Radio_Button.Gtk_Radio_Button_New_With_Label_From_Widget (Group => ZL, Label => "Tiny");
       HB3.Pack_Start (Child => ZT, Expand => False, Fill => False, Padding => 1);
       Dlg_Box.Pack_Start (Child => HB3, Expand => False, Fill => False, Padding => 1);
       case Crt.Tube.Zoom is
          when Large   => ZL.Set_Active (True);
          when Normal  => ZN.Set_Active (True);
          when Smaller => ZS.Set_Active (True);
-         when Tiny    => ZT.Set_Active (True);      
+         when Tiny    => ZT.Set_Active (True);
       end case;
-         
+
       Cancel_Unused := Dialog.Add_Button ("Cancel", Gtk_Response_Cancel);
       Resize_Unused := Dialog.Add_Button ("Resize", Gtk_Response_Accept);
       Dialog.Set_Default_Response (Gtk_Response_Accept);
       Dialog.Show_All;
-      if Dialog.Run = Gtk_Response_Accept then 
+      if Dialog.Run = Gtk_Response_Accept then
          declare
             New_Zoom : Zoom_T;
             New_Cols, New_Lines : Gint;
          begin
-            -- first check if zoom has changed
-            if    ZL.Get_Active then New_Zoom := Large;
-            elsif ZN.Get_Active then New_Zoom := Normal;
-            elsif ZS.Get_Active then New_Zoom := Smaller;
-            else New_Zoom := Tiny;
+            --  first check if zoom has changed
+            if    ZL.Get_Active then
+               New_Zoom := Large;
+            elsif ZN.Get_Active then
+               New_Zoom := Normal;
+            elsif ZS.Get_Active then
+               New_Zoom := Smaller;
+            else
+               New_Zoom := Tiny;
             end if;
             if New_Zoom /= Crt.Tube.Zoom then
                Font.Load_Font (Crt.Font_Filename, New_Zoom);
                Crt.Tube.Zoom := New_Zoom;
             end if;
-            -- resize
-            if    L24.Get_Active then New_Lines := 24;
-            elsif L25.Get_Active then New_Lines := 25;
-            elsif L36.Get_Active then New_Lines := 36;
-            elsif L48.Get_Active then New_Lines := 48;
-            else New_Lines := 66;
+            --  resize
+            if    L24.Get_Active then
+               New_Lines := 24;
+            elsif L25.Get_Active then
+               New_Lines := 25;
+            elsif L36.Get_Active then
+               New_Lines := 36;
+            elsif L48.Get_Active then
+               New_Lines := 48;
+            else
+               New_Lines := 66;
             end if;
-            if C80.Get_Active then New_Cols := 80;
-            elsif C81.Get_Active then New_Cols := 81;
-            elsif C132.Get_Active then New_Cols := 132;
-            else New_Cols := 135;
+            if C80.Get_Active then
+               New_Cols := 80;
+            elsif C81.Get_Active then
+               New_Cols := 81;
+            elsif C132.Get_Active then
+               New_Cols := 132;
+            else
+               New_Cols := 135;
             end if;
-            Crt.Tube.DA.Set_Size_Request(BDF_Font.Font.Get_Char_Width * New_Cols, 
+            Crt.Tube.DA.Set_Size_Request (BDF_Font.Font.Get_Char_Width * New_Cols,
                                BDF_Font.Font.Get_Char_Height * New_Lines);
-            Display.Set_Visible_Lines (Positive(New_Lines));
-            Display.Set_Visible_Cols  (Positive(New_Cols));
-            -- Ask for window resize to smaller than we are - the effect
-            -- is to reduce window size to minimum that contains all content.
+            Display.Set_Visible_Lines (Positive (New_Lines));
+            Display.Set_Visible_Cols  (Positive (New_Cols));
+            --  Ask for window resize to smaller than we are - the effect
+            --  is to reduce window size to minimum that contains all content.
             Main_Window.Resize (400, 400);
          end;
       end if;
@@ -277,7 +286,7 @@ package body GUI is
    function Label_To_Markup (L : Unbounded_String) return Unbounded_String is
       M : Unbounded_String := Null_Unbounded_String;
    begin
-      for Ix in 1 .. Length(L) loop
+      for Ix in 1 .. Length (L) loop
          if Element (L, Ix) = '\' then
             M := M & ASCII.LF;
          else
@@ -290,14 +299,15 @@ package body GUI is
    procedure Send_Text_File_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       use Ada.Text_IO;
-      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Text File", 
-                                                                        Dir_Only => False, 
-                                                                        Must_Exist => True);
+      Filename : constant String :=
+         Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Text File",
+                                                      Dir_Only => False,
+                                                      Must_Exist => True);
       Text_File : File_Type;
-      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;                                                              
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       if Filename'Length > 0 then
-         Open (File => Text_File, Mode => In_File, Name => Filename); 
+         Open (File => Text_File, Mode => In_File, Name => Filename);
          while not End_Of_File (Text_File) loop
             Redirector.Router.Send_Data (Get_Line (Text_File));
          end loop;
@@ -305,38 +315,40 @@ package body GUI is
       end if;
    exception
       when others =>
-         Unused_Buttons := Message_Dialog (Msg => "Could not open text file", 
+         Unused_Buttons := Message_Dialog (Msg => "Could not open text file",
                                            Title => "DasherA - Error");
    end Send_Text_File_CB;
 
    procedure Load_Template_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
-      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Function Key Template", 
-                                                                        Dir_Only => False, 
-                                                                        Must_Exist => True);
+      Filename : constant String :=
+         Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Function Key Template",
+                                                      Dir_Only => False,
+                                                      Must_Exist => True);
       Templ_File : Ada.Text_IO.File_Type;
       Lab : Unbounded_String;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       if Filename'Length > 1 then
          Log (DEBUG, "Chose template file: " & Filename);
-         -- clear the labels
+         --  clear the labels
          for K in 1 .. 17 loop
             for R in 1 .. 4 loop
-               if K /= 6 and k /= 12 then
-                  Template_Labels(R,K).Set_Markup ("");
+               if K /= 6 and then K /= 12 then
+                  Template_Labels (R, K).Set_Markup ("");
                end if;
             end loop;
          end loop;
          Ada.Text_IO.Open (File => Templ_File, Mode => Ada.Text_IO.In_File, Name => Filename);
          Lab := Text_IO.Unbounded_IO.Get_Line (Templ_File);
-         L_FKeys_Label.Set_Markup ("<small><small>" & To_String(Lab) & "</small></small>");
-         R_FKeys_Label.Set_Markup ("<small><small>" & To_String(Lab) & "</small></small>");
+         L_FKeys_Label.Set_Markup ("<small><small>" & To_String (Lab) & "</small></small>");
+         R_FKeys_Label.Set_Markup ("<small><small>" & To_String (Lab) & "</small></small>");
          for K in 1 .. 17 loop
             for R in reverse 1 .. 4 loop
-               if K /= 6 and K /= 12 and not Ada.Text_IO.End_Of_File(Templ_File) then
-                  Lab := "<small><small>" & Label_To_Markup (Text_IO.Unbounded_IO.Get_Line (Templ_File)) & "</small></small>";
-                  Template_Labels(R,K).Set_Markup (To_String(Lab));
+               if K /= 6 and then K /= 12 and then not Ada.Text_IO.End_Of_File (Templ_File) then
+                  Lab := "<small><small>" & Label_To_Markup (Text_IO.Unbounded_IO.Get_Line (Templ_File)) &
+                         "</small></small>";
+                  Template_Labels (R, K).Set_Markup (To_String (Lab));
                end if;
             end loop;
          end loop;
@@ -347,15 +359,16 @@ package body GUI is
       end if;
    exception
       when others =>
-         Unused_Buttons := Message_Dialog (Msg => "Could not load template file", 
-                                           Title => "DasherA - Error"); 
+         Unused_Buttons := Message_Dialog (Msg => "Could not load template file",
+                                           Title => "DasherA - Error");
    end Load_Template_CB;
 
    procedure Expect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
-      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA mini-Expect Script", 
-                                                                        Dir_Only => False, 
-                                                                        Must_Exist => True);
+      Filename : constant String :=
+         Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA mini-Expect Script",
+                                                      Dir_Only => False,
+                                                      Must_Exist => True);
    begin
       if Filename'Length > 1 then
          Mini_Expect.Prepare (Filename);
@@ -369,19 +382,20 @@ package body GUI is
          Session_Logger.Stop_Logging;
       else
          declare
-            Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Log File", 
-                                                                        Dir_Only => False, 
-                                                                        Must_Exist => False);
+            Filename : constant String :=
+               Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA Log File",
+                                                            Dir_Only => False,
+                                                            Must_Exist => False);
             OK : Boolean;
             Message : aliased Gtk_Message_Dialog;
          begin
             if Filename'Length > 1 then
                OK := Session_Logger.Start_Logging (Filename);
-               if not OK then 
-                  Message := Gtk_Message_Dialog_New (Parent => Main_Window, 
-                              Flags => Modal, 
-                              The_Type => Message_Error, 
-                              Buttons => Buttons_Close, 
+               if not OK then
+                  Message := Gtk_Message_Dialog_New (Parent => Main_Window,
+                              Flags => Modal,
+                              The_Type => Message_Error,
+                              Buttons => Buttons_Close,
                               Message => "Could not open log file");
                end if;
             end if;
@@ -398,14 +412,14 @@ package body GUI is
    begin
       if Wait_Is_Text_Available (Clipboard) then
          declare
-            Text : constant String := String(Wait_For_Text (Clipboard));
+            Text : constant String := String (Wait_For_Text (Clipboard));
          begin
             for C of Text loop
                Redirector.Router.Handle_Data (C);
             end loop;
          end;
       else
-         Unused_Buttons := Message_Dialog (Msg => "Nothing in Clipboard to Paste", 
+         Unused_Buttons := Message_Dialog (Msg => "Nothing in Clipboard to Paste",
                                            Title => "DasherA - Infomation");
       end if;
 
@@ -431,7 +445,7 @@ package body GUI is
 
       Gtk.Label.Gtk_New (Port_Label, "Port:");
       Ser_Grid.Attach (Child => Port_Label, Left => 0, Top => 0);
-      Gtk.GEntry.Gtk_New (The_Entry => Port_Entry); 
+      Gtk.GEntry.Gtk_New (The_Entry => Port_Entry);
       Ser_Grid.Attach (Child => Port_Entry, Left => 1, Top => 0);
 
       Gtk.Label.Gtk_New (Baud_Label, "Baud:");
@@ -477,9 +491,9 @@ package body GUI is
       Connect_Unused := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
       Dialog.Set_Default_Response (Gtk_Response_Accept);
       Dialog.Show_All;
-      if Dialog.Run = Gtk_Response_Accept then 
+      if Dialog.Run = Gtk_Response_Accept then
          if Port_Entry.Get_Text_Length = 0 then
-            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter a Serial Port", 
+            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter a Serial Port",
                                                              Title => "DasherA - Error");
          else
             declare
@@ -496,12 +510,12 @@ package body GUI is
                   when 3 => Rate := B9600;
                   when 4 => Rate := B19200;
                   when 5 => Rate := B38400;
-                  when others => null; 
+                  when others => null;
                end case;
                case Bits_Combo.Get_Active is
                   when 0 => Bits := CS7;
                   when 1 => Bits := CS8;
-                  when others => null; 
+                  when others => null;
                end case;
                case Parity_Combo.Get_Active is
                   when 0 => Parity := None;
@@ -526,8 +540,8 @@ package body GUI is
                Xmodem_Send1k_Item.Set_Sensitive (True);
             exception
                when others =>
-                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not open Serial Port", 
-                                                                   Title => "DasherA - Error");  
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not open Serial Port",
+                                                                   Title => "DasherA - Error");
             end;
          end if;
       end if;
@@ -580,9 +594,9 @@ package body GUI is
       Connect_Unused := Dialog.Add_Button ("Connect", Gtk_Response_Accept);
       Dialog.Set_Default_Response (Gtk_Response_Accept);
       Dialog.Show_All;
-      if Dialog.Run = Gtk_Response_Accept then     
-         if Host_Entry.Get_Text_Length = 0 or Port_Entry.Get_Text_Length = 0 then
-            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter both Host and Port", 
+      if Dialog.Run = Gtk_Response_Accept then
+         if Host_Entry.Get_Text_Length = 0 or else Port_Entry.Get_Text_Length = 0 then
+            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter both Host and Port",
                                                              Title => "DasherA - Error");
          else
             declare
@@ -590,7 +604,7 @@ package body GUI is
                Port_Num : Positive;
             begin
                Port_Num := Positive'Value (Port_Entry.Get_Text);
-               Telnet_Sess := Telnet.New_Connection (String(Host_Str), Port_Num);
+               Telnet_Sess := Telnet.New_Connection (String (Host_Str), Port_Num);
                Redirector.Router.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
@@ -600,8 +614,8 @@ package body GUI is
                Saved_Port := To_Unbounded_String (Port_Entry.Get_Text);
             exception
                when others =>
-                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect", 
-                                                                   Title => "DasherA - Error");   
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect",
+                                                                   Title => "DasherA - Error");
             end;
          end if;
       end if;
@@ -627,29 +641,30 @@ package body GUI is
       Dummy_Button : Gtk_Widget;
       Unused_Buttons : Message_Dialog_Buttons;
    begin
-      FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Xmodem Receive File As...", 
+      FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Xmodem Receive File As...",
                                                 Parent => Main_Window,
                                                 Action => Action_Save);
-      Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);  
+      Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);
       Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
       if FC_Dialog.Run = Gtk_Response_OK then
          Log (DEBUG, "Chosen file for Xmodem Rx: " & FC_Dialog.Get_Filename);
-         Xmodem.Receive (String(FC_Dialog.Get_Filename), Trace_Xmodem_Opt);
-      end if; 
-      FC_Dialog.Destroy; 
+         Xmodem.Receive (String (FC_Dialog.Get_Filename), Trace_Xmodem_Opt);
+      end if;
+      FC_Dialog.Destroy;
    exception
       when Xmodem.Already_Exists =>
-         FC_Dialog.Destroy; 
-         Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist", 
+         FC_Dialog.Destroy;
+         Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist",
                                                           Title => "DasherA - Error");
    end Xmodem_Rx_CB;
 
    procedure Xmodem_Tx_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
-      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA - Xmodem-CRC File Send", 
-                                                                        Dir_Only => False, 
-                                                                        Must_Exist => True);
-      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;  
+      Filename : constant String :=
+         Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA - Xmodem-CRC File Send",
+                                                      Dir_Only => False,
+                                                      Must_Exist => True);
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       if Filename'Length > 0 then
          Xmodem.Send (Filename => Filename, Pkt_Len => Xmodem.Short, Trace_Flag => Trace_Xmodem_Opt);
@@ -658,16 +673,17 @@ package body GUI is
       when Xmodem.Protocol_Error =>
          Unused_Buttons := Message_Dialog (Msg => "Xmodem Protocol Error", Title => "DasherA - Error");
       when others =>
-         Unused_Buttons := Message_Dialog (Msg => "Could not open file to send: " & Filename, 
+         Unused_Buttons := Message_Dialog (Msg => "Could not open file to send: " & Filename,
                                            Title => "DasherA - Error");
-   end Xmodem_Tx_CB;   
+   end Xmodem_Tx_CB;
 
    procedure Xmodem_Tx_1k_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
-      Filename : constant String := Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA - Xmodem-CRC 1k File Send", 
-                                                                        Dir_Only => False, 
-                                                                        Must_Exist => True);
-      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;  
+      Filename : constant String :=
+         Gtkada.File_Selection.File_Selection_Dialog (Title => "DasherA - Xmodem-CRC 1k File Send",
+                                                      Dir_Only => False,
+                                                      Must_Exist => True);
+      Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       if Filename'Length > 0 then
          Xmodem.Send (Filename => Filename, Pkt_Len => Xmodem.Long, Trace_Flag => Trace_Xmodem_Opt);
@@ -676,12 +692,12 @@ package body GUI is
       when Xmodem.Protocol_Error =>
          Unused_Buttons := Message_Dialog (Msg => "Xmodem Protocol Error", Title => "DasherA - Error");
       when others =>
-         Unused_Buttons := Message_Dialog (Msg => "Could not open file to send: " & Filename, 
+         Unused_Buttons := Message_Dialog (Msg => "Could not open file to send: " & Filename,
                                            Title => "DasherA - Error");
-   end Xmodem_Tx_1k_CB; 
+   end Xmodem_Tx_1k_CB;
 
-   function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key) 
-      return Boolean  is
+   function Handle_Key_Release_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
+      return Boolean is
       pragma Unreferenced (Self);
    begin
       Keyboard.Handle_Key_Release (Event.Keyval);
@@ -689,7 +705,7 @@ package body GUI is
    end Handle_Key_Release_Event_CB;
 
    function Handle_Key_Press_Event_CB (Self : access Gtk.Widget.Gtk_Widget_Record'Class; Event : Gdk.Event.Gdk_Event_Key)
-      return Boolean  is
+      return Boolean is
       pragma Unreferenced (Self);
    begin
       Keyboard.Handle_Key_Press (Event.Keyval);
@@ -711,10 +727,10 @@ package body GUI is
       Log (DEBUG, "Starting to Create_Menu_Bar");
       Gtk_New (Menu_Bar);
 
-      -- File
-      
+      --  File
+
       Gtk_New (Menu_Item, "File");
-      Menu_Bar.Append(Menu_Item);
+      Menu_Bar.Append (Menu_Item);
       Gtk_New (File_Menu);
       Menu_Item.Set_Submenu (File_Menu);
 
@@ -757,20 +773,20 @@ package body GUI is
       File_Menu.Append (Quit_Item);
       Quit_Item.On_Activate (Quit_CB'Access);
 
-      -- Edit
+      --  Edit
 
       Gtk_New (Menu_Item, "Edit");
-      Menu_Bar.Append(Menu_Item);
+      Menu_Bar.Append (Menu_Item);
       Gtk_New (Edit_Menu);
       Menu_Item.Set_Submenu (Edit_Menu);
       Gtk_New (Paste_Item, "Paste");
       Edit_Menu.Append (Paste_Item);
       Paste_Item.On_Activate (Paste_CB'Access);
 
-      -- Emulation
+      --  Emulation
 
       Gtk_New (Menu_Item, "Emulation");
-      Menu_Bar.Append(Menu_Item);
+      Menu_Bar.Append (Menu_Item);
       Gtk_New (Emulation_Menu);
       Menu_Item.Set_Submenu (Emulation_Menu);
       Gtk_New (D200_Item, "D200");
@@ -800,10 +816,10 @@ package body GUI is
       Emulation_Menu.Append (Load_Template_Item);
       Load_Template_Item.On_Activate (Load_Template_CB'Access);
 
-      -- Serial
+      --  Serial
 
       Gtk_New (Menu_Item, "Serial");
-      Menu_Bar.Append(Menu_Item);
+      Menu_Bar.Append (Menu_Item);
       Gtk_New (Serial_Menu);
       Menu_Item.Set_Submenu (Serial_Menu);
       Gtk_New (Serial_Connect_Item, "Connect");
@@ -815,10 +831,10 @@ package body GUI is
       Serial_Disconnect_Item.Set_Sensitive (False);
       Serial_Disconnect_Item.On_Activate (Serial_Disconnect_CB'Access);
 
-      -- Network
+      --  Network
 
       Gtk_New (Menu_Item, "Network");
-      Menu_Bar.Append(Menu_Item);
+      Menu_Bar.Append (Menu_Item);
       Gtk_New (Network_Menu);
       Menu_Item.Set_Submenu (Network_Menu);
       Gtk_New (Net_Connect_Item, "Connect");
@@ -830,10 +846,10 @@ package body GUI is
       Net_Disconnect_Item.Set_Sensitive (False);
       Net_Disconnect_Item.On_Activate (Telnet_Disconnect_CB'Access);
 
-      -- Help
+      --  Help
 
       Gtk_New (Menu_Item, "Help");
-      Menu_Bar.Append(Menu_Item);    
+      Menu_Bar.Append (Menu_Item);
       Gtk_New (Help_Menu);
       Menu_Item.Set_Submenu (Help_Menu);
 
@@ -841,33 +857,32 @@ package body GUI is
       Help_Menu.Append (About_Item);
       About_Item.On_Activate (About_CB'Access);
 
-
       return Menu_Bar;
    end Create_Menu_Bar;
 
---    procedure Local_Print_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
---       pragma Unreferenced (Btn);
---       use Gtk.File_Chooser;   use Gtk.File_Chooser_Dialog;
---       use Gtk.Stock;
---       FC_Dialog : Gtk_File_Chooser_Dialog;
---       Dummy_Button : Gtk_Widget;
---       Unused_Buttons : Message_Dialog_Buttons;
---    begin
---       FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Save Screen Image As...", 
---                                                 Parent => Main_Window,
---                                                 Action => Action_Save);
---       Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);  
---       Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
---       if FC_Dialog.Run = Gtk_Response_OK then
--- NULL;
---       end if; 
---       FC_Dialog.Destroy; 
---    exception
---       when Xmodem.Already_Exists =>
---          FC_Dialog.Destroy; 
---          Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist", 
---                                                           Title => "DasherA - Error");
---    end Local_Print_Btn_CB;
+--     procedure Local_Print_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
+--        pragma Unreferenced (Btn);
+--        use Gtk.File_Chooser;   use Gtk.File_Chooser_Dialog;
+--        use Gtk.Stock;
+--        FC_Dialog : Gtk_File_Chooser_Dialog;
+--        Dummy_Button : Gtk_Widget;
+--        Unused_Buttons : Message_Dialog_Buttons;
+--     begin
+--        FC_Dialog := Gtk_File_Chooser_Dialog_New (Title => "DasherA - Save Screen Image As...",
+--                                                  Parent => Main_Window,
+--                                                  Action => Action_Save);
+--        Dummy_Button := FC_Dialog.Add_Button (Stock_Cancel, Gtk_Response_Cancel);
+--        Dummy_Button := FC_Dialog.Add_Button (Stock_Ok, Gtk_Response_OK);
+--        if FC_Dialog.Run = Gtk_Response_OK then
+--  NULL;
+--        end if;
+--        FC_Dialog.Destroy;
+--     exception
+--        when Xmodem.Already_Exists =>
+--           FC_Dialog.Destroy;
+--           Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "The file must not already exist",
+--                                                            Title => "DasherA - Error");
+--     end Local_Print_Btn_CB;
 
    procedure Handle_Key_Btn_CB (Btn : access Gtk.Button.Gtk_Button_Record'Class) is
       use Redirector;
@@ -883,24 +898,24 @@ package body GUI is
             Log (INFO, "BREAK only implemented for Serial connections");
          end if;
       elsif Lab = "C1" then
-         Keyboard.Handle_Key_Release (GDK_F31);  
+         Keyboard.Handle_Key_Release (GDK_F31);
       elsif Lab = "C2" then
-         Keyboard.Handle_Key_Release (GDK_F32);  
+         Keyboard.Handle_Key_Release (GDK_F32);
       elsif Lab = "C3" then
-         Keyboard.Handle_Key_Release (GDK_F33);  
+         Keyboard.Handle_Key_Release (GDK_F33);
       elsif Lab = "C4" then
-         Keyboard.Handle_Key_Release (GDK_F34);                                    
+         Keyboard.Handle_Key_Release (GDK_F34);
       elsif Lab = "Er.Page" then
          Keyboard.Handle_Key_Release (GDK_3270_EraseEOF);
-      -- elsif Lab = "Loc.Print" then
-      --    Keyboard.Handle_Key_Release (GDK_3270_PrintScreen);  -- TODO Local Print
+      --  elsif Lab = "Loc.Print" then
+      --     Keyboard.Handle_Key_Release (GDK_3270_PrintScreen);  --  TODO Local Print
       elsif Lab = "Er.EOL" then
-         Keyboard.Handle_Key_Release (GDK_3270_EraseInput);   
+         Keyboard.Handle_Key_Release (GDK_3270_EraseInput);
       elsif Lab = "CR" then
          Keyboard.Handle_Key_Release (GDK_KP_Enter);
       elsif Lab = "Hold" then
          Term.Holding := not Term.Holding;
-      end if; 
+      end if;
    end Handle_Key_Btn_CB;
 
    function Create_Keys_Box return Gtk.Box.Gtk_Box is
@@ -909,13 +924,13 @@ package body GUI is
       Break_Btn, Er_Pg_Btn, Er_EOL_Btn, CR_Btn, Hold_Btn : Gtk.Button.Gtk_Button;
       Sep : Gtk.Separator.Gtk_Vseparator;
    begin
-      Gtk.Box.Gtk_New (Keys_Box, Orientation_Horizontal, 1);  
+      Gtk.Box.Gtk_New (Keys_Box, Orientation_Horizontal, 1);
       Keys_Box.Set_Homogeneous (False);
       Gtk.Button.Gtk_New (Break_Btn, "Break");
       Break_Btn.Set_Tooltip_Text ("Send BREAK signal on Serial Connection");
       Break_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Break_Btn);
-      --Break_Btn.Set_Hexpand (True); 
+      --  Break_Btn.Set_Hexpand (True);
 
       Gtk.Separator.Gtk_New_Vseparator (Sep);
       Keys_Box.Add (Sep);
@@ -941,9 +956,9 @@ package body GUI is
       Er_Pg_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
       Keys_Box.Add (Er_Pg_Btn);
 
-      -- Gtk.Button.Gtk_New (Loc_Pr_Btn, "Loc.Print");
-      -- Loc_Pr_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
-      -- Keys_Box.Add (Loc_Pr_Btn);
+      --  Gtk.Button.Gtk_New (Loc_Pr_Btn, "Loc.Print");
+      --  Loc_Pr_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
+      --  Keys_Box.Add (Loc_Pr_Btn);
 
       Gtk.Button.Gtk_New (Er_EOL_Btn, "Er.EOL");
       Er_EOL_Btn.On_Clicked (Handle_Key_Btn_CB'Access);
@@ -993,13 +1008,13 @@ package body GUI is
       elsif Lab = "F13" then
          Keyboard.Handle_Key_Release (GDK_F13);
       elsif Lab = "F14" then
-         Keyboard.Handle_Key_Release (GDK_F14);  
+         Keyboard.Handle_Key_Release (GDK_F14);
       elsif Lab = "F15" then
-         Keyboard.Handle_Key_Release (GDK_F15);                                                                                                                            
+         Keyboard.Handle_Key_Release (GDK_F15);
       end if;
    end Handle_FKey_Btn_CB;
 
-   function Create_Template_Labels_Revealer return Gtk.Revealer.Gtk_Revealer is 
+   function Create_Template_Labels_Revealer return Gtk.Revealer.Gtk_Revealer is
       Template_Rev : Gtk.Revealer.Gtk_Revealer;
       Template_Grid : Gtk.Grid.Gtk_Grid;
       FProvider : constant Gtk.Css_Provider.Gtk_Css_Provider := Gtk.Css_Provider.Gtk_Css_Provider_New;
@@ -1016,18 +1031,18 @@ package body GUI is
       Gtk.Grid.Gtk_New (Template_Grid);
       for row in 1 .. 4 loop
          for col in 1 .. 17 loop
-            Gtk.Label.Gtk_New (Template_Labels(row, col));
-            Template_Labels(row, col).Set_Size_Request (Width => 48, Height => 30);
-            Template_Labels(row, col).Set_Justify (Gtk.Enums.Justify_Center);
-            Template_Grid.Attach (Child => Template_Labels(row, col), Left => Gint(col) - 1, Top => Gint(row) - 1 , Width => 1, Height => 1);
+            Gtk.Label.Gtk_New (Template_Labels (row, col));
+            Template_Labels (row, col).Set_Size_Request (Width => 48, Height => 30);
+            Template_Labels (row, col).Set_Justify (Gtk.Enums.Justify_Center);
+            Template_Grid.Attach (Child => Template_Labels (row, col), Left => Gint (col) - 1, Top => Gint (row) - 1, Width => 1, Height => 1);
          end loop;
       end loop;
-      Template_Labels(1, 6).Set_Markup ("<small><small><b>Ctrl-Shift</b></small></small>");
-      Template_Labels(2, 6).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
-      Template_Labels(3, 6).Set_Markup ("<small><small><b>Shift</b></small></small>");
-      Template_Labels(1, 12).Set_Markup ("<small><small><b>Ctrl-Shift</b></small></small>");
-      Template_Labels(2, 12).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
-      Template_Labels(3, 12).Set_Markup ("<small><small><b>Shift</b></small></small>");
+      Template_Labels (1, 6).Set_Markup ("<small><small><b>Ctrl-Shift</b></small></small>");
+      Template_Labels (2, 6).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
+      Template_Labels (3, 6).Set_Markup ("<small><small><b>Shift</b></small></small>");
+      Template_Labels (1, 12).Set_Markup ("<small><small><b>Ctrl-Shift</b></small></small>");
+      Template_Labels (2, 12).Set_Markup ("<small><small><b>Ctrl</b></small></small>");
+      Template_Labels (3, 12).Set_Markup ("<small><small><b>Shift</b></small></small>");
       Template_Rev.Add (Template_Grid);
       Dummy := FProvider.Load_From_Data (CSS, Error'Access);
       if not Dummy then
@@ -1040,11 +1055,11 @@ package body GUI is
 
    function Create_FKeys_Box return Gtk.Box.Gtk_Box is
       FKeys_Box :  Gtk.Box.Gtk_Box;
-      FKeys : array(1 .. 15) of Gtk.Button.Gtk_Button;
+      FKeys : array (1 .. 15) of Gtk.Button.Gtk_Button;
       Error : aliased Glib.Error.GError;
       FProvider : constant Gtk.Css_Provider.Gtk_Css_Provider := Gtk.Css_Provider.Gtk_Css_Provider_New;
       Dummy    : Boolean;
- 
+
       CSS : constant String :=
        "#FKey_Button {" & ASCII.LF
      & "  color: white;" & ASCII.LF
@@ -1058,7 +1073,7 @@ package body GUI is
      & "}";
 
    begin
-      Gtk.Box.Gtk_New (FKeys_Box, Gtk.Enums.Orientation_Horizontal, 1);  
+      Gtk.Box.Gtk_New (FKeys_Box, Gtk.Enums.Orientation_Horizontal, 1);
       FKeys_Box.Set_Homogeneous (True);
       Dummy := FProvider.Load_From_Data (CSS, Error'Access);
       if not Dummy then
@@ -1068,29 +1083,29 @@ package body GUI is
          declare
             Lab : constant String := N'Image;
          begin
-            Gtk.Button.Gtk_New(FKeys(N), "F" & Ada.Strings.Fixed.Trim (Lab, Ada.Strings.Both));
-            FKeys(N).On_Clicked (Handle_FKey_Btn_CB'Access);
-            FKeys(N).Set_Size_Request (Width => 40, Height => 28);
-            FKeys(N).Set_Name ("FKey_Button");
+            Gtk.Button.Gtk_New (FKeys (N), "F" & Ada.Strings.Fixed.Trim (Lab, Ada.Strings.Both));
+            FKeys (N).On_Clicked (Handle_FKey_Btn_CB'Access);
+            FKeys (N).Set_Size_Request (Width => 40, Height => 28);
+            FKeys (N).Set_Name ("FKey_Button");
          end;
-      end loop; 
-      -- we want labels between the groups of 5 f-key buttons
+      end loop;
+      --  we want labels between the groups of 5 f-key buttons
       for F in 1 .. 5 loop
-         FKeys_Box.Pack_Start (FKeys(F), False, False);
+         FKeys_Box.Pack_Start (FKeys (F), False, False);
       end loop;
       Gtk.Label.Gtk_New (L_FKeys_Label, " ");
       FKeys_Box.Pack_Start (L_FKeys_Label);
       for F in 6 .. 10 loop
-         FKeys_Box.Pack_Start (FKeys(F), False, False);
+         FKeys_Box.Pack_Start (FKeys (F), False, False);
       end loop;
       Gtk.Label.Gtk_New (R_FKeys_Label, " ");
       FKeys_Box.Pack_Start (R_FKeys_Label);
       for F in 11 .. 15 loop
-         FKeys_Box.Pack_Start (FKeys(F), False, False);
+         FKeys_Box.Pack_Start (FKeys (F), False, False);
       end loop;
       Apply_Css (FKeys_Box, +FProvider);
       return FKeys_Box;
-   end Create_FKeys_Box;  
+   end Create_FKeys_Box;
 
    function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Box) return Boolean is
       Dest : Redirector.Connection_T;
@@ -1098,17 +1113,17 @@ package body GUI is
       Redirector.Router.Get_Destination (Dest);
       Gdk.Threads.Enter;
       case Dest is
-         when Redirector.Local =>   
+         when Redirector.Local =>
             Online_Label.Set_Text ("Local");
             Host_Label.Set_Text ("(Disconnected)");
             Net_Connect_Item.Set_Sensitive (True);
             Net_Disconnect_Item.Set_Sensitive (False);
             Serial_Connect_Item.Set_Sensitive (True);
             Serial_Disconnect_Item.Set_Sensitive (False);
-         when Redirector.Async =>   
+         when Redirector.Async =>
             Online_Label.Set_Text ("Online (Serial)");
             Host_Label.Set_Text (To_String (Serial.Port_US));
-         when Redirector.Network => 
+         when Redirector.Network =>
             Online_Label.Set_Text ("Online (Telnet)");
             Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
                                  Ada.Strings.Fixed.Trim (Telnet_Sess.Port_Num'Image, Ada.Strings.Both));
@@ -1133,7 +1148,7 @@ package body GUI is
    end Update_Status_Box_CB;
 
    procedure Adj_Changed_CB (Self : access Gtk.Adjustment.Gtk_Adjustment_Record'Class) is
-      Posn : constant Natural := Natural(Self.Get_Value);
+      Posn : constant Natural := Natural (Self.Get_Value);
    begin
       if Posn = Display_P.History_Lines then
          Display_P.Display.Cancel_Scroll_Back;
@@ -1145,11 +1160,11 @@ package body GUI is
    function Create_Scrollbar return Gtk.Scrollbar.Gtk_Vscrollbar is
       SB  : Gtk.Scrollbar.Gtk_Vscrollbar;
    begin
-      Gtk.Adjustment.Gtk_New (Adjustment => Adj, 
-                              Value => Gdouble(History_Lines), 
-                              Lower => 0.0, 
-                              Upper => Gdouble(History_Lines), 
-                              Step_Increment => 1.0, 
+      Gtk.Adjustment.Gtk_New (Adjustment => Adj,
+                              Value => Gdouble (History_Lines),
+                              Lower => 0.0,
+                              Upper => Gdouble (History_Lines),
+                              Step_Increment => 1.0,
                               Page_Increment => 24.0);
       SB := Gtk.Scrollbar.Gtk_Vscrollbar_New (Adj);
       Adj.On_Value_Changed (Adj_Changed_CB'Access, False);
@@ -1201,33 +1216,33 @@ package body GUI is
       Log (DEBUG, "Starting to Create_Window");
       Trace_Xmodem_Opt := Trace_Xmodem;
 
-      -- Gtk.Window.Initialize (Main_Window);
+      --  Gtk.Window.Initialize (Main_Window);
       Gtk.Window.Gtk_New (Main_Window);
       Log (DEBUG, "New Window Created");
       Main_Window.Set_Title (App_Title);
       Main_Window.On_Destroy (Window_Close_CB'Access);
 
-      -- Everything is in a Grid...
+      --  Everything is in a Grid...
       Gtk.Grid.Gtk_New (Main_Grid);
       Main_Grid.Set_Orientation (Gtk.Enums.Orientation_Vertical);
       Main_Grid.Set_Row_Spacing (2);
 
-      -- Menu
+      --  Menu
       Main_Grid.Add (Create_Menu_Bar);
 
-      -- Virtual Keys, Function Keys and Template
+      --  Virtual Keys, Function Keys and Template
       Main_Grid.Add (Create_Keys_Box);
       Template_Revealer := Create_Template_Labels_Revealer;
       Main_Grid.Add (Template_Revealer);
       Main_Grid.Add (Create_FKeys_Box);
 
-      -- CRT area
+      --  CRT area
       Display_P.Display.Init;
       Term := Terminal.Create (Terminal.D210);
       Crt.Init (Zoom => BDF_Font.Normal);
       Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
       Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-      -- Main_Grid.Add (Crt.Tube.DA);
+      --  Main_Grid.Add (Crt.Tube.DA);
 
       Gtk.Grid.Gtk_New (H_Grid);
       H_Grid.Set_Orientation (Gtk.Enums.Orientation_Horizontal);
@@ -1235,8 +1250,8 @@ package body GUI is
       H_Grid.Add (Crt.Tube.DA);
       H_Grid.Add (Create_Scrollbar);
       Main_Grid.Add (H_Grid);
-      
-      -- Status Bar
+
+      --  Status Bar
       Main_Grid.Add (Create_Status_Box);
 
       Main_Window.Add (Main_Grid);
@@ -1260,26 +1275,26 @@ package body GUI is
 
       if Host_Arg /= Null_Unbounded_String then
          if Count (Host_Arg, ":") /= 1 then
-            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter both Host and Port separated by a colon", 
+            Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "You must enter both Host and Port separated by a colon",
                                                              Title => "DasherA - Error");
          else
             declare
                Colon_Ix : constant Natural := Index (Host_Arg, ":");
                Host_Str : constant String  := Slice (Host_Arg, 1, Colon_Ix - 1);
-               Port_Num : constant Positive := Positive'Value (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
+               Port_Num : constant Positive := Positive'Value (Slice (Host_Arg, Colon_Ix + 1, Length (Host_Arg)));
             begin
-              Telnet_Sess := Telnet.New_Connection (Host_Str, Port_Num);
+               Telnet_Sess := Telnet.New_Connection (Host_Str, Port_Num);
                Redirector.Router.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
                Serial_Connect_Item.Set_Sensitive (False);
                Serial_Disconnect_Item.Set_Sensitive (False);
                Saved_Host := To_Unbounded_String (Host_Str);
-               Saved_Port := To_Unbounded_String (Slice (Host_Arg, Colon_Ix + 1, Length(Host_Arg)));
+               Saved_Port := To_Unbounded_String (Slice (Host_Arg, Colon_Ix + 1, Length (Host_Arg)));
             exception
                when others =>
-                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect to host", 
-                                                                   Title => "DasherA - Error");  
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect to host",
+                                                                   Title => "DasherA - Error");
             end;
          end if;
       end if;
