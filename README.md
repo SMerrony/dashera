@@ -29,28 +29,29 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
   
 Here is the full [Implementation Chart](./Docs/implementationChart.md) for DasherA.
 
-## Download
+## Source
 DasherA is [hosted on GitHub](https://github.com/SMerrony/dashera).
 
 A binary version for 64-bit GNU/Linux *may* be available as part of a release.
 
 ## Build
 
-You will need the Ada compiler chain, and the GtkAda (libgtkada-dev) libraries installed.
-On modern (2022) Debian-based systems the `gnat`, `gprbuild`, and `libgtkada19-dev` packages work just fine.
+Dashera has moved to the [Alire](https://alire.ada.dev/) build system.
 
-* Unpack (or `git clone`) DasherA and `cd` into its directory
-* Create an `obj` directory if it does not already exist
-* Build with `gprbuild`
-
-The default build is with debugging and without optimisation.  Append `-Xmode=release` to the build command for an optimised build.
+Once you have Alire installed you should be able to obtain the latest release of Dashera and install it with just the three commands below...
+```
+alr get dashera
+cd dashera
+alr build
+```
+If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.
 
 ## Run
-`./dashera`
+`.bin/dashera`
 
 Append `-h` to see all options.
 
-You need the DASHER font and icon to be in the same directory as the executable (for now).
+~~~You need the DASHER font and icon to be in the same directory as the xecutable (for now).~~~
 
 ## Operational Notes
 * The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the
