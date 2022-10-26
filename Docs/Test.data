@@ -1,0 +1,10 @@
+Test data for DasherA terminal emulator... (at top of screen)
+ - The BELL may have rung (see the user guide)
+ - Blinking is enabled
+This should blinkThis should not blink
+This should be dimThis should be normal
+This should be in reverse video if you have set D210 modeThis should be normal
+This should be underlinedThis should be normal
+
+
+This should start at position (10,10)
