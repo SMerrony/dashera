@@ -6,7 +6,10 @@ authors = ["Stephen Merrony"]
 maintainers = ["Stephen Merrony <merrony@gmail.com>"]
 maintainers-logins = ["SMerrony"]
 
+tags = ["gtk", "terminal", "dasher", "emulator",]
+
 executables = ["dashera"]
+
 [[depends-on]]
 gtkada = "^21.0.0"
 [[depends-on]]

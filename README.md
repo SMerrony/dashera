@@ -44,14 +44,14 @@ alr get dashera
 cd dashera
 alr build
 ```
-If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.
+N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.  This can take some time when it first happens, subsequent builds will be much faster.
 
 ## Run
 `.bin/dashera`
 
 Append `-h` to see all options.
 
-~~~You need the DASHER font and icon to be in the same directory as the xecutable (for now).~~~
+~~You need the DASHER font and icon to be in the same directory as the xecutable (for now).~~
 
 ## Operational Notes
 * The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the
