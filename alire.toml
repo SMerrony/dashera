@@ -1,6 +1,8 @@
 name = "dashera"
 description = "DASHER Terminal Emulator"
 version = "0.12.0"
+licenses = "MIT"
+website = "https://github.com/SMerrony/dashera"
 
 authors = ["Stephen Merrony"]
 maintainers = ["Stephen Merrony <merrony@gmail.com>"]
