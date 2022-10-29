@@ -6,7 +6,6 @@ It is written in GNU Ada using the GtkAda toolkit and should run on all common p
 ![Screenshot](./Screenshots/DasherA-20220305.png)
 
 
-
 ## Key Features
 
 * DASHER D200 & D210 Emulation
@@ -32,26 +31,28 @@ Here is the full [Implementation Chart](./Docs/implementationChart.md) for Dashe
 ## Source
 DasherA is [hosted on GitHub](https://github.com/SMerrony/dashera).
 
-A binary version for 64-bit GNU/Linux *may* be available as part of a release.
+A binary version for 64-bit Debian-based systems *may* be available as part of a release.
 
 ## Build
 
 Dashera has moved to the [Alire](https://alire.ada.dev/) build system.
 
-Once you have Alire installed you should be able to obtain the latest release of Dashera and install it with just the three commands below...
+[![Alire](https://img.shields.io/endpoint?url=https://alire.ada.dev/badges/dashera.json)](https://alire.ada.dev/crates/dashera.html)
+
+Once you have Alire installed you should be able to obtain the latest release of Dashera and build it with just the three commands below...
 ```
 alr get dashera
 cd dashera
 alr build
 ```
-N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.  This can take some time when it first happens, subsequent builds will be much faster.
+N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.  This can take some time when it first happens, subsequent builds should be much faster.
 
 ## Run
 `.bin/dashera`
 
 Append `-h` to see all options.
 
-~~You need the DASHER font and icon to be in the same directory as the xecutable (for now).~~
+You need the DASHER font and icon to be in the same directory as the executable (for now).
 
 ## Operational Notes
 * The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the

@@ -2,8 +2,7 @@
 
 ## November 2021...
 
-DasherA is an attempt at rewriting DasherG v0.10.0x in Ada using the
-GtkAda toolkit and only Gtk3 elements.
+DasherA is a rewrite of DasherG v0.10.0x in Ada using the GtkAda toolkit and only Gtk3 elements.
 
 The GUI toolkit used for DasherG (go-gtk) now seems to be unmaintained and it is probably a good time to leave Gtk2 behind. 
 
@@ -40,23 +39,17 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 
 ## Build and Clean
 
-Make sure you have all the Ada and GtkAda stuff available.
+Dashera has moved to the [Alire](https://alire.ada.dev/) build system.
 
-On Debian-based systems you can use the `gnat` compiler and the `libgtkada19-dev` (or later) GUI
-toolkit from the standard provided packages.
+[![Alire](https://img.shields.io/endpoint?url=https://alire.ada.dev/badges/dashera.json)](https://alire.ada.dev/crates/dashera.html)
 
-On a Linux dev box where I had installed GtkAda from source, I had to do...
+Once you have Alire installed you should be able to obtain the latest release of Dashera and build it with just the three commands below...
 ```
-GPR_PROJECT_PATH=/usr/local/lib/gnat
-export GPR_PROJECT_PATH
+alr get dashera
+cd dashera
+alr build
 ```
-Create the `obj` directory if it does not exist.
-
-Then...
-* `gprclean`
-* `gprbuild`
-
-Default build is with debugging and without optimisation.  Append `-Xmode=release` for optimised build.
+N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.  This can take some time when it first happens, subsequent builds should be much faster.
 
 ## Run with Fatal Warnings...
 `./dashera --gtk-fatal-warnings --g-fatal--warnings`
@@ -69,7 +62,7 @@ Ensure `ncurses-term` package is installed.
 
 You may have to `stty echo` if no characters appear when you type.
 
-N.B. There are bugs in the termcap database for (all) the DASHER terminals; not many allegedly termcap (ncurses) aware programs actually handle unusual terminal types.  The `htop` program does a fair job of behaving properly - even so, you will see a few glitches over time. Likewise with `iftop`.
+N.B. There are bugs in the termcap database for (all) the DASHER terminals; not many allegedly termcap (ncurses) aware programs actually handle unusual terminal types.  The `htop` program does a fair job of behaving properly - even so, you will see a few glitches over time. Likewise with `iftop`.  The  `nano` editor seems to behave quite well - although you may need to use the function keys to save and exit.
 
 ## Serial Port Test Setup (Linux)
 
