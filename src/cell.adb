@@ -42,6 +42,9 @@ package body Cell is
          Prot  := Protect;
       end Get;
 
+      function Get_Char return Character is
+         (Char_Value);
+
       procedure Clear_To_Space is
       begin
          Char_Value := ' ';

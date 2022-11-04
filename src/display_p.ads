@@ -29,8 +29,8 @@ package Display_P is
    History_Lines : constant Natural := 1000;
 
    type Cell_Array    is array (0 .. Total_Lines - 1, 0 .. Total_Cols - 1) of Cell.Cell_T;
-   type History_Line  is array (0 .. Total_Cols - 1)    of Cell.Cell_T;
-   type History_Array is array (0 .. History_Lines - 1) of History_Line;
+   type History_Array is array (0 .. History_Lines - 1, 0 .. Total_Cols - 1) of Cell.Cell_T;
+   type History_Line  is array (0 .. Total_Cols - 1) of Cell.Cell_T;
 
    type Display_T is record
       Cells : Cell_Array;
@@ -40,7 +40,7 @@ package Display_P is
    end record;
 
    type History_T is record
-      Lines       : History_Array;
+      Cells       : History_Array;
       First, Last : Natural;
    end record;
 
@@ -65,13 +65,12 @@ package Display_P is
       procedure Copy_Line (Src, Dest : Integer);
       procedure Copy_Line_To_History (Src : Integer);
       --  Inserts a line into the circular history buffer
+      function  Get_First_History_Line return Integer;
+      function  Get_Last_History_Line return Integer;
+      function  Get_History_Line (Line : Integer) return String;
 
       procedure Scroll_Up (Lines : Natural);
 
-      function  Is_Scrolled_Back return Boolean;
-      procedure Set_Scrolled_Back (Back : Boolean);
-      procedure Scroll_Back (Start_Line : Natural);
-      procedure Cancel_Scroll_Back;
       function  Get_Visible_Cols  return Positive;
       function  Get_Visible_Lines return Positive;
       procedure Set_Visible_Cols  (Cols  : Positive);
@@ -81,8 +80,6 @@ package Display_P is
    private
       Disp, Saved_Disp   : Display_T;
       History            : History_T;
-      Empty_History_Line : History_Line;
-      Scrolled_Back      : Boolean;
       Dirty              : Boolean;
    end Display;
 

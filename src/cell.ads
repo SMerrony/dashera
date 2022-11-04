@@ -27,6 +27,8 @@ package Cell is
 
       procedure Get (Value : out Character; Blnk, Dm, Rv, Under, Prot : out Boolean);
 
+      function Get_Char return Character;
+
       procedure Clear_To_Space;
 
       procedure Clear_If_Unprotected;
@@ -45,8 +47,6 @@ package Cell is
       Dirty                                : Boolean;
 
    end Cell_T;
-
-   type Cell_Acc_T is access all Cell_T;
 
    procedure Copy (Src : in out Cell_T; Dest : out Cell_T);
 

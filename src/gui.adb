@@ -47,12 +47,14 @@ with Gtk.Menu;                use Gtk.Menu;
 with Gtk.Menu_Bar;            use Gtk.Menu_Bar;
 with Gtk.Message_Dialog;      use Gtk.Message_Dialog;
 with Gtk.Radio_Button;
-with Gtk.Scrollbar;           --  use Gtk.Scrollbar;
+with Gtk.Scrolled_Window;
 with Gtk.Separator;
 with Gtk.Separator_Menu_Item; use Gtk.Separator_Menu_Item;
 with Gtk.Stock;
 with Gtk.Style_Context;
 with Gtk.Style_Provider;
+with Gtk.Text_Buffer;
+with Gtk.Text_View;
 with Gtk.Widget; use Gtk.Widget;
 
 with Gtkada.Dialogs;          use Gtkada.Dialogs;
@@ -62,6 +64,7 @@ with Text_IO.Unbounded_IO;
 
 with BDF_Font;       use BDF_Font;
 with Crt;
+with Dasher_Codes;
 with Display_P;      use Display_P;
 with Keyboard;
 with Logging;        use Logging;
@@ -633,6 +636,55 @@ package body GUI is
       Serial_Disconnect_Item.Set_Sensitive (False);
    end Telnet_Disconnect_CB;
 
+   procedure View_History_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+      use Gtk.Scrolled_Window;
+      use Gtk.Text_Buffer;
+      use Gtk.Text_View;
+      Dialog : Gtk_Dialog;
+      Dlg_Box : Gtk.Box.Gtk_Box;
+      Scrollable : Gtk_Scrolled_Window;
+      View    : Gtk_Text_View;
+      Buffer  : Gtk_Text_Buffer;
+      Close_Unused   : Gtk.Widget.Gtk_Widget;
+      H_First, H_Last, H_Line : Integer;
+   begin
+      Gtk_New (Dialog);
+      Dialog.Set_Modal (True);
+      Dialog.Set_Title (App_Title & " - History");
+      Dialog.Set_Size_Request (800, 800);
+      Dlg_Box := Dialog.Get_Content_Area;
+      Gtk_New (Scrollable);
+      Gtk_New (View);
+      View.Set_Editable (False);
+      View.Set_Monospace (True);
+      Buffer := View.Get_Buffer;
+      Buffer.Set_Text ("   *** Start of History ***");
+      H_First := Display_P.Display.Get_First_History_Line;
+      H_Last := Display_P.Display.Get_Last_History_Line;
+      H_Line := H_First;
+      if H_First > H_Last then
+         while H_Line < Display_P.History_Lines loop
+            Buffer.Insert_At_Cursor (Display_P.Display.Get_History_Line (H_Line) & Dasher_Codes.Dasher_NL);
+            H_Line := H_Line + 1;
+         end loop;
+         H_Line := 0;
+      end if;
+      while H_Line <= H_Last loop
+         Buffer.Insert_At_Cursor (Display_P.Display.Get_History_Line (H_Line) & Dasher_Codes.Dasher_NL);
+         H_Line := H_Line + 1;
+      end loop;
+      Scrollable.Add (View);
+      Dlg_Box.Pack_Start (Child => Scrollable, Expand => True, Padding => 5);
+      Close_Unused := Dialog.Add_Button ("Close", Gtk_Response_Cancel);
+      Dialog.Set_Default_Response (Gtk_Response_Cancel);
+      Dialog.Show_All;
+      if Dialog.Run = Gtk_Response_Cancel then
+         null;
+      end if;
+      Dialog.Destroy;
+   end View_History_CB;
+
    procedure Xmodem_Rx_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
       use Gtk.File_Chooser;   use Gtk.File_Chooser_Dialog;
@@ -715,11 +767,12 @@ package body GUI is
    function Create_Menu_Bar return Gtk.Menu_Bar.Gtk_Menu_Bar is
       Menu_Bar : Gtk.Menu_Bar.Gtk_Menu_Bar;
       Sep_Item : Gtk.Separator_Menu_Item.Gtk_Separator_Menu_Item;
-      File_Menu, Edit_Menu, Emulation_Menu, Serial_Menu, Network_Menu,
-      Help_Menu : Gtk.Menu.Gtk_Menu;
+      File_Menu, Edit_Menu, View_Menu, Emulation_Menu, Serial_Menu,
+      Network_Menu, Help_Menu : Gtk.Menu.Gtk_Menu;
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
       Logging_Item, Expect_Item, Send_File_Item,
-      D200_Item, D210_Item, Self_Test_Item, Load_Template_Item, Resize_Item,
+      History_Item, Resize_Item,
+      D200_Item, D210_Item, Self_Test_Item, Load_Template_Item,
       Quit_Item,
       Paste_Item,
       About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
@@ -783,6 +836,20 @@ package body GUI is
       Edit_Menu.Append (Paste_Item);
       Paste_Item.On_Activate (Paste_CB'Access);
 
+      --  View
+      Gtk_New (Menu_Item, "View");
+      Menu_Bar.Append (Menu_Item);
+      Gtk_New (View_Menu);
+      Menu_Item.Set_Submenu (View_Menu);
+
+      Gtk_New (History_Item, "History");
+      View_Menu.Append (History_Item);
+      History_Item.On_Activate (View_History_CB'Access);
+
+      Gtk_New (Resize_Item, "Resize Terminal");
+      View_Menu.Append (Resize_Item);
+      Resize_Item.On_Activate (Resize_CB'Access);
+
       --  Emulation
 
       Gtk_New (Menu_Item, "Emulation");
@@ -798,10 +865,6 @@ package body GUI is
 
       Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
-
-      Gtk_New (Resize_Item, "Resize");
-      Emulation_Menu.Append (Resize_Item);
-      Resize_Item.On_Activate (Resize_CB'Access);
 
       Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
@@ -1147,30 +1210,6 @@ package body GUI is
       return True;
    end Update_Status_Box_CB;
 
-   procedure Adj_Changed_CB (Self : access Gtk.Adjustment.Gtk_Adjustment_Record'Class) is
-      Posn : constant Natural := Natural (Self.Get_Value);
-   begin
-      if Posn = Display_P.History_Lines then
-         Display_P.Display.Cancel_Scroll_Back;
-      else
-         Display_P.Display.Scroll_Back (Display_P.History_Lines - Posn);
-      end if;
-   end Adj_Changed_CB;
-
-   function Create_Scrollbar return Gtk.Scrollbar.Gtk_Vscrollbar is
-      SB  : Gtk.Scrollbar.Gtk_Vscrollbar;
-   begin
-      Gtk.Adjustment.Gtk_New (Adjustment => Adj,
-                              Value => Gdouble (History_Lines),
-                              Lower => 0.0,
-                              Upper => Gdouble (History_Lines),
-                              Step_Increment => 1.0,
-                              Page_Increment => 24.0);
-      SB := Gtk.Scrollbar.Gtk_Vscrollbar_New (Adj);
-      Adj.On_Value_Changed (Adj_Changed_CB'Access, False);
-      return SB;
-   end Create_Scrollbar;
-
    function Create_Status_Box return Gtk.Box.Gtk_Box is
       Status_Box : Gtk.Box.Gtk_Box;
       Online_Frame, Host_Frame, Logging_Frame, Emul_Frame, Hold_Frame : Gtk.Frame.Gtk_Frame;
@@ -1242,13 +1281,11 @@ package body GUI is
       Crt.Init (Zoom => BDF_Font.Normal);
       Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
       Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-      --  Main_Grid.Add (Crt.Tube.DA);
 
       Gtk.Grid.Gtk_New (H_Grid);
       H_Grid.Set_Orientation (Gtk.Enums.Orientation_Horizontal);
 
       H_Grid.Add (Crt.Tube.DA);
-      H_Grid.Add (Create_Scrollbar);
       Main_Grid.Add (H_Grid);
 
       --  Status Bar

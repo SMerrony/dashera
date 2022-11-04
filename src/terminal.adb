@@ -187,10 +187,6 @@ package body Terminal is
       C : Character;
    begin
 
-      if Display.Is_Scrolled_Back then
-         Display.Cancel_Scroll_Back;
-      end if;
-
       for Ix in Str'Range loop
          B := Str (Ix);
          B_Int := Character'Pos (B);

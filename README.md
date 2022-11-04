@@ -19,7 +19,7 @@ no/odd/even parity, 1 or 2 stop bits (defaults to DG-standard: 9600, 8, n, 1)
 * 15 (plus Ctrl & Shift) DASHER Function keys, Erase Page, Erase EOL, Hold, and Break keys
 * C1, C2, C3 and C4 DASHER Custom keys (plus shifted versions)
 * Loadable function-key templates (BROWSE, SED and SMI provided as examples)
-* 1000-line scrollable terminal history
+* 1000-line terminal history
 * Session logging to file
 * Various terminal widths, heights and zoom-levels available
 * Support for mini-Expect scripts to automate some tasks [see Wiki](https://github.com/SMerrony/DasherG/wiki/DasherG-Mini-Expect-Scripts)

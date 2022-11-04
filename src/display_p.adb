@@ -47,15 +47,14 @@ package body Display_P is
          Disp.Blink_Enabled := True;
          History.First := 0;
          History.Last  := 0;
-         for C in Empty_History_Line'Range loop
-            Empty_History_Line (C).Clear_To_Space;
-         end loop;
-         for HL in History.Lines'Range loop
+         --  for C in Empty_History_Line'Range loop
+         --     Empty_History_Line (C).Clear_To_Space;
+         --  end loop;
+         for Line in 0 .. History_Lines - 1 loop
             for Col in 0 .. Total_Cols - 1 loop
-               History.Lines (HL)(Col).Clear_To_Space;
+               History.Cells (Line, Col).Clear_To_Space;
             end loop;
          end loop;
-         Set_Scrolled_Back (False);
       end Init;
 
       procedure Copy (Src : in out Display_T; Dest : out Display_T) is
@@ -144,33 +143,29 @@ package body Display_P is
             end if;
          end if;
 
-         for C in History.Lines (History.Last)'Range loop
-            Cell.Copy (Src => Disp.Cells (Src, C), Dest => History.Lines (History.Last)(C));
+         for C in 0 .. Total_Cols - 1 loop
+            Cell.Copy (Src => Disp.Cells (Src, C), Dest => History.Cells (History.Last, C));
          end loop;
       end Copy_Line_To_History;
 
-      procedure Copy_Line_From_History (Src, Dest : Natural) is
-         HL : History_Line;
-         Ix : Integer;
-      begin
-         if History.First = History.Last then --  no history yet
-            for C in Empty_History_Line'Range loop
-               Cell.Copy (Src => Empty_History_Line (C), Dest => HL (C));
-            end loop;
-         else
-            Ix := History.Last - Src;
-            if Ix < 0 then
-               Ix := Ix + History_Lines;
-            end if;
-            for C in History.Lines (Ix)'Range loop
-               Cell.Copy (Src => History.Lines (Ix)(C), Dest => HL (C));
-            end loop;
-         end if;
+      function Get_First_History_Line return Integer is
+         (History.First);
+      function Get_Last_History_Line return Integer is
+         (History.Last);
 
-         for Col in 0 .. Total_Cols - 1 loop
-            Cell.Copy (Src => HL (Col), Dest => Disp.Cells (Dest, Col));
+      function  Get_History_Line (Line : Integer) return String is
+         Result : String (1 .. Disp.Visible_Cols);
+         --  Char : Character;
+         --  Blnk, Dm, Rv, Under, Prot : Boolean;
+         --  Tmp_Cell : Cell.Cell_T;
+      begin
+         for C in 0 .. Disp.Visible_Cols - 1 loop
+            Result (C + 1) := History.Cells (Line, C).Get_Char;
+            --  History.Cells (L, C).Get (Value => Char, Blnk => Blnk, Dm => Dm, Rv => Rv, Under => Under, Prot => Prot);
          end loop;
-      end Copy_Line_From_History;
+
+         return Result;
+      end Get_History_Line;
 
       procedure Scroll_Up (Lines : Natural) is
       begin
@@ -183,52 +178,6 @@ package body Display_P is
             Clear_Line (Disp.Visible_Lines - 1);
          end loop;
       end Scroll_Up;
-
-      function Is_Scrolled_Back return Boolean is
-         (Scrolled_Back);
-
-      procedure Set_Scrolled_Back (Back : Boolean) is
-      begin
-         Scrolled_Back := Back;
-      end Set_Scrolled_Back;
-
-      procedure Scroll_Back (Start_Line : Natural) is
-      begin
-         if not Scrolled_Back then
-            Copy (Src => Disp, Dest => Saved_Disp);
-            Scrolled_Back := True;
-         end if;
-         --  there are two cases: we are already scrolled back beyond the 'live' screen,
-         --  or we are partially showing it
-         if Start_Line < Disp.Visible_Lines then
-            declare
-               On_Screen_Line, Live_Line : Natural := 0;
-            begin
-               for HL in reverse 0 .. Start_Line loop
-                  Copy_Line_From_History (HL, On_Screen_Line);
-                  On_Screen_Line := On_Screen_Line + 1;
-               end loop;
-               while On_Screen_Line < Disp.Visible_Lines loop
-                  Copy_Line_From_History (Live_Line, On_Screen_Line);
-                  Live_Line := Live_Line + 1;
-                  On_Screen_Line := On_Screen_Line + 1;
-               end loop;
-            end;
-         else
-            --  all 'history' - easier
-            for L in 0 .. Disp.Visible_Lines loop
-               Copy_Line_From_History (Start_Line - L, L);
-            end loop;
-         end if;
-         Set_Dirty;
-      end Scroll_Back;
-
-      procedure Cancel_Scroll_Back is
-      begin
-         Copy (Src => Saved_Disp, Dest => Disp);
-         Scrolled_Back := False;
-         Set_Dirty;
-      end Cancel_Scroll_Back;
 
    end Display;
 
