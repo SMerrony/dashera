@@ -47,6 +47,7 @@ procedure Dashera is
       Ada.Text_IO.Put_Line ("Usage of dashera:");
       Ada.Text_IO.Put_Line ("  -amber            Use an amber font instead of green");
       Ada.Text_IO.Put_Line ("  -debug            Print debugging information on STDOUT");
+      Ada.Text_IO.Put_Line ("  -h or -help       Print this help");
       Ada.Text_IO.Put_Line ("  -host <host:port> Host to connect with via Telnet");
       Ada.Text_IO.Put_Line ("  -tracescript      Print trace of Mini-Expect script on STDOUT");
       Ada.Text_IO.Put_Line ("  -tracexmodem      Show details of XMODEM file transfers on STDOUT");

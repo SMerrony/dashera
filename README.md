@@ -50,11 +50,11 @@ N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then
 ## Run
 `.bin/dashera`
 
-Append `-h` to see all options available.
 ```
 Usage of dashera:
   -amber            Use an amber font instead of green
   -debug            Print debugging information on STDOUT
+  -h or -help       Print this help
   -host <host:port> Host to connect with via Telnet
   -tracescript      Print trace of Mini-Expect script on STDOUT
   -tracexmodem      Show details of XMODEM file transfers on STDOUT
