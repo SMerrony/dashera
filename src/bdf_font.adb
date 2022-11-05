@@ -52,7 +52,6 @@ package body BDF_Font is
          End_Pos := End_Pos + 1;
       end loop;
       X_Offset := Integer'Value (Font_Line (Start_Pos .. End_Pos - 1));
-
       Start_Pos := End_Pos + 1;
       End_Pos   := Font_Line_Length;
       Y_Offset  := Integer'Value (Font_Line (Start_Pos .. End_Pos));
@@ -61,14 +60,16 @@ package body BDF_Font is
 
    protected body Font is
 
-      procedure Load_Font (File_Name : String; Zoom : Zoom_T) is
+      procedure Load_Font (File_Name : String;
+                           Zoom : Zoom_T;
+                           Font_Colour : Font_Colour_T) is
          --  Font                                              : aliased Decoded_Acc_T := new Decoded_T;
          Char_Count                                        : Positive;
          Font_File                                         : File_Type;
          Font_Line                                         : String (1 .. 80);
          Font_Line_Length                                  : Natural;
          Tmp_Pix_Buf, Tmp_Dim_Pix_Buf, Tmp_Reverse_Pix_Buf,
-         Green_Pix_Buf, Dim_Pix_Buf, Black_Pix_Buf         : Gdk_Pixbuf;
+         Normal_Pix_Buf, Dim_Pix_Buf, Black_Pix_Buf        : Gdk_Pixbuf;
          ASCII_Code                                        : Natural;
          Pix_Width, Pix_Height                             : Integer;
          X_Offset, Y_Offset                                : Integer;
@@ -120,11 +121,20 @@ package body BDF_Font is
          Tmp_Dim_Pix_Buf     := Gdk_New (Width => Font_Width, Height => Font_Height);
          Tmp_Reverse_Pix_Buf := Gdk_New (Width => Font_Width, Height => Font_Height);
 
-         Green_Pix_Buf := Gdk_New (Width => 1, Height => 1);
-         Fill (Green_Pix_Buf, 16#00ff00ff#);
+         Normal_Pix_Buf := Gdk_New (Width => 1, Height => 1);
          Dim_Pix_Buf := Gdk_New (Width => 1, Height => 1);
-         Fill (Dim_Pix_Buf, 16#008800ff#);
          Black_Pix_Buf := Gdk_New (Width => 1, Height => 1);
+         case Font_Colour is
+            when Green =>
+               Fill (Normal_Pix_Buf, 16#00ff00ff#);
+               Fill (Dim_Pix_Buf, 16#008800ff#);
+            when White =>
+               Fill (Normal_Pix_Buf, 16#ffffffff#);
+               Fill (Dim_Pix_Buf, 16#888888ff#);
+            when Amber =>
+               Fill (Normal_Pix_Buf, 16#ffbf00ff#);
+               Fill (Dim_Pix_Buf, 16#885f00ff#);
+         end case;
          Fill (Black_Pix_Buf, 16#000000ff#);
 
          for CC in 0 .. Char_Count - 1 loop
@@ -155,7 +165,12 @@ package body BDF_Font is
          --  load the actual bitmap for this char a row at a time from the top down
             Fill (Tmp_Pix_Buf, 0);
             Fill (Tmp_Dim_Pix_Buf, 0);
-            Fill (Tmp_Reverse_Pix_Buf, 16#00FF_0000#);
+            case Font_Colour is
+               when Green => Fill (Tmp_Reverse_Pix_Buf, 16#00ff00ff#);
+               when White => Fill (Tmp_Reverse_Pix_Buf, 16#ffffffff#);
+               when Amber => Fill (Tmp_Reverse_Pix_Buf, 16#ffbf00ff#);
+            end case;
+
             for Bitmap_Line in 0 .. Pix_Height - 1 loop
                Get_Line (Font_File, Font_Line, Font_Line_Length);
                Line_Byte := Unsigned_8'Value ("16#" & Font_Line (1 .. 2) & "#");
@@ -163,7 +178,7 @@ package body BDF_Font is
                   if (Line_Byte and 16#80#) /= 0 then
                      X := Gint (X_Offset + I);
                      Y := Gint (Bitmap_Line + 12 - Pix_Height - Y_Offset);
-                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Green_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1,
+                     Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Normal_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1,
                                           Dest_Pixbuf => Tmp_Pix_Buf, Dest_X => X, Dest_Y => Y);
                      Gdk.Pixbuf.Copy_Area (Src_Pixbuf => Dim_Pix_Buf, Src_X => 0, Src_Y => 0, Width => 1, Height => 1,
                                           Dest_Pixbuf => Tmp_Dim_Pix_Buf, Dest_X => X, Dest_Y => Y);

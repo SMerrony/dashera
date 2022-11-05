@@ -37,6 +37,7 @@ package Crt is
    type Crt_T is record
       DA         : Gtk.Drawing_Area.Gtk_Drawing_Area;
       Zoom       : BDF_Font.Zoom_T;
+      Saved_Font_Colour : BDF_Font.Font_Colour_T;
       Blink_State : Boolean;
       --  Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
@@ -45,7 +46,7 @@ package Crt is
    surface : Cairo.Cairo_Surface;
    Blink_TO, Redraw_TO : Glib.Main.G_Source_Id;
 
-   procedure Init (Zoom : BDF_Font.Zoom_T);
+   procedure Init (Zoom : BDF_Font.Zoom_T; Font_Colour : BDF_Font.Font_Colour_T);
 
    function Configure_Event_CB
      (Self  : access Gtk.Widget.Gtk_Widget_Record'Class;

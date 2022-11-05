@@ -244,7 +244,7 @@ package body GUI is
                New_Zoom := Tiny;
             end if;
             if New_Zoom /= Crt.Tube.Zoom then
-               Font.Load_Font (Crt.Font_Filename, New_Zoom);
+               Font.Load_Font (Crt.Font_Filename, New_Zoom, Saved_Font_Colour);
                Crt.Tube.Zoom := New_Zoom;
             end if;
             --  resize
@@ -1247,6 +1247,7 @@ package body GUI is
    end Create_Status_Box;
 
    function Create_Window (Host_Arg     : Unbounded_String;
+                           Font_Colour  : BDF_Font.Font_Colour_T;
                            Trace_Xmodem : Boolean) return Gtk.Window.Gtk_Window is
       H_Grid : Gtk.Grid.Gtk_Grid;
       Error : aliased Glib.Error.GError;
@@ -1254,6 +1255,7 @@ package body GUI is
    begin
       Log (DEBUG, "Starting to Create_Window");
       Trace_Xmodem_Opt := Trace_Xmodem;
+      Saved_Font_Colour := Font_Colour;
 
       --  Gtk.Window.Initialize (Main_Window);
       Gtk.Window.Gtk_New (Main_Window);
@@ -1278,7 +1280,7 @@ package body GUI is
       --  CRT area
       Display_P.Display.Init;
       Term := Terminal.Create (Terminal.D210);
-      Crt.Init (Zoom => BDF_Font.Normal);
+      Crt.Init (BDF_Font.Normal, Font_Colour);
       Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
       Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
 

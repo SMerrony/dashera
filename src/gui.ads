@@ -35,6 +35,7 @@ with Gtk.Window;              use Gtk.Window;
 
 with Resources;
 
+with BDF_Font;
 with Telnet;
 with Terminal;
 
@@ -68,6 +69,8 @@ package GUI is
    Saved_Host,
    Saved_Port  : Unbounded_String := Null_Unbounded_String;
 
+   Saved_Font_Colour  : BDF_Font.Font_Colour_T;
+
    --  Menu items for which we need access...
    Net_Connect_Item, Net_Disconnect_Item,
    Xmodem_Rx_Item, Xmodem_Send_Item, Xmodem_Send1k_Item,
@@ -82,6 +85,7 @@ package GUI is
    Trace_Script_Opt, Trace_Xmodem_Opt : Boolean;
 
    function Create_Window (Host_Arg     : Unbounded_String;
+                           Font_Colour  : BDF_Font.Font_Colour_T;
                            Trace_Xmodem : Boolean) return Gtk_Window;
 
 end GUI;

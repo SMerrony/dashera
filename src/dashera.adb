@@ -27,6 +27,7 @@ with Gdk.Threads;
 with Gtk.Main;
 with Gtk.Window;  use Gtk.Window;
 
+with BDF_Font;
 with GUI;
 with Logging; use Logging;
 
@@ -37,17 +38,20 @@ procedure Dashera is
 
    --  program args etc.
    Arg_Ix : Natural := 1;
+   Font_Colour : BDF_Font.Font_Colour_T := BDF_Font.Green;
    Host_Arg : Unbounded_String := Null_Unbounded_String;
    Trace_Xmodem : Boolean := False;
 
    procedure Print_Help is
    begin
       Ada.Text_IO.Put_Line ("Usage of dashera:");
-      Ada.Text_IO.Put_Line ("  -host <host:port> Host to connect with via Telnet");
+      Ada.Text_IO.Put_Line ("  -amber            Use an amber font instead of green");
       Ada.Text_IO.Put_Line ("  -debug            Print debugging information on STDOUT");
+      Ada.Text_IO.Put_Line ("  -host <host:port> Host to connect with via Telnet");
       Ada.Text_IO.Put_Line ("  -tracescript      Print trace of Mini-Expect script on STDOUT");
       Ada.Text_IO.Put_Line ("  -tracexmodem      Show details of XMODEM file transfers on STDOUT");
-      Ada.Text_IO.Put_Line ("  -version          show the version number of dashera and exit");
+      Ada.Text_IO.Put_Line ("  -version          Show the version number of dashera and exit");
+      Ada.Text_IO.Put_Line ("  -white            Use a white font instead of green");
    end Print_Help;
 
 begin
@@ -65,6 +69,10 @@ begin
          Set_Level (TRACE);
       elsif Argument (Arg_Ix) = "-tracexmodem" then
          Trace_Xmodem := True;
+      elsif Argument (Arg_Ix) = "-amber" then
+         Font_Colour := BDF_Font.Amber;  
+      elsif Argument (Arg_Ix) = "-white" then
+         Font_Colour := BDF_Font.White;    
       elsif Argument (Arg_Ix) = "-h" or else Argument (Arg_Ix) = "-help" then
          Print_Help;
          GNAT.OS_Lib.OS_Exit (0);
@@ -77,7 +85,7 @@ begin
    Gtk.Main.Init;
    Log (DEBUG, "Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
-   Main_Window := GUI.Create_Window (Host_Arg, Trace_Xmodem);
+   Main_Window := GUI.Create_Window (Host_Arg, Font_Colour, Trace_Xmodem);
    Main_Window.Show_All;
    Gtk.Main.Main;
    Gdk.Threads.Leave;

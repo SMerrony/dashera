@@ -49,8 +49,12 @@ package BDF_Font is
       Char_Width, Char_Height : Gint;
    end record;
 
+   type Font_Colour_T is (Green, White, Amber);
+
    protected Font is
-      procedure Load_Font (File_Name : String; Zoom : Zoom_T);
+      procedure Load_Font (File_Name : String;
+                           Zoom : Zoom_T;
+                           Font_Colour : Font_Colour_T);
 
       function Get_Char_Width  return Gint;
       function Get_Char_Height return Gint;

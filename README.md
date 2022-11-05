@@ -50,8 +50,17 @@ N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then
 ## Run
 `.bin/dashera`
 
-Append `-h` to see all options.
-
+Append `-h` to see all options available.
+```
+Usage of dashera:
+  -amber            Use an amber font instead of green
+  -debug            Print debugging information on STDOUT
+  -host <host:port> Host to connect with via Telnet
+  -tracescript      Print trace of Mini-Expect script on STDOUT
+  -tracexmodem      Show details of XMODEM file transfers on STDOUT
+  -version          Show the version number of dashera and exit
+  -white            Use a white font instead of green
+```
 You need the DASHER font and icon to be in the same directory as the executable (for now).
 
 ## Operational Notes
