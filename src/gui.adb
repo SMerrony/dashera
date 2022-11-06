@@ -417,9 +417,7 @@ package body GUI is
          declare
             Text : constant String := String (Wait_For_Text (Clipboard));
          begin
-            for C of Text loop
-               Redirector.Router.Handle_Data (C);
-            end loop;
+            Redirector.Router.Send_Data (Text);
          end;
       else
          Unused_Buttons := Message_Dialog (Msg => "Nothing in Clipboard to Paste",
