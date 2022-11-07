@@ -37,6 +37,11 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 * Xmodem.Receiver (transient)
 * Xmodem.Sender (transient)
 
+### Embedded Resources
+
+The embedded font and icon were generated with this command, run from the top-level dir...
+`are --lang=Ada -o src --resource=Embedded --name-access --fileset='**/*.*' share/dashera`
+
 ## Build and Clean
 
 Dashera has moved to the [Alire](https://alire.ada.dev/) build system.

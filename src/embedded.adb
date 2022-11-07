@@ -31,7 +31,7 @@ package body Embedded is
       return (Natural (G (F1)) + Natural (G (F2))) mod 2;
    end Hash;
 
-   C_0 : aliased constant System.Storage_Elements.Storage_Array :=
+   C_0 : aliased constant Ada.Streams.Stream_Element_Array :=
      (83, 84, 65, 82, 84, 70, 79, 78, 84, 32, 50, 46, 49, 10, 70, 79, 78, 84, 32, 45, 70,
       111, 110, 116, 70, 111, 114, 103, 101, 45, 68, 97, 115, 104, 101, 114, 45, 77, 101, 100, 105,
       117, 109, 45, 82, 45, 78, 111, 114, 109, 97, 108, 45, 45, 49, 50, 45, 49, 50, 48, 45,
@@ -563,7 +563,7 @@ package body Embedded is
       65, 65, 10, 53, 52, 10, 65, 65, 10, 69, 78, 68, 67, 72, 65, 82, 10, 69, 78, 68,
       70, 79, 78, 84, 10);
 
-   C_1 : aliased constant System.Storage_Elements.Storage_Array :=
+   C_1 : aliased constant Ada.Streams.Stream_Element_Array :=
      (0, 0, 1, 0, 10, 0, 0, 0, 0, 0, 1, 0, 32, 0, 71, 31, 0, 0, 166, 0, 0,
       0, 48, 48, 2, 0, 1, 0, 1, 0, 48, 3, 0, 0, 237, 31, 0, 0, 32, 32, 2,
       0, 1, 0, 1, 0, 48, 1, 0, 0, 29, 35, 0, 0, 16, 16, 2, 0, 1, 0, 1,
@@ -1855,15 +1855,23 @@ package body Embedded is
       0, 0, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0,
       128, 255, 0, 0, 128, 255, 0, 0, 192, 255, 0, 0, 240, 255, 0, 0);
 
+   type Name_Array is array (Natural range <>) of Name_Access;
 
-   type Content_List_Array is array (Natural range <>) of access constant System.Storage_Elements.Storage_Array;
+
+   K_0             : aliased constant String := "D410-b-12.bdf";
+   K_1             : aliased constant String := "DGlogoOrange.ico";
+
+   Names : constant Name_Array := (
+      K_0'Access, K_1'Access);
+
+   type Content_List_Array is array (Natural range <>) of Content_Type;
    Contents : constant Content_List_Array := (
-      C_0'Access, C_1'Access);
+      (K_0'Access, C_0'Access, 1642326716, FILE_RAW), (K_1'Access, C_1'Access, 1642326716, FILE_RAW));
 
-   function Get_Content (Name : String) return access constant System.Storage_Elements.Storage_Array is
+   function Get_Content (Name : String) return Content_Type is
       H : constant Natural := Hash (Name);
    begin
-      return (if Names (H).all = Name then Contents (H) else null);
+      return (if Names (H).all = Name then Contents (H) else Null_Content);
    end Get_Content;
 
 end Embedded;

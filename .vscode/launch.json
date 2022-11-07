@@ -5,7 +5,7 @@
          "name": "(gdb) Launch",
          "type": "cppdbg",
          "request": "launch",
-         "program": "${workspaceFolder}/dashera",
+         "program": "${workspaceFolder}/bin/dashera",
          "args": [],
          "stopAtEntry": false,
          "cwd": "${workspaceFolder}",

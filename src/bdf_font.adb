@@ -17,9 +17,10 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Streams; use Ada.Streams;
 with Interfaces;  use Interfaces;
 
+with Embedded;
 with Logging;     use Logging;
 
 package body BDF_Font is
@@ -63,10 +64,12 @@ package body BDF_Font is
       procedure Load_Font (File_Name : String;
                            Zoom : Zoom_T;
                            Font_Colour : Font_Colour_T) is
-         --  Font                                              : aliased Decoded_Acc_T := new Decoded_T;
-         Char_Count                                        : Positive;
-         Font_File                                         : File_Type;
-         Font_Line                                         : String (1 .. 80);
+         --  Font   : aliased Decoded_Acc_T := new Decoded_T;
+         Char_Count : Positive;
+         Font_Emb   : constant Embedded.Content_Type := Embedded.Get_Content (File_Name);
+         Font_Blob  : Stream_Element_Array (1 .. 16000);
+         Font_Blob_Ix : Ada.Streams.Stream_Element_Offset := 1;
+         Font_Line  : String (1 .. 132);
          Font_Line_Length                                  : Natural;
          Tmp_Pix_Buf, Tmp_Dim_Pix_Buf, Tmp_Reverse_Pix_Buf,
          Normal_Pix_Buf, Dim_Pix_Buf, Black_Pix_Buf        : Gdk_Pixbuf;
@@ -75,7 +78,28 @@ package body BDF_Font is
          X_Offset, Y_Offset                                : Integer;
          X, Y                                              : Gint;
          Line_Byte                                         : Unsigned_8;
+
+         procedure Get_Font_Line (Line : in out String; Last : out Natural) is
+            Char        : Character;
+         begin
+            Last := 1;
+            loop
+               Char := Character'Val (Font_Blob (Font_Blob_Ix));
+               Font_Blob_Ix := Font_Blob_Ix + 1;
+               exit when Char = Character'Val (10);
+               Line (Last) := Char;
+               Last := Last + 1;
+            end loop;
+            Last := Last - 1;
+         end Get_Font_Line;
+
       begin
+         for Val of Font_Emb.Content.all loop
+            Font_Blob (Font_Blob_Ix) := Val;
+            Font_Blob_Ix := Font_Blob_Ix + 1;
+         end loop;
+         Font_Blob_Ix := 1;
+
          case Zoom is
             when Large =>
                Decoded.Char_Width  := 10;
@@ -91,25 +115,17 @@ package body BDF_Font is
                Decoded.Char_Height := 10;
          end case;
 
-         begin
-            Open (File => Font_File, Mode => In_File, Name => Dashera_Resources.Resource_Path & "/" & File_Name);
-
-         exception
-            when others =>
-               raise OPEN_FAILURE with "ERROR: Cannot open the file '" & Dashera_Resources.Resource_Path & "/" & File_Name &
-                  "'. Does it exist?";
-         end;
-
          for C of Decoded.Font loop
             C.Loaded := False;
          end loop;
 
          loop
-            Get_Line (Font_File, Font_Line, Font_Line_Length);
+            --  Get_Font_Line (Font_Line, Font_Line_Length);
+            Get_Font_Line (Font_Line, Font_Line_Length);
             --  Log (DEBUG, "" & Font_Line (1 .. Font_Line_Length));
             exit when Font_Line (1 .. Font_Line_Length) = "ENDPROPERTIES";
          end loop;
-         Get_Line (Font_File, Font_Line, Font_Line_Length);
+         Get_Font_Line (Font_Line, Font_Line_Length);
          if Font_Line (1 .. 5) /= "CHARS" then
             raise BDF_DECODE with "ERROR: BDF_Font - CHARS line not found";
          end if;
@@ -141,11 +157,11 @@ package body BDF_Font is
             Log (DEBUG, "Loading char No. " & Integer'Image (CC));
 
             loop
-               Get_Line (Font_File, Font_Line, Font_Line_Length);
+               Get_Font_Line (Font_Line, Font_Line_Length);
                exit when Font_Line (1 .. 9) = "STARTCHAR";
             end loop;
 
-            Get_Line (Font_File, Font_Line, Font_Line_Length);
+            Get_Font_Line (Font_Line, Font_Line_Length);
             if Font_Line (1 .. 8) /= "ENCODING" then
                raise BDF_DECODE with "ERROR: BDF_Font - ENCODING line not found";
             end if;
@@ -153,14 +169,14 @@ package body BDF_Font is
             Log (DEBUG, "... ASCII Code: " & ASCII_Code'Image);
 
             --  skip 2 lines
-            Get_Line (Font_File, Font_Line, Font_Line_Length);
-            Get_Line (Font_File, Font_Line, Font_Line_Length);
+            Get_Font_Line (Font_Line, Font_Line_Length);
+            Get_Font_Line (Font_Line, Font_Line_Length);
 
-            Get_Line (Font_File, Font_Line, Font_Line_Length);
+            Get_Font_Line (Font_Line, Font_Line_Length);
             Parse_BBX (Font_Line, Font_Line_Length, Pix_Width, Pix_Height, X_Offset, Y_Offset);
 
             --  skip the BITMAP line
-            Get_Line (Font_File, Font_Line, Font_Line_Length);
+            Get_Font_Line (Font_Line, Font_Line_Length);
 
          --  load the actual bitmap for this char a row at a time from the top down
             Fill (Tmp_Pix_Buf, 0);
@@ -172,7 +188,7 @@ package body BDF_Font is
             end case;
 
             for Bitmap_Line in 0 .. Pix_Height - 1 loop
-               Get_Line (Font_File, Font_Line, Font_Line_Length);
+               Get_Font_Line (Font_Line, Font_Line_Length);
                Line_Byte := Unsigned_8'Value ("16#" & Font_Line (1 .. 2) & "#");
                for I in 0 .. Pix_Width - 1 loop
                   if (Line_Byte and 16#80#) /= 0 then
@@ -205,8 +221,6 @@ package body BDF_Font is
             Decoded.Font (ASCII_Code).Loaded  := True;
 
          end loop;
-
-         Close (File => Font_File);
 
       end Load_Font;
 

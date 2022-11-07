@@ -1,25 +1,29 @@
 --  Advanced Resource Embedder 1.2.0
-with System.Storage_Elements;
+with Ada.Streams;
+with Interfaces.C;
 package Embedded is
 
-   type Content_Access is access constant System.Storage_Elements.Storage_Array;
+   type Content_Access is access constant Ada.Streams.Stream_Element_Array;
 
    type Name_Access is access constant String;
 
-   type Name_Array is array (Natural range <>) of Name_Access;
+   type Format_Type is (FILE_RAW, FILE_GZIP);
 
-   Names : constant Name_Array;
+   type Content_Type is record
+      Name    : Name_Access;
+      Content : Content_Access;
+      Modtime : Interfaces.C.long := 0;
+      Format  : Format_Type := FILE_RAW;
+   end record;
+
+   Null_Content : constant Content_Type;
 
    --  Returns the data stream with the given name or null.
    function Get_Content (Name : String) return
-      access constant System.Storage_Elements.Storage_Array;
+      Content_Type;
 
 private
 
+   Null_Content : constant Content_Type := (others => <>);
 
-   K_0             : aliased constant String := "D410-b-12.bdf";
-   K_1             : aliased constant String := "DGlogoOrange.ico";
-
-   Names : constant Name_Array := (
-      K_0'Access, K_1'Access);
 end Embedded;
