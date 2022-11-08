@@ -20,11 +20,7 @@
 with Gdk.Pixbuf; use Gdk.Pixbuf;
 with Glib;       use Glib;
 
-with Resources;
-
 package BDF_Font is
-
-   package Dashera_Resources is new Resources ("dashera");
 
    Max_Chars : constant Positive := 128;
    BPP       : constant Positive := 8;

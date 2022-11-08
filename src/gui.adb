@@ -17,6 +17,8 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
+with Ada.Directories;
+with Ada.Sequential_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
@@ -60,12 +62,15 @@ with Gtk.Widget; use Gtk.Widget;
 with Gtkada.Dialogs;          use Gtkada.Dialogs;
 with Gtkada.File_Selection;
 
+with Interfaces;
+
 with Text_IO.Unbounded_IO;
 
 with BDF_Font;       use BDF_Font;
 with Crt;
 with Dasher_Codes;
 with Display_P;      use Display_P;
+with Embedded;
 with Keyboard;
 with Logging;        use Logging;
 with Mini_Expect;
@@ -1244,11 +1249,33 @@ package body GUI is
       return Status_Box;
    end Create_Status_Box;
 
+   function Create_Icon_Pixbuf return Gdk.Pixbuf.Gdk_Pixbuf is
+      IP :  Gdk.Pixbuf.Gdk_Pixbuf;
+      Icon_Emb : constant Embedded.Content_Type := Embedded.Get_Content (App_Icon);
+      package IO is new Ada.Sequential_IO (Interfaces.Unsigned_8);
+      Tmp_Filename : constant String := "DasherA_Icon.tmp";
+      Tmp_File : IO.File_Type;
+      Error : aliased Glib.Error.GError;
+   begin
+      if Ada.Directories.Exists (Tmp_Filename) then
+         Ada.Directories.Delete_File (Tmp_Filename);
+      end if;
+      IO.Create (File => Tmp_File, Name => Tmp_Filename);
+      for Val of Icon_Emb.Content.all loop
+         IO.Write (Tmp_File, Interfaces.Unsigned_8 (Val));
+      end loop;
+      IO.Close (Tmp_File);
+      Gdk.Pixbuf.Gdk_New_From_File (Pixbuf => IP, Filename => Tmp_Filename, Error => Error);
+      if Error /= null then
+         Log (WARNING, "Could not find/load icon file: DasherA_Icon.tmp");
+      end if;
+      Ada.Directories.Delete_File (Tmp_Filename);
+      return IP;
+   end Create_Icon_Pixbuf;
+
    function Create_Window (Host_Arg     : Unbounded_String;
                            Font_Colour  : BDF_Font.Font_Colour_T;
                            Trace_Xmodem : Boolean) return Gtk.Window.Gtk_Window is
-      H_Grid : Gtk.Grid.Gtk_Grid;
-      Error : aliased Glib.Error.GError;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Log (DEBUG, "Starting to Create_Window");
@@ -1281,12 +1308,7 @@ package body GUI is
       Crt.Init (BDF_Font.Normal, Font_Colour);
       Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
       Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-
-      Gtk.Grid.Gtk_New (H_Grid);
-      H_Grid.Set_Orientation (Gtk.Enums.Orientation_Horizontal);
-
-      H_Grid.Add (Crt.Tube.DA);
-      Main_Grid.Add (H_Grid);
+      Main_Grid.Add (Crt.Tube.DA);
 
       --  Status Bar
       Main_Grid.Add (Create_Status_Box);
@@ -1301,12 +1323,8 @@ package body GUI is
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 
-      Gdk.Pixbuf.Gdk_New_From_File (Pixbuf => Icon_PB, Filename => Dashera_Resources.Resource_Path & App_Icon, Error => Error);
-      if Error /= null then
-         Log (WARNING, "Could not find/load icon file: " & App_Icon);
-      else
-         Main_Window.Set_Icon (Icon_PB);
-      end if;
+      Icon_PB := Create_Icon_Pixbuf;
+      Main_Window.Set_Icon (Icon_PB);
 
       Log (DEBUG, "Main Window Built");
 

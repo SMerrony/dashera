@@ -38,7 +38,7 @@ package Crt is
       DA         : Gtk.Drawing_Area.Gtk_Drawing_Area;
       Zoom       : BDF_Font.Zoom_T;
       Saved_Font_Colour : BDF_Font.Font_Colour_T;
-      Blink_State : Boolean;
+      Blink_State : Boolean := False;
       --  Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
 

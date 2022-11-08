@@ -71,9 +71,9 @@ begin
       elsif Argument (Arg_Ix) = "-tracexmodem" then
          Trace_Xmodem := True;
       elsif Argument (Arg_Ix) = "-amber" then
-         Font_Colour := BDF_Font.Amber;  
+         Font_Colour := BDF_Font.Amber;
       elsif Argument (Arg_Ix) = "-white" then
-         Font_Colour := BDF_Font.White;    
+         Font_Colour := BDF_Font.White;
       elsif Argument (Arg_Ix) = "-h" or else Argument (Arg_Ix) = "-help" then
          Print_Help;
          GNAT.OS_Lib.OS_Exit (0);

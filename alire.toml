@@ -13,6 +13,4 @@ tags = ["gtk", "terminal", "dasher", "emulator",]
 executables = ["dashera"]
 
 [[depends-on]]
-resources = "~0.1.0"
-[[depends-on]]
 gtkada = "^23.0.0"
