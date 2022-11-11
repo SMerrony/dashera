@@ -1,12 +1,16 @@
 dashera (0.12.2) stable; urgency=low
 
   [SMerrony]
+  * Fix issue with Edit|Paste not actually pasting into data stream
+  * Fix issue with cursor sometimes leaving trail on screen
   * Add View menu
   * Add View|History to display terminal history, remove scrollback
   * Move Edit|Resize to View|Resize Terminal
   * Upgrade Gtkada to v.23
+  * Embed font and icon resources in code using 'are'
+  * Add `-amber` and `-white` options to emulate different phosphor colours
 
- -- SMerrony <merrony@gmail.com>  Fri, 4 Nov 2022 10:00:00 +0200
+ -- SMerrony <merrony@gmail.com>  Fri, 11 Nov 2022 10:00:00 +0200
 
 dashera (0.12.1) stable; urgency=low
 

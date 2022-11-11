@@ -110,6 +110,7 @@ package body Display_P is
 
       procedure Set_Cursor (X, Y : Natural) is
       begin
+         Disp.Cells (Disp.Cursor_Y, Disp.Cursor_X).Set_Dirty;
          Disp.Cursor_X := X;
          Disp.Cursor_Y := Y;
       end Set_Cursor;
