@@ -1,4 +1,4 @@
-dashera (0.12.2) stable; urgency=low
+dashera (0.13.0) stable; urgency=low
 
   [SMerrony]
   * Fix issue with Edit|Paste not actually pasting into data stream
