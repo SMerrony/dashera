@@ -1,3 +1,10 @@
+dashera (0.13.1) stable; urgency=low
+
+  [SMerrony]
+  * Fix issue File|Send (Text) File not sending new-lines
+
+ -- SMerrony <merrony@gmail.com>  Tue, 15 Nov 2022 10:00:00 +0200
+
 dashera (0.13.0) stable; urgency=low
 
   [SMerrony]

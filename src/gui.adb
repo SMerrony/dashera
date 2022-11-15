@@ -317,7 +317,7 @@ package body GUI is
       if Filename'Length > 0 then
          Open (File => Text_File, Mode => In_File, Name => Filename);
          while not End_Of_File (Text_File) loop
-            Redirector.Router.Send_Data (Get_Line (Text_File));
+            Redirector.Router.Send_Data (Get_Line (Text_File) & Dasher_Codes.Dasher_NL);
          end loop;
          Close (Text_File);
       end if;
