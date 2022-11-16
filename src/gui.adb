@@ -362,6 +362,9 @@ package body GUI is
          end loop;
          Ada.Text_IO.Close (Templ_File);
          Template_Revealer.Set_Reveal_Child (True);
+         Template_Revealer.Set_Visible (True);
+         Hide_Template_Item.Set_Sensitive (True);
+         Display.Set_Dirty;
       else
          Log (INFO, "No Template file chosen");
       end if;
@@ -370,6 +373,18 @@ package body GUI is
          Unused_Buttons := Message_Dialog (Msg => "Could not load template file",
                                            Title => "DasherA - Error");
    end Load_Template_CB;
+
+   procedure Hide_Template_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
+      pragma Unreferenced (Self);
+   begin
+      Template_Revealer.Set_Reveal_Child (False);
+      Template_Revealer.Set_Visible (False); --  Required to reclaim vertical space when we resize
+      Hide_Template_Item.Set_Sensitive (False);
+      --  Ask for window resize to smaller than we are - the effect
+      --  is to reduce window size to minimum that contains all content.
+      Main_Window.Resize (400, 400);
+      Display.Set_Dirty;
+   end Hide_Template_CB;
 
    procedure Expect_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
@@ -775,7 +790,7 @@ package body GUI is
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
       Logging_Item, Expect_Item, Send_File_Item,
       History_Item, Resize_Item,
-      D200_Item, D210_Item, Self_Test_Item, Load_Template_Item,
+      D200_Item, D210_Item, Self_Test_Item, 
       Quit_Item,
       Paste_Item,
       About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
@@ -849,9 +864,15 @@ package body GUI is
       View_Menu.Append (History_Item);
       History_Item.On_Activate (View_History_CB'Access);
 
-      Gtk_New (Resize_Item, "Resize Terminal");
-      View_Menu.Append (Resize_Item);
-      Resize_Item.On_Activate (Resize_CB'Access);
+      Gtk_New (Sep_Item);
+      View_Menu.Append (Sep_Item);
+      Gtk_New (Load_Template_Item, "Load Func. Key Template");
+      View_Menu.Append (Load_Template_Item);
+      Load_Template_Item.On_Activate (Load_Template_CB'Access);
+      Gtk_New (Hide_Template_Item, "Hide Func. Key Template");
+      View_Menu.Append (Hide_Template_Item);
+      Hide_Template_Item.Set_Sensitive (False);
+      Hide_Template_Item.On_Activate (Hide_Template_CB'Access);   
 
       --  Emulation
 
@@ -868,6 +889,9 @@ package body GUI is
 
       Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
+      Gtk_New (Resize_Item, "Resize Terminal");
+      Emulation_Menu.Append (Resize_Item);
+      Resize_Item.On_Activate (Resize_CB'Access);
 
       Gtk_New (Sep_Item);
       Emulation_Menu.Append (Sep_Item);
@@ -875,12 +899,6 @@ package body GUI is
       Gtk_New (Self_Test_Item, "Self-Test");
       Emulation_Menu.Append (Self_Test_Item);
       Self_Test_Item.On_Activate (Self_Test_CB'Access);
-
-      Gtk_New (Sep_Item);
-      Emulation_Menu.Append (Sep_Item);
-      Gtk_New (Load_Template_Item, "Load Func. Key Template");
-      Emulation_Menu.Append (Load_Template_Item);
-      Load_Template_Item.On_Activate (Load_Template_CB'Access);
 
       --  Serial
 

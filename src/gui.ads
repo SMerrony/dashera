@@ -69,6 +69,7 @@ package GUI is
    Saved_Font_Colour  : BDF_Font.Font_Colour_T;
 
    --  Menu items for which we need access...
+   Load_Template_Item, Hide_Template_Item,
    Net_Connect_Item, Net_Disconnect_Item,
    Xmodem_Rx_Item, Xmodem_Send_Item, Xmodem_Send1k_Item,
    Serial_Connect_Item, Serial_Disconnect_Item : Gtk_Menu_Item;

@@ -39,15 +39,12 @@ package body Crt is
             Display.Cell_Set_Dirty_If_Blinking (Line, Col);
          end loop;
       end loop;
-      Display.Set_Dirty;
       return True;
    end Blink_Timeout_CB;
 
    function Redraw_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
    begin
-      if Display.Is_Dirty then
-         DA.Queue_Draw;
-      end if;
+      DA.Queue_Draw;
       return True;
    end Redraw_Timeout_CB;
 
@@ -113,6 +110,9 @@ package body Crt is
       Char_X, Char_Y, Char_UL : Gdouble;
       Value : Character;
       Blnk, Dm, Rv, Under, Prot : Boolean;
+      All_Dirty      : constant Boolean := Display.Is_Dirty;
+      Blink_Enabled  : constant Boolean := Display.Is_Blink_Enabled;
+      Blink_State    : constant Boolean := Tube.Blink_State;
       Decoded_Height : constant Gint := Font.Get_Char_Height;
       Decoded_Width  : constant Gint := Font.Get_Char_Width;
       use Glib;
@@ -126,7 +126,7 @@ package body Crt is
          for Col in 0 .. Display.Get_Visible_Cols - 1 loop
             Char_X  := Gdouble (Gint (Col) * Decoded_Width);
 
-            if Display.Cell_Is_Dirty (Line, Col) then
+            if All_Dirty or else Display.Cell_Is_Dirty (Line, Col) then
 
                Display.Get_Cell (Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
 
@@ -135,7 +135,7 @@ package body Crt is
                --     raise Unloaded_Character with "Line:" & Line'Image & " Col:" & Col'Image & " Index :" & Char_Ix'Image;
                --  end if;
 
-               if Display.Is_Blink_Enabled and then Tube.Blink_State and then Blnk then
+               if Blnk and then Blink_Enabled and then Blink_State then
                   Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
                                                 Pixbuf => Font.Get_Dim_Pixbuf (32),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
