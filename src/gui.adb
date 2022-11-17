@@ -999,6 +999,11 @@ package body GUI is
          Keyboard.Handle_Key_Release (GDK_KP_Enter);
       elsif Lab = "Hold" then
          Term.Holding := not Term.Holding;
+         if Term.Holding then
+            Keyboard.Handle_Key_Release (GDK_F29);
+         else
+            Keyboard.Handle_Key_Release (GDK_F30);
+         end if;
       end if;
    end Handle_Key_Btn_CB;
 

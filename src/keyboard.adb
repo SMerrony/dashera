@@ -112,6 +112,8 @@ package body Keyboard is
          --  Special codes from the virtual key buttons on the GUI
          when GDK_3270_EraseEOF => Enqueue_Key (Dasher_Erase_Page);
          when GDK_3270_EraseInput => Enqueue_Key (Dasher_Erase_EOL);
+         when GDK_F29 => Enqueue_Key (Character'Val (19)); --  Fake Ctrl-S
+         when GDK_F30 => Enqueue_Key (Character'Val (17)); --  Fake Ctrl-Q
          when GDK_F31 => Enqueue_Pair (Dasher_Command, Modify (Dasher_C1));
          when GDK_F32 => Enqueue_Pair (Dasher_Command, Modify (Dasher_C2));
          when GDK_F33 => Enqueue_Pair (Dasher_Command, Modify (Dasher_C3));

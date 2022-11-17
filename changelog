@@ -2,6 +2,7 @@ dashera (0.13.1) stable; urgency=low
 
   [SMerrony]
   * Issue: Fix File|Send (Text) File not sending new-lines
+  * Issue: Fix #7 (Hold not working) by sending Ctrl-S/Q
   * Usability: Move terminal Resize menu item back to Emulation menu
   * Usability: Move Load F-Key Template to View menu
   * Usability: Add new Hide F-Key Template menu item
