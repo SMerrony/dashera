@@ -1,3 +1,13 @@
+dashera (0.13.2) stable; urgency=low
+
+  [SMerrony]
+  * Build: Remove call to Set_Monospace in Gui so GtkAda v21 still works
+  * Build: Reintroduce non-Alire build config
+  * Docs:  Update README.md to include non-Alire build
+  * Usability: Add more info to message when Telnet fails to connect
+
+ -- SMerrony <merrony@gmail.com>  Sun, 20 Nov 2022 10:00:00 +0200
+
 dashera (0.13.1) stable; urgency=low
 
   [SMerrony]

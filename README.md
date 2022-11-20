@@ -33,9 +33,14 @@ DasherA is [hosted on GitHub](https://github.com/SMerrony/dashera).
 
 A binary version for 64-bit Debian-based systems *may* be available as part of a release.
 
+I would love to be able to provide a Windows binary, but I don't have the required
+facilities.  If anyone could help with this, please do get in touch.
+
 ## Build
 
-Dashera has moved to the [Alire](https://alire.ada.dev/) build system.
+### Alire
+
+Dashera has moved to the [Alire](https://alire.ada.dev/) build system (but see below).
 
 [![Alire](https://img.shields.io/endpoint?url=https://alire.ada.dev/badges/dashera.json)](https://alire.ada.dev/crates/dashera.html)
 
@@ -46,6 +51,16 @@ cd dashera
 alr build
 ```
 N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.  This can take some time when it first happens, subsequent builds should be much faster.
+
+### Non-Alire
+
+If you cannot use Alire, it should still be possible to build Dashera with gprbuild... 
+```
+gprbuild -Pnon_alire
+```
+Ignore the warning about file name not matching project name.
+
+Without Alire you will have to manually ensure that dependencies (eg. GtkAda) are installed.
 
 ## Run
 `.bin/dashera`
@@ -66,9 +81,7 @@ You need the DASHER font and icon to be in the same directory as the executable 
 ## Operational Notes
 * The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the
 numeric keypad enter key (if present).
-* The DASHER 'Hold' key is available from both the GUI 'Hold' button and the PC-style 'Pause'
-button (if present).
 * The BELL sound will only work if DasherA is started from a terminal supporting such an event, 
-or if the windowing system permits Window Beeps.  In Mint 20, the critical setting is
+or if the windowing system permits Window Beeps.  In Mint 20+, the critical setting is
 Accessibility => Keyboard => Event Feedback => Sound to use for window alerts.
 

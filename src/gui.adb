@@ -18,6 +18,7 @@
 --  THE SOFTWARE.
 
 with Ada.Directories;
+with Ada.Exceptions;          use Ada.Exceptions;
 with Ada.Sequential_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
@@ -634,8 +635,10 @@ package body GUI is
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Port_Entry.Get_Text);
             exception
-               when others =>
-                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect",
+               when Error : others =>
+                  Log (DEBUG, Exception_Information (Error));
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect. " &
+                                                                   Exception_Information (Error),
                                                                    Title => "DasherA - Error");
             end;
          end if;
@@ -659,11 +662,18 @@ package body GUI is
       use Gtk.Scrolled_Window;
       use Gtk.Text_Buffer;
       use Gtk.Text_View;
-      Dialog : Gtk_Dialog;
-      Dlg_Box : Gtk.Box.Gtk_Box;
+      Dialog     : Gtk_Dialog;
+      Dlg_Box    : Gtk.Box.Gtk_Box;
+      FProvider  : constant Gtk.Css_Provider.Gtk_Css_Provider := Gtk.Css_Provider.Gtk_Css_Provider_New;
+      CSS        : constant String :=
+      "textview.view {" & ASCII.LF
+      & " font-family: monospace;" & ASCII.LF
+      & "}" & ASCII.LF;
+      Error      : aliased Glib.Error.GError;
+      Dummy      : Boolean;
       Scrollable : Gtk_Scrolled_Window;
-      View    : Gtk_Text_View;
-      Buffer  : Gtk_Text_Buffer;
+      View       : Gtk_Text_View;
+      Buffer     : Gtk_Text_Buffer;
       Close_Unused   : Gtk.Widget.Gtk_Widget;
       H_First, H_Last, H_Line : Integer;
    begin
@@ -675,7 +685,12 @@ package body GUI is
       Gtk_New (Scrollable);
       Gtk_New (View);
       View.Set_Editable (False);
-      View.Set_Monospace (True);
+      --  View.Set_Monospace (True);
+      Dummy := FProvider.Load_From_Data (CSS, Error'Access);
+      if not Dummy then
+         Log (Logging.ERROR, "Loading CSS from data");
+      end if;
+      Apply_Css (Widget => View, Provider => +FProvider);
       Buffer := View.Get_Buffer;
       Buffer.Set_Text ("   *** Start of History ***");
       H_First := Display_P.Display.Get_First_History_Line;
@@ -1370,8 +1385,9 @@ package body GUI is
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Slice (Host_Arg, Colon_Ix + 1, Length (Host_Arg)));
             exception
-               when others =>
-                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect to host",
+               when Error : others =>
+                  Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect. " &
+                                                                   Exception_Information (Error),
                                                                    Title => "DasherA - Error");
             end;
          end if;

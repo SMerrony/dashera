@@ -32,10 +32,11 @@ package body Telnet is
    begin
       --  Exceptions should be handled by caller
       GNAT.Sockets.Create_Socket (Sess.Conn);
-      Log (DEBUG, "Host: " & Host_Str & ", Port: " & Port_Num'Image);
+      Log (DEBUG, "Telnet - Host: " & Host_Str & ", Port: " & Port_Num'Image);
       Address.Addr := GNAT.Sockets.Addresses (GNAT.Sockets.Get_Host_By_Name (Host_Str), 1);
       Address.Port := GNAT.Sockets.Port_Type (Port_Num);
       GNAT.Sockets.Connect_Socket (Sess.Conn, Address);
+      Log (DEBUG, "Telnet - Socket connected");
       --  GNAT.Sockets.Set_Socket_Option (Socket => Sess.Conn, Option => (No_Delay, True));
       Sess.Host_Str := To_Unbounded_String (Host_Str);
       Sess.Port_Num := Port_Num;
