@@ -56,11 +56,13 @@ N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then
 
 If you cannot use Alire, it should still be possible to build Dashera with gprbuild... 
 ```
-gprbuild -Pnon_alire
+mkdir obj
+gprbuild -Pnon_alire -Xmode=release
 ```
 Ignore the warning about file name not matching project name.
 
 Without Alire you will have to manually ensure that dependencies (eg. GtkAda) are installed.
+Eg. You may need to install the `libgtkada20-dev` package.
 
 ## Run
 `.bin/dashera`

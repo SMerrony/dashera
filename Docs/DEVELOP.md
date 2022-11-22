@@ -56,6 +56,20 @@ alr build
 ```
 N.B. If you have not built a GtkAda crate (the GUI toolkit we use) recently then Alire will automatically download and build that before building Dashera itself.  This can take some time when it first happens, subsequent builds should be much faster.
 
+### Non-Alire Build
+
+If you cannot use Alire, it should still be possible to build Dashera with gprbuild... 
+```
+mkdir obj
+gprbuild -Pnon_alire 
+```
+Ignore the warning about file name not matching project name.
+You may append `-Xmode=release` to the gprbuild command for an optimised build.
+
+Without Alire you will have to manually ensure that dependencies (eg. GtkAda) are installed.
+Eg. You may need to install the `libgtkada20-dev` package.
+
+
 ## Run with Fatal Warnings...
 `./dashera --gtk-fatal-warnings --g-fatal--warnings`
 
