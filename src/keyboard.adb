@@ -19,8 +19,6 @@
 
 --  See include/gtkada/gtkada.relocatable/gtkada/gdk-types-keysyms.ads for key symbol definitions
 
-with Gdk.Types.Keysyms; use Gdk.Types.Keysyms;
-
 with Dasher_Codes; use Dasher_Codes;
 with Redirector;
 
@@ -33,6 +31,11 @@ package body Keyboard is
          when GDK_Shift_L   | GDK_Shift_R   => Shift_Pressed := True;
          when others => null;
       end case;
+      -- is the user holding a key down?
+      if Last_Pressed = Key then
+         Process_Key (Key);
+      end if;
+      Last_Pressed := Key;
    end Handle_Key_Press;
 
    procedure Enqueue_Key (Ch : Character) is
@@ -69,7 +72,13 @@ package body Keyboard is
    end Enqueue_Pair;
 
    procedure Handle_Key_Release (Key  : Gdk_Key_Type) is
-      Char : Character;
+   begin
+      Process_Key (Key);
+      Last_Pressed := GDK_VoidSymbol;
+   end Handle_Key_Release;
+
+   procedure Process_Key (Key : Gdk_Key_Type) is
+        Char : Character;
    begin
       --  Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image);
       case Key is
@@ -86,8 +95,8 @@ package body Keyboard is
          when GDK_Right  => Enqueue_Key (Dasher_Cursor_Right);
          when GDK_Home   => Enqueue_Key (Dasher_Home);
 
-         --  The DEL key must map to 127 which is the DASHER DEL code
-         when GDK_Delete => Enqueue_Key (Dasher_Delete);
+         --  The Backspace / DEL key must map to 127 which is the DASHER DEL code
+         when GDK_BackSpace | GDK_Delete => Enqueue_Key (Dasher_Delete);
 
          when GDK_Escape => Enqueue_Key (Dasher_Escape);
 
@@ -128,6 +137,5 @@ package body Keyboard is
                Enqueue_Key (Char);
             end if;
       end case;
-   end Handle_Key_Release;
-
+   end Process_Key;
 end Keyboard;

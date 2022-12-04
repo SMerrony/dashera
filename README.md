@@ -83,6 +83,7 @@ You need the DASHER font and icon to be in the same directory as the executable 
 ## Operational Notes
 * The DASHER 'CR' (carriage-return, no line-feed) is available from both the GUI 'CR' button and the
 numeric keypad enter key (if present).
+* The DASHER keyboards had a 'DEL' key but no 'Backspace', Dashera treats both keys as a DASHER Delete (backwards)
 * The BELL sound will only work if DasherA is started from a terminal supporting such an event, 
 or if the windowing system permits Window Beeps.  In Mint 20+, the critical setting is
 Accessibility => Keyboard => Event Feedback => Sound to use for window alerts.

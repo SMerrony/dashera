@@ -1,3 +1,12 @@
+dashera (0.13.3) stable; urgency=low
+
+  [SMerrony]
+  * Usability: Implement key auto-repeat (Issue #8)
+  * Usability: Make the Backspace key work the same as DEL
+  * Issue:     Remove template title labels when collapsing template
+
+ -- SMerrony <merrony@gmail.com>  Sun, 03 Dec 2022 10:00:00 +0200
+
 dashera (0.13.2) stable; urgency=low
 
   [SMerrony]

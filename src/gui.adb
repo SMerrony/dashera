@@ -103,6 +103,9 @@ package body GUI is
    begin
       Log (DEBUG, "Calling Main_Quit at level: " & Gtk.Main.Main_Level'Image);
       Gtk.Main.Main_Quit;
+   exception
+      when others =>
+         null;
    end Window_Close_CB;
 
    procedure Quit_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
@@ -379,6 +382,8 @@ package body GUI is
       pragma Unreferenced (Self);
    begin
       Template_Revealer.Set_Reveal_Child (False);
+      L_FKeys_Label.Set_Markup ("<small><small> </small></small>");
+      R_FKeys_Label.Set_Markup ("<small><small> </small></small>");
       Template_Revealer.Set_Visible (False); --  Required to reclaim vertical space when we resize
       Hide_Template_Item.Set_Sensitive (False);
       --  Ask for window resize to smaller than we are - the effect

@@ -89,6 +89,6 @@ begin
    Main_Window := GUI.Create_Window (Host_Arg, Font_Colour, Trace_Xmodem);
    Main_Window.Show_All;
    Gtk.Main.Main;
-   Gdk.Threads.Leave;
+   -- Gdk.Threads.Leave;
 
 end Dashera;
