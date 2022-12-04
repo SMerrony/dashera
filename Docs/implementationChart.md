@@ -2,7 +2,7 @@
 
 | Command                              | Octal       | Keyboard                   | D200 | D210 | Notes                            |
 |--------------------------------------|-------------|----------------------------| :--: | :--: | ----------------------------------|
-| Bell                                 | 007         | Ctrl-G                     | Y    | Y    | Must run from terminal that rings bell |
+| Bell                                 | 007         | Ctrl-G                     | Y    | Y    | Must be allowed by your window manager |
 | Blink Disable                        | 004         | Ctrl-D                     | Y    | Y    | Disable blinking on screen  |
 | Blink Enable                         | 003         | Ctrl-C                     | Y    | Y    | Enable blinking on screen  |
 | Blink Off                            | 017         | Ctrl-O                     | Y    | Y    |                            |

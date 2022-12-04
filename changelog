@@ -1,11 +1,12 @@
-dashera (0.13.3) stable; urgency=low
+dashera (0.14.0) stable; urgency=low
 
   [SMerrony]
   * Usability: Implement key auto-repeat (Issue #8)
   * Usability: Make the Backspace key work the same as DEL
+  * Usability: Increase history to 2000 lines
   * Issue:     Remove template title labels when collapsing template
 
- -- SMerrony <merrony@gmail.com>  Sun, 03 Dec 2022 10:00:00 +0200
+ -- SMerrony <merrony@gmail.com>  Sun, 04 Dec 2022 10:00:00 +0200
 
 dashera (0.13.2) stable; urgency=low
 

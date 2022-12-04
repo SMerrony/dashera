@@ -810,7 +810,7 @@ package body GUI is
       Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
       Logging_Item, Expect_Item, Send_File_Item,
       History_Item, Resize_Item,
-      D200_Item, D210_Item, Self_Test_Item, 
+      D200_Item, D210_Item, Self_Test_Item,
       Quit_Item,
       Paste_Item,
       About_Item : Gtk.Menu_Item.Gtk_Menu_Item;
@@ -892,7 +892,7 @@ package body GUI is
       Gtk_New (Hide_Template_Item, "Hide Func. Key Template");
       View_Menu.Append (Hide_Template_Item);
       Hide_Template_Item.Set_Sensitive (False);
-      Hide_Template_Item.On_Activate (Hide_Template_CB'Access);   
+      Hide_Template_Item.On_Activate (Hide_Template_CB'Access);
 
       --  Emulation
 
