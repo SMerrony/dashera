@@ -47,20 +47,26 @@ package BDF_Font is
 
    type Font_Colour_T is (Green, White, Amber);
 
-   protected Font is
+   --  protected Font is
       procedure Load_Font (File_Name : String;
                            Zoom : Zoom_T;
                            Font_Colour : Font_Colour_T);
 
       function Get_Char_Width  return Gint;
+      pragma Inline (Get_Char_Width);
       function Get_Char_Height return Gint;
+      pragma Inline (Get_Char_Height);
       function Is_Loaded      (Ix : Natural) return Boolean;
+      pragma Inline (Is_Loaded);
       function Get_Dim_Pixbuf (Ix : Natural) return Gdk_Pixbuf;
+      pragma Inline (Get_Dim_Pixbuf);
       function Get_Rev_Pixbuf (Ix : Natural) return Gdk_Pixbuf;
+      pragma Inline (Get_Rev_Pixbuf);
       function Get_Pixbuf     (Ix : Natural) return Gdk_Pixbuf;
-   private
+      pragma Inline (Get_Pixbuf);
+   --  private
       Decoded : Decoded_T;
-   end Font;
+   --  end Font;
 
    OPEN_FAILURE,
    BDF_DECODE : exception;

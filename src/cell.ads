@@ -34,12 +34,16 @@ package Cell is
       procedure Clear_If_Unprotected;
 
       function Is_Blinking return Boolean;
+      pragma Inline (Is_Blinking);
 
       function Is_Dirty return Boolean;
+      pragma Inline (Is_Dirty);
 
       procedure Clear_Dirty;
+      pragma Inline (Clear_Dirty);
 
       procedure Set_Dirty;
+      pragma Inline (Set_Dirty);
 
    private
       Char_Value                           : Character;

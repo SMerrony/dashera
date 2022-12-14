@@ -450,7 +450,7 @@ package body Terminal is
 
          --  Finally! Put the character in the displayable matrix
          C := Character'Val (127); --  the 'unknown character' character
-         if B_Int < 128 and then BDF_Font.Font.Is_Loaded (B_Int) then
+         if B_Int < 128 and then BDF_Font.Is_Loaded (B_Int) then
             C := B;
          end if;
 
