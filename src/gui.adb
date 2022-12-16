@@ -78,6 +78,7 @@ with Mini_Expect;
 with Session_Logger;
 with Redirector;     use Redirector;
 with Serial;
+with Viewer;
 with Xmodem;
 
 package body GUI is
@@ -1318,11 +1319,13 @@ package body GUI is
 
    function Create_Window (Host_Arg     : Unbounded_String;
                            Font_Colour  : BDF_Font.Font_Colour_T;
+                           Text_Only    : Boolean;
                            Trace_Xmodem : Boolean) return Gtk.Window.Gtk_Window is
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Log (DEBUG, "Starting to Create_Window");
-      Trace_Xmodem_Opt := Trace_Xmodem;
+      Text_Only_Opt     := Text_Only;
+      Trace_Xmodem_Opt  := Trace_Xmodem;
       Saved_Font_Colour := Font_Colour;
 
       --  Gtk.Window.Initialize (Main_Window);
@@ -1349,9 +1352,14 @@ package body GUI is
       Display_P.Display.Init;
       Term := Terminal.Create (Terminal.D210);
       Crt.Init (BDF_Font.Normal, Font_Colour);
-      Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
-      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-      Main_Grid.Add (Crt.Tube.DA);
+      if Text_Only then
+         Viewer.Init;
+         Main_Grid.Add (Viewer.View);
+      else
+         Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
+         Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
+         Main_Grid.Add (Crt.Tube.DA);
+      end if;
 
       --  Status Bar
       Main_Grid.Add (Create_Status_Box);

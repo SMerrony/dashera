@@ -39,6 +39,7 @@ package body Crt is
             Display.Cell_Set_Dirty_If_Blinking (Line, Col);
          end loop;
       end loop;
+      DA.Queue_Draw;
       return True;
    end Blink_Timeout_CB;
 
@@ -64,9 +65,9 @@ package body Crt is
       end if;
 
       --  TESTING = Redraw timer...
-      if Redraw_TO = 0 then
-         Redraw_TO := Redraw_Timeout.Timeout_Add (50, Redraw_Timeout_CB'Access, Tube.DA);
-      end if;
+      --  if Redraw_TO = 0 then
+      --     Redraw_TO := Redraw_Timeout.Timeout_Add (50, Redraw_Timeout_CB'Access, Tube.DA);
+      --  end if;
 
    end Init;
 
@@ -126,7 +127,7 @@ package body Crt is
          for Col in 0 .. Display.Get_Visible_Cols - 1 loop
             Char_X  := Gdouble (Gint (Col) * Decoded_Width);
 
-            if All_Dirty or else Display.Cell_Is_Dirty (Line, Col) then
+            if Display.Cell_Is_Dirty (Line, Col) then
 
                Display.Get_Cell (Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
 

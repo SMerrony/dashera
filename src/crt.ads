@@ -17,6 +17,9 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
+-- Crt provides a pixel-realistic DASHER VDU look for the text display.
+-- It may be slower than the text Viewer on systems with limited resources.
+
 with Cairo;
 with Gdk.Event;
 with Glib;        use Glib;

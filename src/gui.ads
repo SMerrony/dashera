@@ -41,7 +41,7 @@ package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
    package SB_Timeout_P is new Glib.Main.Generic_Sources (Gtk.Box.Gtk_Box);
 
-   App_SemVer       : constant String := "0.14.0";  --  TODO Update Version each release!
+   App_SemVer       : constant String := "0.15.0";  --  TODO Update Version each release!
    App_Title        : constant String := "DasherA";
    App_Comment      : constant String := "A Data General DASHER terminal emulator";
    App_Author       : constant String := "Stephen Merrony";
@@ -80,10 +80,11 @@ package GUI is
    SB_Timeout  : Glib.Main.G_Source_Id := 0;
 
    --  Flags
-   Trace_Script_Opt, Trace_Xmodem_Opt : Boolean;
+   Trace_Script_Opt, Text_Only_Opt, Trace_Xmodem_Opt : Boolean;
 
    function Create_Window (Host_Arg     : Unbounded_String;
                            Font_Colour  : BDF_Font.Font_Colour_T;
+                           Text_Only    : Boolean;
                            Trace_Xmodem : Boolean) return Gtk_Window;
 
 end GUI;

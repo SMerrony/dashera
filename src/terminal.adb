@@ -24,6 +24,7 @@ with Gdk.Main;
 with Glib.Main;
 
 with BDF_Font;
+with Crt;
 with Dasher_Codes;   use Dasher_Codes;
 with Display_P;      use Display_P;
 with Logging;        use Logging;
@@ -462,6 +463,7 @@ package body Terminal is
       <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);
          Display.Set_Dirty;
+         Crt.Tube.DA.Queue_Draw;
       end loop;
    end Process;
 
