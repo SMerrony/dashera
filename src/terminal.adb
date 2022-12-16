@@ -24,19 +24,22 @@ with Gdk.Main;
 with Glib.Main;
 
 with BDF_Font;
+with Crt;
 with Dasher_Codes;   use Dasher_Codes;
 with Display_P;      use Display_P;
 with Logging;        use Logging;
 with Session_Logger;
 with Mini_Expect;
 with Redirector;
+with Viewer;
 
 package body Terminal is
 
-   function Create (Emul : Emulation_T) return Terminal_Acc_T is
+   function Create (Emul : Emulation_T; Text_Only : Boolean) return Terminal_Acc_T is
       T : aliased constant Terminal_Acc_T := new Terminal_T;
    begin
       T.Emulation := Emul;
+      T.Text_Only := Text_Only;
       T.Cursor_X := 0;
       T.Cursor_Y := 0;
       T.In_Command := False;
@@ -185,6 +188,7 @@ package body Terminal is
       B : Character;
       B_Int : Integer;
       C : Character;
+      Unused_SI : Glib.Main.G_Source_Id;
    begin
 
       for Ix in Str'Range loop
@@ -450,7 +454,7 @@ package body Terminal is
 
          --  Finally! Put the character in the displayable matrix
          C := Character'Val (127); --  the 'unknown character' character
-         if B_Int < 128 and then BDF_Font.Font.Is_Loaded (B_Int) then
+         if B_Int < 128 and then BDF_Font.Is_Loaded (B_Int) then
             C := B;
          end if;
 
@@ -462,6 +466,12 @@ package body Terminal is
       <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);
          Display.Set_Dirty;
+         if T.Text_Only then
+            Unused_SI := Glib.Main.Idle_Add (Viewer.Update_CB'Access);
+            --  Viewer.Update;
+         else
+            Crt.Tube.DA.Queue_Draw;
+         end if;
       end loop;
    end Process;
 

@@ -39,33 +39,23 @@ package body Crt is
             Display.Cell_Set_Dirty_If_Blinking (Line, Col);
          end loop;
       end loop;
-      return True;
-   end Blink_Timeout_CB;
-
-   function Redraw_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
-   begin
       DA.Queue_Draw;
       return True;
-   end Redraw_Timeout_CB;
+   end Blink_Timeout_CB;
 
    procedure Init (Zoom : Zoom_T; Font_Colour : Font_Colour_T) is
    begin
       Log (DEBUG, "Creating Crt");
-      Font.Load_Font (Font_Filename, Zoom, Font_Colour);
+      Load_Font (Font_Filename, Zoom, Font_Colour);
       Tube.Saved_Font_Colour := Font_Colour;
       Gtk.Drawing_Area.Gtk_New (Tube.DA);
-      Tube.DA.Set_Size_Request (Font.Get_Char_Width * Gint (Display.Get_Visible_Cols),
-                                Font.Get_Char_Height * Gint (Display.Get_Visible_Lines));
+      Tube.DA.Set_Size_Request (Get_Char_Width * Gint (Display.Get_Visible_Cols),
+                                Get_Char_Height * Gint (Display.Get_Visible_Lines));
       Tube.Zoom := Zoom;
 
       --  Blink timer
       if Blink_TO = 0 then
          Blink_TO := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, Tube.DA);
-      end if;
-
-      --  TESTING = Redraw timer...
-      if Redraw_TO = 0 then
-         Redraw_TO := Redraw_Timeout.Timeout_Add (50, Redraw_Timeout_CB'Access, Tube.DA);
       end if;
 
    end Init;
@@ -113,8 +103,8 @@ package body Crt is
       All_Dirty      : constant Boolean := Display.Is_Dirty;
       Blink_Enabled  : constant Boolean := Display.Is_Blink_Enabled;
       Blink_State    : constant Boolean := Tube.Blink_State;
-      Decoded_Height : constant Gint := Font.Get_Char_Height;
-      Decoded_Width  : constant Gint := Font.Get_Char_Width;
+      Decoded_Height : constant Gint := Get_Char_Height;
+      Decoded_Width  : constant Gint := Get_Char_Width;
       use Glib;
    begin
       Cr := Cairo.Create (surface);
@@ -126,30 +116,30 @@ package body Crt is
          for Col in 0 .. Display.Get_Visible_Cols - 1 loop
             Char_X  := Gdouble (Gint (Col) * Decoded_Width);
 
-            if All_Dirty or else Display.Cell_Is_Dirty (Line, Col) then
+            if Display.Cell_Is_Dirty (Line, Col) then
 
                Display.Get_Cell (Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
 
                Char_Ix := Character'Pos (Value);
-               --  if not Font.Is_Loaded (Char_IX) then
+               --  if not Is_Loaded (Char_IX) then
                --     raise Unloaded_Character with "Line:" & Line'Image & " Col:" & Col'Image & " Index :" & Char_Ix'Image;
                --  end if;
 
                if Blnk and then Blink_Enabled and then Blink_State then
                   Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
-                                                Pixbuf => Font.Get_Dim_Pixbuf (32),
+                                                Pixbuf => Get_Dim_Pixbuf (32),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                elsif Dm then
                   Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
-                                                Pixbuf => Font.Get_Dim_Pixbuf (Char_Ix),
+                                                Pixbuf => Get_Dim_Pixbuf (Char_Ix),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                elsif Rv then
                   Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
-                                                Pixbuf => Font.Get_Rev_Pixbuf (Char_Ix),
+                                                Pixbuf => Get_Rev_Pixbuf (Char_Ix),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                else
                   Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
-                                                Pixbuf => Font.Get_Pixbuf (Char_Ix),
+                                                Pixbuf => Get_Pixbuf (Char_Ix),
                                                 Pixbuf_X => Char_X, Pixbuf_Y => Char_Y);
                end if;
                Cairo.Paint (Cr);
@@ -179,12 +169,12 @@ package body Crt is
          end if;
          if Rv then
             Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
-                                         Pixbuf => Font.Get_Pixbuf (Char_Ix),
+                                         Pixbuf => Get_Pixbuf (Char_Ix),
                                          Pixbuf_X => Gdouble (Gint (Display.Get_Cursor_X) * Decoded_Width),
                                          Pixbuf_Y => Gdouble (Gint (Display.Get_Cursor_Y) * Decoded_Height));
          else
             Gdk.Cairo.Set_Source_Pixbuf (Cr => Cr,
-                                         Pixbuf => Font.Get_Rev_Pixbuf (Char_Ix),
+                                         Pixbuf => Get_Rev_Pixbuf (Char_Ix),
                                          Pixbuf_X => Gdouble (Gint (Display.Get_Cursor_X) * Decoded_Width),
                                          Pixbuf_Y => Gdouble (Gint (Display.Get_Cursor_Y) * Decoded_Height));
          end if;

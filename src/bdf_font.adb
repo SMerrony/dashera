@@ -59,7 +59,7 @@ package body BDF_Font is
 
    end Parse_BBX;
 
-   protected body Font is
+   --  protected body Font is
 
       procedure Load_Font (File_Name : String;
                            Zoom : Zoom_T;
@@ -242,6 +242,6 @@ package body BDF_Font is
       function Get_Pixbuf (Ix : Natural) return Gdk_Pixbuf is
          (Decoded.Font (Ix).Pix_Buf);
 
-   end Font;
+   --  end Font;
 
 end BDF_Font;

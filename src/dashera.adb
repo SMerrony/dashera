@@ -37,9 +37,10 @@ procedure Dashera is
    Main_Window : Gtk_Window;
 
    --  program args etc.
-   Arg_Ix : Natural := 1;
-   Font_Colour : BDF_Font.Font_Colour_T := BDF_Font.Green;
-   Host_Arg : Unbounded_String := Null_Unbounded_String;
+   Arg_Ix       : Natural := 1;
+   Font_Colour  : BDF_Font.Font_Colour_T := BDF_Font.Green;
+   Host_Arg     : Unbounded_String := Null_Unbounded_String;
+   Text_Only    : Boolean := False;
    Trace_Xmodem : Boolean := False;
 
    procedure Print_Help is
@@ -49,6 +50,7 @@ procedure Dashera is
       Ada.Text_IO.Put_Line ("  -debug            Print debugging information on STDOUT");
       Ada.Text_IO.Put_Line ("  -h or -help       Print this help");
       Ada.Text_IO.Put_Line ("  -host <host:port> Host to connect with via Telnet");
+      Ada.Text_IO.Put_Line ("  -textonly         Use system text widget rather than graphical display");
       Ada.Text_IO.Put_Line ("  -tracescript      Print trace of Mini-Expect script on STDOUT");
       Ada.Text_IO.Put_Line ("  -tracexmodem      Show details of XMODEM file transfers on STDOUT");
       Ada.Text_IO.Put_Line ("  -version          Show the version number of dashera and exit");
@@ -66,6 +68,8 @@ begin
          Arg_Ix := Arg_Ix + 1;
       elsif Argument (Arg_Ix) = "-debug" then
          Set_Level (DEBUG);
+      elsif Argument (Arg_Ix) = "-textonly" then
+         Text_Only := True;
       elsif Argument (Arg_Ix) = "-tracescript" then
          Set_Level (TRACE);
       elsif Argument (Arg_Ix) = "-tracexmodem" then
@@ -86,9 +90,9 @@ begin
    Gtk.Main.Init;
    Log (DEBUG, "Preparing to enter Main GTK event loop...");
    Gdk.Threads.Enter;
-   Main_Window := GUI.Create_Window (Host_Arg, Font_Colour, Trace_Xmodem);
+   Main_Window := GUI.Create_Window (Host_Arg, Font_Colour, Text_Only, Trace_Xmodem);
    Main_Window.Show_All;
    Gtk.Main.Main;
-   -- Gdk.Threads.Leave;
+   --  Gdk.Threads.Leave;
 
 end Dashera;

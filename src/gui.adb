@@ -78,6 +78,7 @@ with Mini_Expect;
 with Session_Logger;
 with Redirector;     use Redirector;
 with Serial;
+with Viewer;
 with Xmodem;
 
 package body GUI is
@@ -253,7 +254,7 @@ package body GUI is
                New_Zoom := Tiny;
             end if;
             if New_Zoom /= Crt.Tube.Zoom then
-               Font.Load_Font (Crt.Font_Filename, New_Zoom, Saved_Font_Colour);
+               Load_Font (Crt.Font_Filename, New_Zoom, Saved_Font_Colour);
                Crt.Tube.Zoom := New_Zoom;
             end if;
             --  resize
@@ -277,8 +278,8 @@ package body GUI is
             else
                New_Cols := 135;
             end if;
-            Crt.Tube.DA.Set_Size_Request (BDF_Font.Font.Get_Char_Width * New_Cols,
-                               BDF_Font.Font.Get_Char_Height * New_Lines);
+            Crt.Tube.DA.Set_Size_Request (BDF_Font.Get_Char_Width * New_Cols,
+                               BDF_Font.Get_Char_Height * New_Lines);
             Display.Set_Visible_Lines (Positive (New_Lines));
             Display.Set_Visible_Cols  (Positive (New_Cols));
             --  Ask for window resize to smaller than we are - the effect
@@ -1318,11 +1319,13 @@ package body GUI is
 
    function Create_Window (Host_Arg     : Unbounded_String;
                            Font_Colour  : BDF_Font.Font_Colour_T;
+                           Text_Only    : Boolean;
                            Trace_Xmodem : Boolean) return Gtk.Window.Gtk_Window is
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Log (DEBUG, "Starting to Create_Window");
-      Trace_Xmodem_Opt := Trace_Xmodem;
+      Text_Only_Opt     := Text_Only;
+      Trace_Xmodem_Opt  := Trace_Xmodem;
       Saved_Font_Colour := Font_Colour;
 
       --  Gtk.Window.Initialize (Main_Window);
@@ -1347,11 +1350,16 @@ package body GUI is
 
       --  CRT area
       Display_P.Display.Init;
-      Term := Terminal.Create (Terminal.D210);
+      Term := Terminal.Create (Terminal.D210, Text_Only_Opt);
       Crt.Init (BDF_Font.Normal, Font_Colour);
-      Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
-      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-      Main_Grid.Add (Crt.Tube.DA);
+      if Text_Only then
+         Viewer.Init;
+         Main_Grid.Add (Viewer.View);
+      else
+         Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
+         Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
+         Main_Grid.Add (Crt.Tube.DA);
+      end if;
 
       --  Status Bar
       Main_Grid.Add (Create_Status_Box);

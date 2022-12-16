@@ -77,6 +77,7 @@ package Display_P is
       procedure Set_Visible_Lines (Lines : Positive);
       function  Is_Blink_Enabled return Boolean;
       procedure Set_Blink_Enabled (Blink : Boolean);
+
    private
       Disp, Saved_Disp   : Display_T;
       History            : History_T;
