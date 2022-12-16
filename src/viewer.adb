@@ -17,6 +17,7 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
+with Gdk.Threads;
 with Gtk.Enums;       use Gtk.Enums;
 with Pango.Font;      use Pango.Font;
 
@@ -61,8 +62,8 @@ package body Viewer is
       --  Clear_Buffer (Buffer);
       Update;
 
-      if Update_TO = 0 then
-         Update_TO := Redraw_Timeout.Timeout_Add (Update_Period_MS, Update_Timeout_CB'Access, True);
+      if Blink_TO = 0 then
+         Blink_TO := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, True);
       end if;
 
    end Init;
@@ -88,11 +89,25 @@ package body Viewer is
       end loop;
    end Clear_Buffer;
 
-   function Update_Timeout_CB (Unused_Bool : Boolean) return Boolean is
+   function Blink_Timeout_CB (Unused_Bool : Boolean) return Boolean is
    begin
+      Blink_State := not Blink_State;
+      for Line in 0 .. Display.Get_Visible_Lines - 1 loop
+         for Col in 0 .. Display.Get_Visible_Cols - 1 loop
+            Display.Cell_Set_Dirty_If_Blinking (Line, Col);
+         end loop;
+      end loop;
       Update;
       return True;
-   end Update_Timeout_CB;
+   end Blink_Timeout_CB;
+
+   function Update_CB return Boolean is
+   begin
+      
+      Update;
+      
+      return False;
+   end Update_CB;
 
    procedure Update is
       Success : Boolean;
@@ -100,25 +115,33 @@ package body Viewer is
       Value : Character;
       Blnk, Dm, Rv, Under, Prot : Boolean;
    begin
-      if Display.Is_Dirty then
-         Buffer.Get_Start_Iter (Start_I);
-         Buffer.Get_End_Iter (End_I);
-         Buffer.Delete (Start_I, End_I);
-         for Line in 0 .. Display.Get_Visible_Lines - 1 loop
-            for Col in 0 .. Display.Get_Visible_Cols -1 loop
+      Log (DEBUG, "Starting Viewer Update");
+      Buffer.Get_Start_Iter (Start_I);
+      Buffer.Get_End_Iter (End_I);
+      Buffer.Delete (Start_I, End_I);
+      for Line in 0 .. Display.Get_Visible_Lines - 1 loop
+         Log (DEBUG, "Line: " & Line'Image);
+         for Col in 0 .. Display.Get_Visible_Cols -1 loop
+            if Display.Cell_Is_Dirty (Line, Col) then
                Display.Get_Cell (Line, Col, Value, Blnk, Dm, Rv, Under, Prot);
                Get_End_Iter (Buffer, Iter);
                Insert (Buffer, Iter, "" & Value);
-            end loop;
-            Insert (Buffer, Iter, "" & ASCII.LF);
-            Start_Iter := Iter;
-            Backward_Chars (Start_Iter, Gint (Display.Get_Visible_Cols) + 1, Success);
-            Apply_Tag (Buffer => Buffer, Tag => Mono, Start => Start_Iter, The_End => Iter);
-            Apply_Tag (Buffer => Buffer, Tag => Green_FG, Start => Start_Iter, The_End => Iter);
-            Apply_Tag (Buffer => Buffer, Tag => Black_BG, Start => Start_Iter, The_End => Iter);
+               Start_Iter := Iter;
+               Backward_Chars (Start_Iter, 1, Success);
+               Apply_Tag (Buffer => Buffer, Tag => Mono, Start => Start_Iter, The_End => Iter);
+               Apply_Tag (Buffer => Buffer, Tag => Green_FG, Start => Start_Iter, The_End => Iter);
+               Apply_Tag (Buffer => Buffer, Tag => Black_BG, Start => Start_Iter, The_End => Iter);
+            end if;
          end loop;
-         Display.Clear_Dirty;
-      end if;
+         Insert (Buffer, Iter, "" & ASCII.LF);
+         --  Start_Iter := Iter;
+         --  Backward_Chars (Start_Iter, Gint (Display.Get_Visible_Cols) + 1, Success);
+         --  Apply_Tag (Buffer => Buffer, Tag => Mono, Start => Start_Iter, The_End => Iter);
+         --  Apply_Tag (Buffer => Buffer, Tag => Green_FG, Start => Start_Iter, The_End => Iter);
+         --  Apply_Tag (Buffer => Buffer, Tag => Black_BG, Start => Start_Iter, The_End => Iter);
+      end loop;
+      Display.Clear_Dirty;
+      Log (DEBUG, "Finished Viewer Update");
    end Update;
 
 end Viewer;

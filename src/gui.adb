@@ -1350,7 +1350,7 @@ package body GUI is
 
       --  CRT area
       Display_P.Display.Init;
-      Term := Terminal.Create (Terminal.D210);
+      Term := Terminal.Create (Terminal.D210, Text_Only_Opt);
       Crt.Init (BDF_Font.Normal, Font_Colour);
       if Text_Only then
          Viewer.Init;

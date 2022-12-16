@@ -31,9 +31,9 @@ with Gtk.Text_View;      use Gtk.Text_View;
 
 package Viewer is
 
-   package Redraw_Timeout is new Glib.Main.Generic_Sources (Boolean);
+   package Blink_Timeout is new Glib.Main.Generic_Sources (Boolean);
 
-   Update_Period_MS : constant Guint := 50;
+   Blink_Period_MS : constant Guint := 500;
 
    Buffer : Gtk_Text_Buffer;
    Tags   : Gtk_Text_Tag_Table;
@@ -41,12 +41,14 @@ package Viewer is
    Black_BG, Green_FG, Mono : Gtk_Text_Tag;
    Colour : Gdk_RGBA;
    Iter, Start_Iter : Gtk_Text_Iter;
-   View   : Gtk_Text_View;
-   Update_TO : Glib.Main.G_Source_Id;
+   View        : Gtk_Text_View;
+   Blink_TO    : Glib.Main.G_Source_Id;
+   Blink_State : Boolean := False;
 
    procedure Init;
    procedure Update;
-   function Update_Timeout_CB (Unused_Bool : Boolean) return Boolean;
+   function Blink_Timeout_CB (Unused_Bool : Boolean) return Boolean;
+   function Update_CB return Boolean;
 
 private
    procedure Clear_Buffer (B : Gtk_Text_Buffer);

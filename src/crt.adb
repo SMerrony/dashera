@@ -43,12 +43,6 @@ package body Crt is
       return True;
    end Blink_Timeout_CB;
 
-   function Redraw_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
-   begin
-      DA.Queue_Draw;
-      return True;
-   end Redraw_Timeout_CB;
-
    procedure Init (Zoom : Zoom_T; Font_Colour : Font_Colour_T) is
    begin
       Log (DEBUG, "Creating Crt");
@@ -63,11 +57,6 @@ package body Crt is
       if Blink_TO = 0 then
          Blink_TO := Blink_Timeout.Timeout_Add (Blink_Period_MS, Blink_Timeout_CB'Access, Tube.DA);
       end if;
-
-      --  TESTING = Redraw timer...
-      --  if Redraw_TO = 0 then
-      --     Redraw_TO := Redraw_Timeout.Timeout_Add (50, Redraw_Timeout_CB'Access, Tube.DA);
-      --  end if;
 
    end Init;
 

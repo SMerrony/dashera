@@ -42,12 +42,11 @@ package Crt is
       Zoom       : BDF_Font.Zoom_T;
       Saved_Font_Colour : BDF_Font.Font_Colour_T;
       Blink_State : Boolean := False;
-      --  Timeout_ID : Glib.Main.G_Source_ID := 0;
    end record;
 
    Tube : Crt_T;
    surface : Cairo.Cairo_Surface;
-   Blink_TO, Redraw_TO : Glib.Main.G_Source_Id;
+   Blink_TO: Glib.Main.G_Source_Id;
 
    procedure Init (Zoom : BDF_Font.Zoom_T; Font_Colour : BDF_Font.Font_Colour_T);
 

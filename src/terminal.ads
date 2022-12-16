@@ -34,6 +34,7 @@ package Terminal is
       Raw_Mode : Boolean; --  in rawMode all host data is passed straight through to rawChan
       Blinking, Dimmed, Reversed, Underscored, Protectd : Boolean;
       Updated                                           : Boolean;
+      Text_Only                        : Boolean;
    end record;
 
    type Terminal_Acc_T is access all Terminal_T;
@@ -46,7 +47,7 @@ package Terminal is
    type Processor_Acc is access Processor;
    Processor_Task : Processor_Acc;
 
-   function Create (Emul : Emulation_T) return Terminal_Acc_T;
+   function Create (Emul : Emulation_T; Text_Only : Boolean) return Terminal_Acc_T;
    procedure Self_Test (T : in out Terminal_T);
    procedure Process (T : in out Terminal_T; Str : String);
 
