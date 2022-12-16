@@ -80,11 +80,11 @@ package GUI is
    SB_Timeout  : Glib.Main.G_Source_Id := 0;
 
    --  Flags
-   Trace_Script_Opt, Text_Only_Opt, Trace_Xmodem_Opt : Boolean;
+   Trace_Script_Opt, Text_Only_Opt, Trace_Xmodem_Opt : Boolean := False;
 
    function Create_Window (Host_Arg     : Unbounded_String;
                            Font_Colour  : BDF_Font.Font_Colour_T;
-                           Text_Only    : Boolean;
+                           --  Text_Only    : Boolean;
                            Trace_Xmodem : Boolean) return Gtk_Window;
 
 end GUI;

@@ -31,7 +31,7 @@ with Logging;        use Logging;
 with Session_Logger;
 with Mini_Expect;
 with Redirector;
-with Viewer;
+--  with Viewer;
 
 package body Terminal is
 
@@ -466,12 +466,12 @@ package body Terminal is
       <<Redraw_Tube>>
          Display.Set_Cursor (T.Cursor_X, T.Cursor_Y);
          Display.Set_Dirty;
-         if T.Text_Only then
-            Unused_SI := Glib.Main.Idle_Add (Viewer.Update_CB'Access);
-            --  Viewer.Update;
-         else
-            Crt.Tube.DA.Queue_Draw;
-         end if;
+         --  if T.Text_Only then
+         --     Unused_SI := Glib.Main.Idle_Add (Viewer.Update_CB'Access);
+         --     --  Viewer.Update;
+         --  else
+         Crt.Tube.DA.Queue_Draw;
+         --  end if;
       end loop;
    end Process;
 

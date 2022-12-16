@@ -17,8 +17,8 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
--- Crt provides a pixel-realistic DASHER VDU look for the text display.
--- It may be slower than the text Viewer on systems with limited resources.
+--  Crt provides a pixel-realistic DASHER VDU look for the text display.
+--  It may be slower than a text-based Viewer on systems with limited resources.
 
 with Cairo;
 with Gdk.Event;
@@ -44,9 +44,9 @@ package Crt is
       Blink_State : Boolean := False;
    end record;
 
-   Tube : Crt_T;
-   surface : Cairo.Cairo_Surface;
-   Blink_TO: Glib.Main.G_Source_Id;
+   Tube     : Crt_T;
+   surface  : Cairo.Cairo_Surface;
+   Blink_TO : Glib.Main.G_Source_Id;
 
    procedure Init (Zoom : BDF_Font.Zoom_T; Font_Colour : BDF_Font.Font_Colour_T);
 

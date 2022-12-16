@@ -26,7 +26,6 @@ with Ada.Text_IO;
 with GNAT.Serial_Communications; use GNAT.Serial_Communications;
 
 with Gdk.Event;               --  use Gdk.Event;
-with Gdk.Threads;
 with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
 
 with Glib;                    use Glib;
@@ -78,7 +77,7 @@ with Mini_Expect;
 with Session_Logger;
 with Redirector;     use Redirector;
 with Serial;
-with Viewer;
+--  with Viewer;
 with Xmodem;
 
 package body GUI is
@@ -1221,7 +1220,6 @@ package body GUI is
       Dest : Redirector.Connection_T;
    begin
       Redirector.Router.Get_Destination (Dest);
-      Gdk.Threads.Enter;
       case Dest is
          when Redirector.Local =>
             Online_Label.Set_Text ("Local");
@@ -1253,7 +1251,6 @@ package body GUI is
          Hold_Label.Set_Text ("");
       end if;
       SB.Queue_Draw;
-      Gdk.Threads.Leave;
       return True;
    end Update_Status_Box_CB;
 
@@ -1319,12 +1316,12 @@ package body GUI is
 
    function Create_Window (Host_Arg     : Unbounded_String;
                            Font_Colour  : BDF_Font.Font_Colour_T;
-                           Text_Only    : Boolean;
+                           --  Text_Only    : Boolean;
                            Trace_Xmodem : Boolean) return Gtk.Window.Gtk_Window is
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
    begin
       Log (DEBUG, "Starting to Create_Window");
-      Text_Only_Opt     := Text_Only;
+      --  Text_Only_Opt     := Text_Only;
       Trace_Xmodem_Opt  := Trace_Xmodem;
       Saved_Font_Colour := Font_Colour;
 
@@ -1352,14 +1349,14 @@ package body GUI is
       Display_P.Display.Init;
       Term := Terminal.Create (Terminal.D210, Text_Only_Opt);
       Crt.Init (BDF_Font.Normal, Font_Colour);
-      if Text_Only then
-         Viewer.Init;
-         Main_Grid.Add (Viewer.View);
-      else
-         Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
-         Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
-         Main_Grid.Add (Crt.Tube.DA);
-      end if;
+      --  if Text_Only then
+      --     Viewer.Init;
+      --     Main_Grid.Add (Viewer.View);
+      --  else
+      Crt.Tube.DA.On_Configure_Event (Crt.Configure_Event_CB'Access);
+      Crt.Tube.DA.On_Draw (Crt.Draw_CB'Access);
+      Main_Grid.Add (Crt.Tube.DA);
+      --  end if;
 
       --  Status Bar
       Main_Grid.Add (Create_Status_Box);

@@ -31,7 +31,6 @@ package body Crt is
    use type Cairo.Cairo_Surface;
 
    function Blink_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
-      pragma Unreferenced (DA);
    begin
       Tube.Blink_State := not Tube.Blink_State;
       for Line in 0 .. Display.Get_Visible_Lines - 1 loop
@@ -100,7 +99,6 @@ package body Crt is
       Char_X, Char_Y, Char_UL : Gdouble;
       Value : Character;
       Blnk, Dm, Rv, Under, Prot : Boolean;
-      All_Dirty      : constant Boolean := Display.Is_Dirty;
       Blink_Enabled  : constant Boolean := Display.Is_Blink_Enabled;
       Blink_State    : constant Boolean := Tube.Blink_State;
       Decoded_Height : constant Gint := Get_Char_Height;
