@@ -31,14 +31,20 @@ package body Crt is
    use type Cairo.Cairo_Surface;
 
    function Blink_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
+      Blinking, Any_Blinking : Boolean := False;
    begin
       Tube.Blink_State := not Tube.Blink_State;
       for Line in 0 .. Display.Get_Visible_Lines - 1 loop
          for Col in 0 .. Display.Get_Visible_Cols - 1 loop
-            Display.Cell_Set_Dirty_If_Blinking (Line, Col);
+            Display.Cell_Set_Dirty_If_Blinking (Line, Col, Blinking);
+            if Blinking then 
+               Any_Blinking := True; 
+            end if;
          end loop;
       end loop;
-      DA.Queue_Draw;
+      if Any_Blinking then
+         DA.Queue_Draw;
+      end if;
       return True;
    end Blink_Timeout_CB;
 

@@ -89,9 +89,10 @@ package body Display_P is
          Disp.Cells (Line, Col).Clear_Dirty;
       end Cell_Clear_Dirty;
 
-      procedure Cell_Set_Dirty_If_Blinking (Line, Col : Natural) is
+      procedure Cell_Set_Dirty_If_Blinking (Line, Col : Natural; Blinking : out Boolean) is
       begin
-         if Disp.Cells (Line, Col).Is_Blinking then
+         Blinking := Disp.Cells (Line, Col).Is_Blinking;
+         if Blinking then
             Disp.Cells (Line, Col).Set_Dirty;
          end if;
       end Cell_Set_Dirty_If_Blinking;
