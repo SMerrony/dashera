@@ -293,7 +293,7 @@ package body GUI is
    procedure Self_Test_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
    begin
-      Term.Self_Test;
+      Terminal.Self_Test;
    end Self_Test_CB;
 
    function Label_To_Markup (L : Unbounded_String) return Unbounded_String is

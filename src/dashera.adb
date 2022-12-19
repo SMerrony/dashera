@@ -23,7 +23,6 @@ with Ada.Text_IO;
 
 with GNAT.OS_Lib;
 
-with Gdk.Threads;
 with Gtk.Main;
 with Gtk.Window;  use Gtk.Window;
 

@@ -33,7 +33,7 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 * Serial.Receiver
 * Telnet.Keyboard_Sender
 * Telnet.Receiver
-* Terminal.Processor
+* ~~Terminal.Processor~~
 * Xmodem.Receiver (transient)
 * Xmodem.Sender (transient)
 

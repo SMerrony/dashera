@@ -19,8 +19,6 @@
 
 with Ada.Exceptions;
 
-with Gdk.Threads;
-
 with Logging;  use Logging;
 with Serial;
 with Telnet;
@@ -43,7 +41,7 @@ package body Redirector is
          or
             accept Send_Data (Data : String) do
                case Destination is
-                  when Local => Terminal.Processor_Task.Accept_Data (Data);
+                  when Local => Terminal.Process (Data);
                   when Async => Serial.Keyboard_Sender_Task.Accept_Data (Data);
                   when Network => Telnet.Keyboard_Sender_Task.Accept_Data (Data);
                end case;
@@ -60,7 +58,7 @@ package body Redirector is
             accept Handle_Data (C : Character) do
                --  Gdk.Threads.Enter;
                case Handler is
-                  when Visual    => Terminal.Processor_Task.Accept_Data ("" & C);
+                  when Visual    => Terminal.Process ("" & C);
                   when Xmodem_Rx => Xmodem.Receiver_Task.Accept_Data (C);
                   when Xmodem_Tx => Xmodem.Sender_Task.Accept_Data (C);
                end case;
