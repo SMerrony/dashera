@@ -51,7 +51,7 @@ package body Redirector is
       case Destination is
          when Local => Terminal.Process (Data);
          when Async => Serial.Keyboard_Sender_Task.Accept_Data (Data);
-         when Network => Telnet.Keyboard_Sender_Task.Accept_Data (Data);
+         when Network => Telnet.Send (Data);
       end case;
    exception
       when Telnet.Disconnected =>

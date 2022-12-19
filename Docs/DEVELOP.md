@@ -31,7 +31,7 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 * ~~Redirector.Router~~
 * Serial.Keyboard_Sender
 * Serial.Receiver
-* Telnet.Keyboard_Sender
+* ~~Telnet.Keyboard_Sender~~
 * Telnet.Receiver
 * ~~Terminal.Processor~~
 * Xmodem.Receiver (transient)
