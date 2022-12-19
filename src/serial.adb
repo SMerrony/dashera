@@ -55,15 +55,12 @@ package body Serial is
       Receiver_Task := new Receiver;
       Receiver_Task.Start;
       Redirector.Set_Destination (Redirector.Async);
-      Keyboard_Sender_Task := new Keyboard_Sender;
-      Keyboard_Sender_Task.Start;
       Log (DEBUG, "Serial port open complete");
    end Open;
 
    procedure Close is
    begin
       Close (Port);
-      Keyboard_Sender_Task.Stop;
       Redirector.Set_Destination (Redirector.Local);
    end Close;
 
@@ -89,44 +86,24 @@ package body Serial is
       Close;
    end Receiver;
 
-   task body Keyboard_Sender is
+   procedure Send (Data : String) is
+      SEA : Stream_Element_Array (1 .. Data'Length);
    begin
-      accept Start do
-         Log (DEBUG, "Serial Keyboard_Sender Started");
-      end Start;
-      loop
-         select
-            accept Accept_Data (Data : String) do
-               declare
-                  SEA : Stream_Element_Array (1 .. Data'Length);
-               begin
-                  for I in 1 .. Data'Length loop
-                     SEA (Stream_Element_Offset (I)) := Stream_Element (Character'Pos (Data (I)));
-                  end loop;
-                  Write (Port, SEA);
-               end;
-            end Accept_Data;
-         or
-            accept Send_Break do
-               declare
-                  SEA : Stream_Element_Array (1 .. 1);
-               begin
-                  --  Set a very slow data rate
-                  GNAT.Serial_Communications.Set (Port, B110, CS8, Two, None);
-                  SEA (1) := 0; --  all zeroes
-                  Write (Port, SEA);
-                  --  Reset port to user settings
-                  GNAT.Serial_Communications.Set (Port, User_Rate, User_Bits, User_Stop_Bits, User_Parity);
-               end;
-            end Send_Break;
-         or
-            accept Stop;
-               Log (DEBUG, "Serial Keyboard_Sender Stopped");
-               exit;
-         or
-            terminate;
-         end select;
+      for I in 1 .. Data'Length loop
+         SEA (Stream_Element_Offset (I)) := Stream_Element (Character'Pos (Data (I)));
       end loop;
-   end Keyboard_Sender;
+      Write (Port, SEA);
+   end Send;
+
+   procedure Send_Break is
+      SEA : Stream_Element_Array (1 .. 1);
+   begin
+      --  Set a very slow data rate
+      GNAT.Serial_Communications.Set (Port, B110, CS8, Two, None);
+      SEA (1) := 0; --  all zeroes
+      Write (Port, SEA);
+      --  Reset port to user settings
+      GNAT.Serial_Communications.Set (Port, User_Rate, User_Bits, User_Stop_Bits, User_Parity);
+   end Send_Break;
 
 end Serial;

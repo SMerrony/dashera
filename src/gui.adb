@@ -998,7 +998,7 @@ package body GUI is
          Keyboard.Handle_Key_Release (GDK_Break);
          Dest := Get_Destination;
          if Dest = Async then
-            Serial.Keyboard_Sender_Task.Send_Break;
+            Serial.Send_Break;
          else
             Log (INFO, "BREAK only implemented for Serial connections");
          end if;

@@ -30,15 +30,6 @@ package Serial is
 
    Receiver_Task : Receiver_Acc;
 
-   task type Keyboard_Sender is
-      entry Start;
-      entry Accept_Data (Data : String);
-      entry Send_Break;
-      entry Stop;
-   end Keyboard_Sender;
-   type Sender_Acc is access Keyboard_Sender;
-
-   Keyboard_Sender_Task : Sender_Acc;
    Port_US : Unbounded_String;
 
    procedure Open (Port_Str  : String;
@@ -46,6 +37,9 @@ package Serial is
                    Bits      : Data_Bits;
                    Parity    : Parity_Check;
                    Stop_Bits : Stop_Bits_Number);
+
+   procedure Send (Data : String);
+   procedure Send_Break;
 
    procedure Close;
 

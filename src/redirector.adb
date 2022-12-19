@@ -49,8 +49,8 @@ package body Redirector is
    procedure Send_Data (Data : String) is
    begin
       case Destination is
-         when Local => Terminal.Process (Data);
-         when Async => Serial.Keyboard_Sender_Task.Accept_Data (Data);
+         when Local   => Terminal.Process (Data);
+         when Async   => Serial.Send (Data);
          when Network => Telnet.Send (Data);
       end case;
    exception
