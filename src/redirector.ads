@@ -25,7 +25,7 @@ package Redirector is
    procedure Set_Destination (Dest : Connection_T);
    function  Get_Destination return Connection_T;
    procedure Set_Handler (Handlr : Handler_T);
-   procedure Handle_Data (C: Character);
+   procedure Handle_Data (C : Character);
    --  Handle_Data deals with data to be processed in the emulator
 
    procedure Send_Data (Data : String);

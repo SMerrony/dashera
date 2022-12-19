@@ -39,8 +39,8 @@ package body Crt is
       for Line in 0 .. Display.Get_Visible_Lines - 1 loop
          for Col in 0 .. Display.Get_Visible_Cols - 1 loop
             Display.Cell_Set_Dirty_If_Blinking (Line, Col, Blinking);
-            if Blinking then 
-               Any_Blinking := True; 
+            if Blinking then
+               Any_Blinking := True;
             end if;
          end loop;
       end loop;

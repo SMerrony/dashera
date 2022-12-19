@@ -23,7 +23,7 @@ with Terminal;
 with Xmodem;
 
 package body Redirector is
-   
+
    procedure Set_Destination (Dest : Connection_T) is
    begin
       Destination := Dest;
@@ -37,7 +37,7 @@ package body Redirector is
       Handler := Handlr;
    end Set_Handler;
 
-   procedure Handle_Data (C: Character) is 
+   procedure Handle_Data (C : Character) is
    begin
       case Handler is
          when Visual    => Terminal.Process ("" & C);

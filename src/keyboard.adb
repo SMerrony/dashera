@@ -31,7 +31,7 @@ package body Keyboard is
          when GDK_Shift_L   | GDK_Shift_R   => Shift_Pressed := True;
          when others => null;
       end case;
-      -- is the user holding a key down?
+      --  is the user holding a key down?
       if Last_Pressed = Key then
          Process_Key (Key);
       end if;
@@ -78,7 +78,7 @@ package body Keyboard is
    end Handle_Key_Release;
 
    procedure Process_Key (Key : Gdk_Key_Type) is
-        Char : Character;
+      Char : Character;
    begin
       --  Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image);
       case Key is
