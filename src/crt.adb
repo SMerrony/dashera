@@ -20,6 +20,7 @@
 with Cairo;       use Cairo;
 
 with Gdk.Cairo;
+with Gdk.Threads;
 with Gdk.Window;
 
 with BDF_Font;    use BDF_Font;
@@ -33,6 +34,7 @@ package body Crt is
    function Blink_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
       Blinking, Any_Blinking : Boolean := False;
    begin
+      Gdk.Threads.Enter;
       Tube.Blink_State := not Tube.Blink_State;
       for Line in 0 .. Display.Get_Visible_Lines - 1 loop
          for Col in 0 .. Display.Get_Visible_Cols - 1 loop
@@ -45,6 +47,7 @@ package body Crt is
       if Any_Blinking then
          DA.Queue_Draw;
       end if;
+      Gdk.Threads.Leave;
       return True;
    end Blink_Timeout_CB;
 

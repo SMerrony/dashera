@@ -59,6 +59,8 @@ package Crt is
       Cr   : Cairo.Cairo_Context)
       return Boolean;
 
+   procedure Draw_Crt;
+
    Unloaded_Character : exception;
 
 end Crt;

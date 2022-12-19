@@ -26,6 +26,7 @@ with Ada.Text_IO;
 with GNAT.Serial_Communications; use GNAT.Serial_Communications;
 
 with Gdk.Event;               --  use Gdk.Event;
+with Gdk.Threads;
 with Gdk.Types.Keysyms;       use Gdk.Types.Keysyms;
 
 with Glib;                    use Glib;
@@ -1219,6 +1220,7 @@ package body GUI is
    function Update_Status_Box_CB (SB : Gtk.Box.Gtk_Box) return Boolean is
       Dest : Redirector.Connection_T;
    begin
+      Gdk.Threads.Enter;
       Redirector.Router.Get_Destination (Dest);
       case Dest is
          when Redirector.Local =>
@@ -1251,6 +1253,7 @@ package body GUI is
          Hold_Label.Set_Text ("");
       end if;
       SB.Queue_Draw;
+      Gdk.Threads.Leave;
       return True;
    end Update_Status_Box_CB;
 

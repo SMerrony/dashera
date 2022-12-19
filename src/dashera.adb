@@ -85,14 +85,14 @@ begin
       Arg_Ix := Arg_Ix + 1;
    end loop;
 
-   Gdk.Threads.G_Init;
-   Gdk.Threads.Init;
+   --  Gdk.Threads.G_Init;
+   --  Gdk.Threads.Init;
    Gtk.Main.Init;
    Log (DEBUG, "Preparing to enter Main GTK event loop...");
-   Gdk.Threads.Enter;
+   --  Gdk.Threads.Enter;
    Main_Window := GUI.Create_Window (Host_Arg, Font_Colour, Trace_Xmodem);
    Main_Window.Show_All;
    Gtk.Main.Main;
-   Gdk.Threads.Leave;
+   --  Gdk.Threads.Leave;
 
 end Dashera;

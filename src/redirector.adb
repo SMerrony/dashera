@@ -58,13 +58,13 @@ package body Redirector is
             end Set_Handler;
          or
             accept Handle_Data (C : Character) do
-               Gdk.Threads.Enter;
+               --  Gdk.Threads.Enter;
                case Handler is
                   when Visual    => Terminal.Processor_Task.Accept_Data ("" & C);
                   when Xmodem_Rx => Xmodem.Receiver_Task.Accept_Data (C);
                   when Xmodem_Tx => Xmodem.Sender_Task.Accept_Data (C);
                end case;
-               Gdk.Threads.Leave;
+               --  Gdk.Threads.Leave;
             end Handle_Data;
          or
             terminate;

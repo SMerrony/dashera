@@ -21,6 +21,7 @@ with Ada.Characters.Latin_1;
 with Ada.Strings.Fixed;
 
 with Gdk.Main;
+with Gdk.Threads;
 with Glib.Main;
 
 with BDF_Font;
@@ -139,7 +140,9 @@ package body Terminal is
       loop
          select
             accept Accept_Data (Str : String) do
+               --  Gdk.Threads.Enter;
                TA.Process (Str);
+               --  Gdk.Threads.Leave;
             end Accept_Data;
          or
             accept Stop;
@@ -470,7 +473,7 @@ package body Terminal is
          --     Unused_SI := Glib.Main.Idle_Add (Viewer.Update_CB'Access);
          --     --  Viewer.Update;
          --  else
-         Crt.Tube.DA.Queue_Draw;
+         Crt.Tube.DA.Queue_Draw; -- FIXME - BUGGY!!!
          --  end if;
       end loop;
    end Process;
