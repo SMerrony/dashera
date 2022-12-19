@@ -76,7 +76,7 @@ with Keyboard;
 with Logging;        use Logging;
 with Mini_Expect;
 with Session_Logger;
-with Redirector;     use Redirector;
+with Redirector;
 with Serial;
 --  with Viewer;
 with Xmodem;
@@ -111,15 +111,15 @@ package body GUI is
 
    procedure Quit_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
-      Conn : Connection_T;
+      Conn : Redirector.Connection_T;
    begin
-      Router.Get_Destination (Conn);
+      Conn := Redirector.Get_Destination;
       case Conn is
-         when Local =>
+         when Redirector.Local =>
             null;
-         when Async =>
+         when Redirector.Async =>
             Serial.Close;
-         when Network =>
+         when Redirector.Network =>
             Telnet_Sess.Close_Connection;
       end case;
       Gtk.Main.Main_Quit;
@@ -322,7 +322,7 @@ package body GUI is
       if Filename'Length > 0 then
          Open (File => Text_File, Mode => In_File, Name => Filename);
          while not End_Of_File (Text_File) loop
-            Redirector.Router.Send_Data (Get_Line (Text_File) & Dasher_Codes.Dasher_NL);
+            Redirector.Send_Data (Get_Line (Text_File) & Dasher_Codes.Dasher_NL);
          end loop;
          Close (Text_File);
       end if;
@@ -444,7 +444,7 @@ package body GUI is
          declare
             Text : constant String := String (Wait_For_Text (Clipboard));
          begin
-            Redirector.Router.Send_Data (Text);
+            Redirector.Send_Data (Text);
          end;
       else
          Unused_Buttons := Message_Dialog (Msg => "Nothing in Clipboard to Paste",
@@ -558,7 +558,7 @@ package body GUI is
                end case;
                Serial.Open (Port_Str, Rate, Bits, Parity, Stop_Bits);
 
-               Redirector.Router.Set_Destination (Redirector.Async);
+               Redirector.Set_Destination (Redirector.Async);
                Serial_Connect_Item.Set_Sensitive (False);
                Serial_Disconnect_Item.Set_Sensitive (True);
                Net_Connect_Item.Set_Sensitive (False);
@@ -580,7 +580,7 @@ package body GUI is
       pragma Unreferenced (Self);
    begin
       Serial.Close;
-      Redirector.Router.Set_Destination (Redirector.Local);
+      Redirector.Set_Destination (Redirector.Local);
       Serial_Connect_Item.Set_Sensitive (True);
       Serial_Disconnect_Item.Set_Sensitive (False);
       Net_Connect_Item.Set_Sensitive (True);
@@ -633,7 +633,7 @@ package body GUI is
             begin
                Port_Num := Positive'Value (Port_Entry.Get_Text);
                Telnet_Sess := Telnet.New_Connection (String (Host_Str), Port_Num);
-               Redirector.Router.Set_Destination (Redirector.Network);
+               Redirector.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
                Serial_Connect_Item.Set_Sensitive (False);
@@ -656,7 +656,7 @@ package body GUI is
       pragma Unreferenced (Self);
    begin
       Telnet_Sess.Close_Connection;
-      Redirector.Router.Set_Destination (Redirector.Local);
+      Redirector.Set_Destination (Redirector.Local);
       Net_Connect_Item.Set_Sensitive (True);
       Net_Disconnect_Item.Set_Sensitive (False);
       Serial_Connect_Item.Set_Sensitive (True);
@@ -996,7 +996,7 @@ package body GUI is
    begin
       if Lab = "Break" then
          Keyboard.Handle_Key_Release (GDK_Break);
-         Redirector.Router.Get_Destination (Dest);
+         Dest := Get_Destination;
          if Dest = Async then
             Serial.Keyboard_Sender_Task.Send_Break;
          else
@@ -1221,7 +1221,7 @@ package body GUI is
       Dest : Redirector.Connection_T;
    begin
       Gdk.Threads.Enter;
-      Redirector.Router.Get_Destination (Dest);
+      Dest := Redirector.Get_Destination;
       case Dest is
          when Redirector.Local =>
             Online_Label.Set_Text ("Local");
@@ -1367,10 +1367,8 @@ package body GUI is
       Main_Window.Add (Main_Grid);
       Main_Window.Set_Position (Gtk.Enums.Win_Pos_Center);
 
-      Redirector.Router := new Redirector.Router_TT;
-
-      Redirector.Router.Set_Destination (Redirector.Local);
-      Redirector.Router.Set_Handler (Redirector.Visual);
+      Redirector.Set_Destination (Redirector.Local);
+      Redirector.Set_Handler (Redirector.Visual);
       Main_Window.On_Key_Press_Event (Handle_Key_Press_Event_CB'Unrestricted_Access);
       Main_Window.On_Key_Release_Event (Handle_Key_Release_Event_CB'Unrestricted_Access);
 
@@ -1390,7 +1388,7 @@ package body GUI is
                Port_Num : constant Positive := Positive'Value (Slice (Host_Arg, Colon_Ix + 1, Length (Host_Arg)));
             begin
                Telnet_Sess := Telnet.New_Connection (Host_Str, Port_Num);
-               Redirector.Router.Set_Destination (Redirector.Network);
+               Redirector.Set_Destination (Redirector.Network);
                Net_Connect_Item.Set_Sensitive (False);
                Net_Disconnect_Item.Set_Sensitive (True);
                Serial_Connect_Item.Set_Sensitive (False);

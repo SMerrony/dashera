@@ -57,11 +57,8 @@ package body Terminal is
       Term.Reversed := False;
       Term.Underscored := False;
       Term.Protectd := False;
-
       Term.Updated := True;
 
-      --  Processor_Task := new Processor;
-      --  Processor_Task.Start (T);
       T := Term;
 
       return Term;
@@ -159,7 +156,7 @@ package body Terminal is
             Response (5) := Character'Val (2#01010001#); --  See p.3-9 of D210/D211 User Manual
             Response (6) := Character'Val (8#132#);      --  Firmware Code
       end case;
-      Redirector.Router.Send_Data (Response);
+      Redirector.Send_Data (Response);
    end Send_Model_ID;
 
    --  Process is to be called with a Byte_Arr whenever there is any data for
@@ -341,11 +338,12 @@ package body Terminal is
                   B3_Arr (1) := Character'Val (31);
                   B3_Arr (2) := Character'Val (T.Cursor_X);
                   B3_Arr (3) := Character'Val (T.Cursor_Y);
-                  select
-                     Redirector.Router.Send_Data (B3_Arr);
-                  or
-                     delay 0.5;
-                  end select;
+                  Redirector.Send_Data (B3_Arr);
+                  --  select
+                  --     Redirector.Send_Data (B3_Arr);
+                  --  or
+                  --     delay 0.5; -- FIXME this was to prevent hang if other end not waiting
+                  --  end select;
                end;
                T.Skip_Byte := True;
             when Dasher_Rev_On =>

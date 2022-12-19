@@ -42,7 +42,7 @@ package body Keyboard is
       Str : String (1 .. 1);
    begin
       Str (1) := Ch;
-      Redirector.Router.Send_Data (Str);
+      Redirector.Send_Data (Str);
    end Enqueue_Key;
 
    function Modify (C : Character) return Character is
@@ -68,7 +68,7 @@ package body Keyboard is
    begin
       Str2 (1) := C1;
       Str2 (2) := C2;
-      Redirector.Router.Send_Data (Str2);
+      Redirector.Send_Data (Str2);
    end Enqueue_Pair;
 
    procedure Handle_Key_Release (Key  : Gdk_Key_Type) is

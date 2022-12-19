@@ -28,7 +28,7 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 ### Tasks
 
 * Mini_Expect.Runner_Task (transient)
-* Redirector.Router
+* ~~Redirector.Router~~
 * Serial.Keyboard_Sender
 * Serial.Receiver
 * Telnet.Keyboard_Sender

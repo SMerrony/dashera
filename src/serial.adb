@@ -54,7 +54,7 @@ package body Serial is
       Port_US := To_Unbounded_String (Port_Str);
       Receiver_Task := new Receiver;
       Receiver_Task.Start;
-      Redirector.Router.Set_Destination (Redirector.Async);
+      Redirector.Set_Destination (Redirector.Async);
       Keyboard_Sender_Task := new Keyboard_Sender;
       Keyboard_Sender_Task.Start;
       Log (DEBUG, "Serial port open complete");
@@ -64,7 +64,7 @@ package body Serial is
    begin
       Close (Port);
       Keyboard_Sender_Task.Stop;
-      Redirector.Router.Set_Destination (Redirector.Local);
+      Redirector.Set_Destination (Redirector.Local);
    end Close;
 
    task body Receiver is
@@ -76,7 +76,7 @@ package body Serial is
       loop
          begin
             Character'Read (Port'Access, B);
-            Redirector.Router.Handle_Data (B);
+            Redirector.Handle_Data (B);
          exception
             when Ada.IO_Exceptions.End_Error =>
                null;

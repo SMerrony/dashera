@@ -95,7 +95,7 @@ package body Telnet is
    begin
       GNAT.Sockets.Shutdown_Socket (Sess.Conn);
       Keyboard_Sender_Task.Stop;
-      Redirector.Router.Set_Destination (Redirector.Local);
+      Redirector.Set_Destination (Redirector.Local);
    exception
       when Socket_Error =>
          Log (WARNING, "Error closing socket (already disconnected?)");
@@ -183,7 +183,7 @@ package body Telnet is
                goto continue;
             end if;
 
-            Redirector.Router.Handle_Data (One_Byte);
+            Redirector.Handle_Data (One_Byte);
 
          <<continue>>
          end loop;

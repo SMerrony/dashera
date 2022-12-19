@@ -22,16 +22,14 @@ package Redirector is
    type Connection_T is (Local, Async, Network);
    type Handler_T is (Visual, Xmodem_Rx, Xmodem_Tx);
 
-   task type Router_TT is
-      entry Set_Destination (Dest : Connection_T);
-      entry Get_Destination (Dest : out Connection_T);
-      entry Send_Data (Data : String);
-      entry Set_Handler (Handlr : Handler_T);
-      entry Handle_Data (C : Character);
-   end Router_TT;
-   type Router_Acc is access Router_TT;
+   procedure Set_Destination (Dest : Connection_T);
+   function  Get_Destination return Connection_T;
+   procedure Set_Handler (Handlr : Handler_T);
+   procedure Handle_Data (C: Character);
+   --  Handle_Data deals with data to be processed in the emulator
 
-   Router : Router_Acc;
+   procedure Send_Data (Data : String);
+   --  Send_Data forwards data to be processed remotely
 
 private
    Destination : Connection_T := Local;

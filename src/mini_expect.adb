@@ -130,7 +130,7 @@ package body Mini_Expect is
             declare
                Converted : constant String := Convert_Line (Expect_Line (6 .. Expect_Line_Length));
             begin
-               Redirector.Router.Send_Data (Converted);
+               Redirector.Send_Data (Converted);
             end;
 
          elsif Expect_Line (1 .. 4) = "exit" then

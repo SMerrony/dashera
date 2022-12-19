@@ -84,11 +84,11 @@ package body Xmodem is
          Log (DEBUG, "X-Modem sending start byte and block number: " & Block_Pos'Image);
          Log (DEBUG, "X-Modem ... Actual data length: " & Data.Length'Image);
       end if;
-      Router.Send_Data (Start_Bytes);
+      Redirector.Send_Data (Start_Bytes);
 
       --  Send the actual data
       for C of Data loop
-         Router.Send_Data ("" & C);
+         Redirector.Send_Data ("" & C);
       end loop;
 
       --  Pad out block
@@ -98,7 +98,7 @@ package body Xmodem is
          end if;
          Padding_String (1) := ASCII.EOT;
          for Ix in Data.Length + 1 .. Block_Size'Enum_Rep loop
-            Router.Send_Data (Padding_String);
+            Redirector.Send_Data (Padding_String);
             Data.Append (ASCII.EOT);
          end loop;
          if Tracing then
@@ -112,7 +112,7 @@ package body Xmodem is
       if Tracing then
          Log (DEBUG, "X-Modem checksum: " & CRC'Image & ", sending: " & CRC_Str);
       end if;
-      Router.Send_Data (CRC_Str);
+      Redirector.Send_Data (CRC_Str);
 
    end Send_Block;
 
@@ -128,7 +128,7 @@ package body Xmodem is
       Create (RX_File, Name => Filename);
       RX_Stream := Stream (RX_File);
       Log (INFO, "Xmodem Created file: " & Filename);
-      Router.Set_Handler (Handlr => Xmodem_Rx);
+      Redirector.Set_Handler (Handlr => Xmodem_Rx);
       Receiver_Task := new Receiver;
       Receiver_Task.Start (RX_Stream);
       loop
@@ -136,7 +136,7 @@ package body Xmodem is
             Receiver_Task.Done;
             Log (INFO, "Xmodem Receive is complete");
             Close (RX_File);
-            Router.Set_Handler (Handlr => Visual);
+            Redirector.Set_Handler (Handlr => Visual);
             exit;
          or
             delay 1.0;
@@ -166,7 +166,7 @@ package body Xmodem is
       if Tracing then
          Log (DEBUG, "Xmodem Sending POLL");
       end if;
-      Router.Send_Data ("" & 'C'); --  POLL
+      Redirector.Send_Data ("" & 'C'); --  POLL
       while not Finished loop --  per packet
          Packet.Clear;
 
@@ -182,7 +182,7 @@ package body Xmodem is
                if Tracing then
                   Log (DEBUG, "Xmodem Got EOT (End of Transmission)");
                end if;
-               Router.Send_Data ("" & ASCII.ACK);
+               Redirector.Send_Data ("" & ASCII.ACK);
                if Tracing then
                   Log (DEBUG, "Xmodem Sent final ACK");
                end if;
@@ -204,7 +204,7 @@ package body Xmodem is
          end case;
 
          if Finished then
-            Router.Set_Handler (Handlr => Visual);
+            Redirector.Set_Handler (Handlr => Visual);
             --  final packet may have trailing EOFs
             while File_Blob (File_Blob.Last_Index) = ASCII.SUB loop
                File_Blob.Delete (File_Blob.Last_Index);
@@ -245,7 +245,7 @@ package body Xmodem is
                         Purged := True;
                   end select;
                end loop;
-               Router.Send_Data ("" & ASCII.NAK);
+               Redirector.Send_Data ("" & ASCII.NAK);
                goto Next_Packet;
             end if;
 
@@ -279,7 +279,7 @@ package body Xmodem is
                if Tracing then
                   Log (DEBUG, "Xmodem CRCs OK - sending ACK");
                end if;
-               Router.Send_Data ("" & ASCII.ACK);
+               Redirector.Send_Data ("" & ASCII.ACK);
                for C of Packet loop
                   File_Blob.Append (C);
                end loop;
@@ -296,7 +296,7 @@ package body Xmodem is
                         Purged := True;
                   end select;
                end loop;
-               Router.Send_Data ("" & ASCII.NAK);
+               Redirector.Send_Data ("" & ASCII.NAK);
 
             end if;
 
@@ -415,7 +415,7 @@ package body Xmodem is
                raise Too_Many_Retries;
             end if;
          end loop;
-         Router.Send_Data ("" & ASCII.EOT);
+         Redirector.Send_Data ("" & ASCII.EOT);
          accept Done;
       or
          delay 30.0;
@@ -434,7 +434,7 @@ package body Xmodem is
          return;
       end if;
       Open (File => TX_File, Mode => In_File, Name => Filename);
-      Router.Set_Handler (Handlr => Xmodem_Tx);
+      Redirector.Set_Handler (Handlr => Xmodem_Tx);
       Sender_Task := new Sender;
       TX_Stream := Stream (TX_File);
       Sender_Task.Start (TX_Stream => TX_Stream, Pkt_Len => Pkt_Len);
@@ -443,7 +443,7 @@ package body Xmodem is
             Sender_Task.Done;
             Log (INFO, "Xmodem Transmit is complete");
             Close (TX_File);
-            Router.Set_Handler (Handlr => Visual);
+            Redirector.Set_Handler (Handlr => Visual);
             exit;
          or
             delay 1.0;
