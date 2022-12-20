@@ -18,11 +18,12 @@
 --  THE SOFTWARE.
 
 with Ada.Exceptions;
-with Ada.Streams;  use Ada.Streams;
+with Ada.Streams;           use Ada.Streams;
 with Ada.Unchecked_Conversion;
 
 with Logging;      use Logging;
 with Redirector;
+with Terminal;
 
 package body Telnet is
 
@@ -78,11 +79,12 @@ package body Telnet is
    end Close_Connection;
 
    task body Receiver is
-      Session      : Session_Acc_T;
-      Block        : Ada.Streams.Stream_Element_Array (1 .. 2048);
-      Offset       : Ada.Streams.Stream_Element_Count;
-      One_Byte     : Character;
-      Three_Bytes  : String (1 .. 3);
+      Session             : Session_Acc_T;
+      Rx_Block            : Ada.Streams.Stream_Element_Array (1 .. 2048);
+      Fwd_US              : Unbounded_String;
+      Offset              : Ada.Streams.Stream_Element_Count;
+      One_Byte            : Character;
+      Three_Bytes         : String (1 .. 3);
       In_Telnet_Cmd, Got_DO, Got_WILL : Boolean := False;
 
    begin
@@ -92,14 +94,15 @@ package body Telnet is
       end Start;
       loop
          --  Log (DEBUG, "Telnet Receive waiting for data...");
-         GNAT.Sockets.Receive_Socket (Session.Conn, Block, Offset);
+         GNAT.Sockets.Receive_Socket (Session.Conn, Rx_Block, Offset);
          --  Log (DEBUG, "...Telnet Receiver got data from host - No. Bytes:" & Offset'Image);
          if Offset = 0 then
             Log (WARNING, "Telnet Receiver Stopping due to empty message from host");
             goto Halt;
          end if;
+         Fwd_US := Null_Unbounded_String;
          for I in 1 .. Offset loop
-            One_Byte := Character'Val (Block (I));
+            One_Byte := Character'Val (Rx_Block (I));
             --  Log (DEBUG, "...Telnet Receiver handling byte: " & One_Byte'Image);
             if One_Byte = Cmd_IAC then
                if In_Telnet_Cmd then
@@ -159,11 +162,13 @@ package body Telnet is
                goto continue;
             end if;
 
-            Redirector.Handle_Data (One_Byte);
+            Append (Fwd_US, One_Byte);
+            --  Redirector.Handle_Data (One_Byte);
 
          <<continue>>
-         end loop;
-      end loop;
+         end loop; -- for I in 1 .. Offset
+         Terminal.Process (To_String (Fwd_US));
+      end loop;    -- forever
       <<Halt>>
       Log (DEBUG, "Telnet Receiver loop exited");
       Session.Close_Connection;

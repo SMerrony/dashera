@@ -594,7 +594,7 @@ package body GUI is
       pragma Unreferenced (Self);
       Dialog : Gtk_Dialog;
       Dlg_Box   : Gtk.Box.Gtk_Box;
-      Host_Label, Port_Label : Gtk.Label.Gtk_Label;
+      Dlg_Host_Label, Dlg_Port_Label : Gtk.Label.Gtk_Label;
       Host_Entry, Port_Entry : Gtk.GEntry.Gtk_Entry;
       Cancel_Unused, Connect_Unused : Gtk.Widget.Gtk_Widget;
       Unused_Buttons : Gtkada.Dialogs.Message_Dialog_Buttons;
@@ -604,15 +604,15 @@ package body GUI is
       Dialog.Set_Modal (True);
       Dialog.Set_Title (App_Title & " - Telnet Host");
       Dlg_Box := Dialog.Get_Content_Area;
-      Gtk.Label.Gtk_New (Host_Label, "Host:");
-      Dlg_Box.Pack_Start (Child => Host_Label, Expand => True, Fill => True, Padding => 5);
+      Gtk.Label.Gtk_New (Dlg_Host_Label, "Host:");
+      Dlg_Box.Pack_Start (Child => Dlg_Host_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Host_Entry);
       Dlg_Box.Pack_Start (Child => Host_Entry, Expand => True, Fill => True, Padding => 5);
       if Saved_Host /= Null_Unbounded_String then
          Host_Entry.Set_Text (To_String (Saved_Host));
       end if;
-      Gtk.Label.Gtk_New (Port_Label, "Port:");
-      Dlg_Box.Pack_Start (Child => Port_Label, Expand => True, Fill => True, Padding => 5);
+      Gtk.Label.Gtk_New (Dlg_Port_Label, "Port:");
+      Dlg_Box.Pack_Start (Child => Dlg_Port_Label, Expand => True, Fill => True, Padding => 5);
       Gtk.GEntry.Gtk_New (The_Entry => Port_Entry);
       if Saved_Port /= Null_Unbounded_String then
          Port_Entry.Set_Text (To_String (Saved_Port));
@@ -640,6 +640,8 @@ package body GUI is
                Serial_Disconnect_Item.Set_Sensitive (False);
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Port_Entry.Get_Text);
+               Host_Label.Set_Text (String (Host_Str) & ":" &
+                                    Ada.Strings.Fixed.Trim (Port_Num'Image, Ada.Strings.Both));                  
             exception
                when Error : others =>
                   Log (DEBUG, Exception_Information (Error));
@@ -1235,8 +1237,6 @@ package body GUI is
             Host_Label.Set_Text (To_String (Serial.Port_US));
          when Redirector.Network =>
             Online_Label.Set_Text ("Online (Telnet)");
-            Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
-                                 Ada.Strings.Fixed.Trim (Telnet_Sess.Port_Num'Image, Ada.Strings.Both));
       end case;
       case Term.Emulation is
          when Terminal.D200 => Emul_Label.Set_Text ("D200");
@@ -1395,6 +1395,8 @@ package body GUI is
                Serial_Disconnect_Item.Set_Sensitive (False);
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Slice (Host_Arg, Colon_Ix + 1, Length (Host_Arg)));
+               Host_Label.Set_Text (To_String (Telnet_Sess.Host_Str) & ":" &
+                                    Ada.Strings.Fixed.Trim (Telnet_Sess.Port_Num'Image, Ada.Strings.Both));
             exception
                when Error : others =>
                   Unused_Buttons := Gtkada.Dialogs.Message_Dialog (Msg => "Could not connect. " &

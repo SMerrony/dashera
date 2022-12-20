@@ -159,7 +159,7 @@ package body Terminal is
       Redirector.Send_Data (Response);
    end Send_Model_ID;
 
-   --  Process is to be called with a Byte_Arr whenever there is any data for
+   --  Process is to be called with a String whenever there is any data for
    --  the terminal to display or otherwise handle.
    procedure Process (Str : String) is
       B : Character;
@@ -448,7 +448,7 @@ package body Terminal is
          --     Unused_SI := Glib.Main.Idle_Add (Viewer.Update_CB'Access);
          --     --  Viewer.Update;
          --  else
-         Crt.Tube.DA.Queue_Draw; -- FIXME - BUGGY!!!
+         Crt.Tube.DA.Queue_Draw;
          --  end if;
       end loop;
    end Process;
