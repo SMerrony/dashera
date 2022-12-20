@@ -50,12 +50,14 @@ package Telnet is
 
    type Session_Acc_T is access all Session_T;
 
+   Session : Session_Acc_T;
+
    function New_Connection (Host_Str : String; Port_Num : Integer) return Session_Acc_T;
    --  Attempt to initiate a new TCPIP/Telnet connection to the specified Host and Port.
    --  Data from the remote host will be directed to the supplied Terminal.
    --  To send data, call the Send procedure
 
-   procedure Send (Sess : Session_Acc_T; Str : String);
+   procedure Send (Str : String);
 
    procedure Close_Connection (Sess : in out Session_T);
 
@@ -65,15 +67,6 @@ package Telnet is
    type Receiver_Acc is access Receiver;
 
    Receiver_Task : Receiver_Acc;
-
-   task type Keyboard_Sender is
-      entry Start (S : Session_Acc_T);
-      entry Accept_Data (Str : String);
-      entry Stop;
-   end Keyboard_Sender;
-   type Sender_Acc is access Keyboard_Sender;
-
-   Keyboard_Sender_Task : Sender_Acc;
 
    Disconnected : exception;
 

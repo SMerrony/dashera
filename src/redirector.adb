@@ -17,11 +17,6 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 
-with Ada.Exceptions;
-
-with Gdk.Threads;
-
-with Logging;  use Logging;
 with Serial;
 with Telnet;
 with Terminal;
@@ -29,51 +24,39 @@ with Xmodem;
 
 package body Redirector is
 
-   task body Router_TT is
+   procedure Set_Destination (Dest : Connection_T) is
    begin
-      loop
-         select
-            accept Set_Destination (Dest : Connection_T) do
-               Destination := Dest;
-            end Set_Destination;
-         or
-            accept Get_Destination (Dest : out Connection_T) do
-               Dest := Destination;
-            end Get_Destination;
-         or
-            accept Send_Data (Data : String) do
-               case Destination is
-                  when Local => Terminal.Processor_Task.Accept_Data (Data);
-                  when Async => Serial.Keyboard_Sender_Task.Accept_Data (Data);
-                  when Network => Telnet.Keyboard_Sender_Task.Accept_Data (Data);
-               end case;
-            exception
-               when Telnet.Disconnected =>
-                  Destination := Local;
-                  Handler     := Visual;
-            end Send_Data;
-         or
-            accept Set_Handler (Handlr : Handler_T) do
-               Handler := Handlr;
-            end Set_Handler;
-         or
-            accept Handle_Data (C : Character) do
-               --  Gdk.Threads.Enter;
-               case Handler is
-                  when Visual    => Terminal.Processor_Task.Accept_Data ("" & C);
-                  when Xmodem_Rx => Xmodem.Receiver_Task.Accept_Data (C);
-                  when Xmodem_Tx => Xmodem.Sender_Task.Accept_Data (C);
-               end case;
-               --  Gdk.Threads.Leave;
-            end Handle_Data;
-         or
-            terminate;
-         end select;
-      end loop;
+      Destination := Dest;
+   end Set_Destination;
+
+   function  Get_Destination return Connection_T is
+      (Destination);
+
+   procedure Set_Handler (Handlr : Handler_T) is
+   begin
+      Handler := Handlr;
+   end Set_Handler;
+
+   procedure Handle_Data (C : Character) is
+   begin
+      case Handler is
+         when Visual    => Terminal.Process ("" & C);
+         when Xmodem_Rx => Xmodem.Receiver_Task.Accept_Data (C);
+         when Xmodem_Tx => Xmodem.Sender_Task.Accept_Data (C);
+      end case;
+   end Handle_Data;
+
+   procedure Send_Data (Data : String) is
+   begin
+      case Destination is
+         when Local   => Terminal.Process (Data);
+         when Async   => Serial.Send (Data);
+         when Network => Telnet.Send (Data);
+      end case;
    exception
-      when E : others =>
-         Log (ERROR, "Redirector Router task has Exception");
-         Log (ERROR, Ada.Exceptions.Exception_Information (E));
-   end Router_TT;
+      when Telnet.Disconnected =>
+         Destination := Local;
+         Handler     := Visual;
+   end Send_Data;
 
 end Redirector;

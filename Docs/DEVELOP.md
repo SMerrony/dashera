@@ -28,12 +28,12 @@ Henceforth, try to use objects only where required, elsewhere a traditional Ada 
 ### Tasks
 
 * Mini_Expect.Runner_Task (transient)
-* Redirector.Router
-* Serial.Keyboard_Sender
+* ~~Redirector.Router~~
+* ~~Serial.Keyboard_Sender~~
 * Serial.Receiver
-* Telnet.Keyboard_Sender
+* ~~Telnet.Keyboard_Sender~~
 * Telnet.Receiver
-* Terminal.Processor
+* ~~Terminal.Processor~~
 * Xmodem.Receiver (transient)
 * Xmodem.Sender (transient)
 

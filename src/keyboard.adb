@@ -31,7 +31,7 @@ package body Keyboard is
          when GDK_Shift_L   | GDK_Shift_R   => Shift_Pressed := True;
          when others => null;
       end case;
-      -- is the user holding a key down?
+      --  is the user holding a key down?
       if Last_Pressed = Key then
          Process_Key (Key);
       end if;
@@ -42,7 +42,7 @@ package body Keyboard is
       Str : String (1 .. 1);
    begin
       Str (1) := Ch;
-      Redirector.Router.Send_Data (Str);
+      Redirector.Send_Data (Str);
    end Enqueue_Key;
 
    function Modify (C : Character) return Character is
@@ -68,7 +68,7 @@ package body Keyboard is
    begin
       Str2 (1) := C1;
       Str2 (2) := C2;
-      Redirector.Router.Send_Data (Str2);
+      Redirector.Send_Data (Str2);
    end Enqueue_Pair;
 
    procedure Handle_Key_Release (Key  : Gdk_Key_Type) is
@@ -78,7 +78,7 @@ package body Keyboard is
    end Handle_Key_Release;
 
    procedure Process_Key (Key : Gdk_Key_Type) is
-        Char : Character;
+      Char : Character;
    begin
       --  Ada.Text_IO.Put_Line ("DEBUG: Handle_Key_Release got key:" & Key'Image);
       case Key is

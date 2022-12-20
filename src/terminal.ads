@@ -39,16 +39,12 @@ package Terminal is
 
    type Terminal_Acc_T is access all Terminal_T;
 
-   task type Processor is
-      entry Start (Termin : Terminal_Acc_T);
-      entry Accept_Data (Str : String);
-      entry Stop;
-   end Processor;
-   type Processor_Acc is access Processor;
-   Processor_Task : Processor_Acc;
+   T    : Terminal_Acc_T;
+
+   --  procedure Init (Termin : Terminal_Acc_T);
+   procedure Process (Str : String);
 
    function Create (Emul : Emulation_T; Text_Only : Boolean) return Terminal_Acc_T;
-   procedure Self_Test (T : in out Terminal_T);
-   procedure Process (T : in out Terminal_T; Str : String);
+   procedure Self_Test;
 
 end Terminal;

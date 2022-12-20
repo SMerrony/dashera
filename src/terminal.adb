@@ -21,7 +21,6 @@ with Ada.Characters.Latin_1;
 with Ada.Strings.Fixed;
 
 with Gdk.Main;
-with Gdk.Threads;
 with Glib.Main;
 
 with BDF_Font;
@@ -37,37 +36,35 @@ with Redirector;
 package body Terminal is
 
    function Create (Emul : Emulation_T; Text_Only : Boolean) return Terminal_Acc_T is
-      T : aliased constant Terminal_Acc_T := new Terminal_T;
+      Term : aliased constant Terminal_Acc_T := new Terminal_T;
    begin
-      T.Emulation := Emul;
-      T.Text_Only := Text_Only;
-      T.Cursor_X := 0;
-      T.Cursor_Y := 0;
-      T.In_Command := False;
-      T.In_Extended_Command := False;
-      T.Getting_X_Addr := False;
-      T.Getting_Y_Addr := False;
-      T.Roll_Enabled := True;
-      T.Protection_Enabled := True;
-      T.Skip_Byte := False;
-      T.Holding := False;
-      T.Expecting := False;
-      T.Raw_Mode := False;
-      T.Blinking := False;
-      T.Dimmed := False;
-      T.Reversed := False;
-      T.Underscored := False;
-      T.Protectd := False;
+      Term.Emulation := Emul;
+      Term.Text_Only := Text_Only;
+      Term.Cursor_X := 0;
+      Term.Cursor_Y := 0;
+      Term.In_Command := False;
+      Term.In_Extended_Command := False;
+      Term.Getting_X_Addr := False;
+      Term.Getting_Y_Addr := False;
+      Term.Roll_Enabled := True;
+      Term.Protection_Enabled := True;
+      Term.Skip_Byte := False;
+      Term.Holding := False;
+      Term.Expecting := False;
+      Term.Raw_Mode := False;
+      Term.Blinking := False;
+      Term.Dimmed := False;
+      Term.Reversed := False;
+      Term.Underscored := False;
+      Term.Protectd := False;
+      Term.Updated := True;
 
-      T.Updated := True;
+      T := Term;
 
-      Processor_Task := new Processor;
-      Processor_Task.Start (T);
-
-      return T;
+      return Term;
    end Create;
 
-   procedure Self_Test (T : in out Terminal_T) is
+   procedure Self_Test is
       HRule1 : constant String := "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012245";
       HRule2 : constant String := "         1         2         3         4         5         6         7         8         9         10        11        12        13    ";
       Chars  : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!""$%^&*";
@@ -81,78 +78,55 @@ package body Terminal is
       NL (1) := Dasher_NL;
 
       Op (1) := Dasher_Erase_Page;
-      T.Process (Op);
+      Process (Op);
 
-      T.Process (HRule1 (1 .. Display.Get_Visible_Cols));
-      T.Process (HRule2 (1 .. Display.Get_Visible_Cols));
+      Process (HRule1 (1 .. Display.Get_Visible_Cols));
+      Process (HRule2 (1 .. Display.Get_Visible_Cols));
 
-      T.Process (NLine);
-      T.Process (Chars);
-      T.Process (NL);
+      Process (NLine);
+      Process (Chars);
+      Process (NL);
 
-      T.Process (DLine);
+      Process (DLine);
       Op (1) := Dasher_Dim_On;
-      T.Process (Op);
-      T.Process (Chars);
+      Process (Op);
+      Process (Chars);
       Op (1) := Dasher_Dim_Off;
-      T.Process (Op);
-      T.Process (NL);
+      Process (Op);
+      Process (NL);
 
-      T.Process (BLine);
+      Process (BLine);
       Op (1) := Dasher_Blink_On;
-      T.Process (Op);
-      T.Process (Chars);
+      Process (Op);
+      Process (Chars);
       Op (1) := Dasher_Blink_Off;
-      T.Process (Op);
-      T.Process (NL);
+      Process (Op);
+      Process (NL);
 
-      T.Process (RLine);
+      Process (RLine);
       Op (1) := Dasher_Rev_On;
-      T.Process (Op);
-      T.Process (Chars);
+      Process (Op);
+      Process (Chars);
       Op (1) := Dasher_Rev_Off;
-      T.Process (Op);
-      T.Process (NL);
+      Process (Op);
+      Process (NL);
 
-      T.Process (ULine);
+      Process (ULine);
       Op (1) := Dasher_Underline;
-      T.Process (Op);
-      T.Process (Chars);
+      Process (Op);
+      Process (Chars);
       Op (1) := Dasher_Normal;
-      T.Process (Op);
-      T.Process (NL);
+      Process (Op);
+      Process (NL);
 
       for L in 8 .. Display.Get_Visible_Lines loop
          if L > 8  then
-            T.Process (NL);
+            Process (NL);
          end if;
-         T.Process (Ada.Strings.Fixed.Trim (L'Image, Ada.Strings.Left));
+         Process (Ada.Strings.Fixed.Trim (L'Image, Ada.Strings.Left));
       end loop;
 
    end Self_Test;
-
-   task body Processor is
-      TA : Terminal_Acc_T;
-   begin
-      accept Start (Termin : Terminal_Acc_T) do
-         TA := Termin;
-      end Start;
-      loop
-         select
-            accept Accept_Data (Str : String) do
-               --  Gdk.Threads.Enter;
-               TA.Process (Str);
-               --  Gdk.Threads.Leave;
-            end Accept_Data;
-         or
-            accept Stop;
-               exit;
-         or
-            terminate;
-         end select;
-      end loop;
-      Log (ERROR, "Terminal Processor has exited");
-   end Processor;
 
    procedure Set_Cursor (T : in out Terminal_T; X, Y : Natural) is
    begin
@@ -182,12 +156,12 @@ package body Terminal is
             Response (5) := Character'Val (2#01010001#); --  See p.3-9 of D210/D211 User Manual
             Response (6) := Character'Val (8#132#);      --  Firmware Code
       end case;
-      Redirector.Router.Send_Data (Response);
+      Redirector.Send_Data (Response);
    end Send_Model_ID;
 
-   --  Process is to be called with a Byte_Arr whenever there is any data for
+   --  Process is to be called with a String whenever there is any data for
    --  the terminal to display or otherwise handle.
-   procedure Process (T : in out Terminal_T; Str : String) is
+   procedure Process (Str : String) is
       B : Character;
       B_Int : Integer;
       C : Character;
@@ -364,11 +338,12 @@ package body Terminal is
                   B3_Arr (1) := Character'Val (31);
                   B3_Arr (2) := Character'Val (T.Cursor_X);
                   B3_Arr (3) := Character'Val (T.Cursor_Y);
-                  select
-                     Redirector.Router.Send_Data (B3_Arr);
-                  or
-                     delay 0.5;
-                  end select;
+                  Redirector.Send_Data (B3_Arr);
+                  --  select
+                  --     Redirector.Send_Data (B3_Arr);
+                  --  or
+                  --     delay 0.5; -- FIXME this was to prevent hang if other end not waiting
+                  --  end select;
                end;
                T.Skip_Byte := True;
             when Dasher_Rev_On =>
@@ -473,7 +448,7 @@ package body Terminal is
          --     Unused_SI := Glib.Main.Idle_Add (Viewer.Update_CB'Access);
          --     --  Viewer.Update;
          --  else
-         Crt.Tube.DA.Queue_Draw; -- FIXME - BUGGY!!!
+         Crt.Tube.DA.Queue_Draw;
          --  end if;
       end loop;
    end Process;

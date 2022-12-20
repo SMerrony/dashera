@@ -18,11 +18,12 @@
 --  THE SOFTWARE.
 
 with Ada.Exceptions;
-with Ada.Streams;  use Ada.Streams;
+with Ada.Streams;           use Ada.Streams;
 with Ada.Unchecked_Conversion;
 
 with Logging;      use Logging;
 with Redirector;
+with Terminal;
 
 package body Telnet is
 
@@ -42,35 +43,11 @@ package body Telnet is
       Sess.Port_Num := Port_Num;
       Receiver_Task := new Receiver;
       Receiver_Task.Start (Sess);
-      Keyboard_Sender_Task := new Keyboard_Sender;
-      Keyboard_Sender_Task.Start (Sess);
+      Session := Sess;
       return Sess;
    end New_Connection;
 
-   --  function Byte_To_Char is new Ada.Unchecked_Conversion(Byte, Character);
-
-   task body Keyboard_Sender is
-      Sess : Session_Acc_T;
-   begin
-      accept Start (S : Session_Acc_T) do
-         Sess := S;
-      end Start;
-      loop
-         select
-            accept Accept_Data (Str : String) do
-               Send (Sess, Str);
-            end Accept_Data;
-         or
-            accept Stop;
-               Log (DEBUG, "Telnet Keyboard_Sender task stopping");
-               exit;
-         or
-            terminate;
-         end select;
-      end loop;
-   end Keyboard_Sender;
-
-   procedure Send (Sess : Session_Acc_T; Str : String) is
+   procedure Send (Str : String) is
       SEA              : Ada.Streams.Stream_Element_Array (1 .. Str'Length);
       Dummy_Bytes_Sent : Ada.Streams.Stream_Element_Offset;
    begin
@@ -78,7 +55,7 @@ package body Telnet is
       for I in 1 .. Str'Length loop
          SEA (Ada.Streams.Stream_Element_Offset (I)) := Ada.Streams.Stream_Element (Character'Pos (Str (I)));
       end loop;
-      GNAT.Sockets.Send_Socket (Socket => Sess.Conn,
+      GNAT.Sockets.Send_Socket (Socket => Session.Conn,
                                 Item => SEA,
                                 Last => Dummy_Bytes_Sent
                                 --  Flags => Send_End_Of_Record
@@ -94,19 +71,20 @@ package body Telnet is
    procedure Close_Connection (Sess : in out Session_T) is
    begin
       GNAT.Sockets.Shutdown_Socket (Sess.Conn);
-      Keyboard_Sender_Task.Stop;
-      Redirector.Router.Set_Destination (Redirector.Local);
+      --  Keyboard_Sender_Task.Stop;
+      Redirector.Set_Destination (Redirector.Local);
    exception
       when Socket_Error =>
          Log (WARNING, "Error closing socket (already disconnected?)");
    end Close_Connection;
 
    task body Receiver is
-      Session      : Session_Acc_T;
-      Block        : Ada.Streams.Stream_Element_Array (1 .. 2048);
-      Offset       : Ada.Streams.Stream_Element_Count;
-      One_Byte     : Character;
-      Three_Bytes  : String (1 .. 3);
+      Session             : Session_Acc_T;
+      Rx_Block            : Ada.Streams.Stream_Element_Array (1 .. 2048);
+      Fwd_US              : Unbounded_String;
+      Offset              : Ada.Streams.Stream_Element_Count;
+      One_Byte            : Character;
+      Three_Bytes         : String (1 .. 3);
       In_Telnet_Cmd, Got_DO, Got_WILL : Boolean := False;
 
    begin
@@ -116,14 +94,15 @@ package body Telnet is
       end Start;
       loop
          --  Log (DEBUG, "Telnet Receive waiting for data...");
-         GNAT.Sockets.Receive_Socket (Session.Conn, Block, Offset);
+         GNAT.Sockets.Receive_Socket (Session.Conn, Rx_Block, Offset);
          --  Log (DEBUG, "...Telnet Receiver got data from host - No. Bytes:" & Offset'Image);
          if Offset = 0 then
             Log (WARNING, "Telnet Receiver Stopping due to empty message from host");
             goto Halt;
          end if;
+         Fwd_US := Null_Unbounded_String;
          for I in 1 .. Offset loop
-            One_Byte := Character'Val (Block (I));
+            One_Byte := Character'Val (Rx_Block (I));
             --  Log (DEBUG, "...Telnet Receiver handling byte: " & One_Byte'Image);
             if One_Byte = Cmd_IAC then
                if In_Telnet_Cmd then
@@ -161,13 +140,13 @@ package body Telnet is
                Three_Bytes (1) := Cmd_IAC;
                Three_Bytes (2) := Cmd_WONT;
                Three_Bytes (3) := One_Byte;
-               Send (Session, Three_Bytes);
+               Send (Three_Bytes);
                Log (DEBUG, "Telnet - Denying DO request for: " & One_Byte'Image);
                Got_DO := False;
                In_Telnet_Cmd := False;
                --  TESTING --
                Three_Bytes (2) := Cmd_GA;
-               Send (Session, Three_Bytes);
+               Send (Three_Bytes);
                goto continue;
             end if;
 
@@ -176,18 +155,20 @@ package body Telnet is
                Three_Bytes (1) := Cmd_IAC;
                Three_Bytes (2) := Cmd_DONT;
                Three_Bytes (3) := One_Byte;
-               Send (Session, Three_Bytes);
+               Send (Three_Bytes);
                Log (DEBUG, "Telnet - Denying WILL request for: " & One_Byte'Image);
                Got_WILL := False;
                In_Telnet_Cmd := False;
                goto continue;
             end if;
 
-            Redirector.Router.Handle_Data (One_Byte);
+            Append (Fwd_US, One_Byte);
+            --  Redirector.Handle_Data (One_Byte);
 
          <<continue>>
-         end loop;
-      end loop;
+         end loop; -- for I in 1 .. Offset
+         Terminal.Process (To_String (Fwd_US));
+      end loop;    -- forever
       <<Halt>>
       Log (DEBUG, "Telnet Receiver loop exited");
       Session.Close_Connection;

@@ -28,7 +28,7 @@ package Keyboard is
    Last_Pressed                : Gdk_Key_Type := GDK_VoidSymbol;
 
    procedure Handle_Key_Press   (Key  : Gdk_Key_Type);
-   -- Handle the pressing (or holding-down) of a key
+   --  Handle the pressing (or holding-down) of a key
 
    procedure Handle_Key_Release (Key  : Gdk_Key_Type);
    --  Handle the release of a key (and cancel any repeating)
