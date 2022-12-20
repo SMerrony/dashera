@@ -641,7 +641,7 @@ package body GUI is
                Saved_Host := To_Unbounded_String (Host_Str);
                Saved_Port := To_Unbounded_String (Port_Entry.Get_Text);
                Host_Label.Set_Text (String (Host_Str) & ":" &
-                                    Ada.Strings.Fixed.Trim (Port_Num'Image, Ada.Strings.Both));                  
+                                    Ada.Strings.Fixed.Trim (Port_Num'Image, Ada.Strings.Both));
             exception
                when Error : others =>
                   Log (DEBUG, Exception_Information (Error));

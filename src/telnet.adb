@@ -21,6 +21,8 @@ with Ada.Exceptions;
 with Ada.Streams;           use Ada.Streams;
 with Ada.Unchecked_Conversion;
 
+with Glib.Main;
+
 with Logging;      use Logging;
 with Redirector;
 with Terminal;
@@ -82,11 +84,11 @@ package body Telnet is
       Session             : Session_Acc_T;
       Rx_Block            : Ada.Streams.Stream_Element_Array (1 .. 2048);
       Fwd_US              : Unbounded_String;
+      Unused_SI           : Glib.Main.G_Source_Id;
       Offset              : Ada.Streams.Stream_Element_Count;
       One_Byte            : Character;
       Three_Bytes         : String (1 .. 3);
       In_Telnet_Cmd, Got_DO, Got_WILL : Boolean := False;
-
    begin
       accept Start (Sess : Session_Acc_T) do
          Session := Sess;
@@ -163,15 +165,37 @@ package body Telnet is
             end if;
 
             Append (Fwd_US, One_Byte);
-            --  Redirector.Handle_Data (One_Byte);
 
          <<continue>>
+
          end loop; -- for I in 1 .. Offset
-         Terminal.Process (To_String (Fwd_US));
+
+         --  wait for any pending data to be processed
+         while Data_Pending loop
+            delay 0.01;
+         end loop;
+         --  (re) lock the data block
+         Data_Pending := True;
+         --  copy the data for retrieval via Get_Data_Block
+         Data_Block := Fwd_US; 
+         --  queue up a process request directly in Terminal
+         --  (this is ok as Xmodem does not work via telnet)
+         Unused_SI := Glib.Main.Idle_Add (Terminal.Process_CB'Access);
+
       end loop;    -- forever
       <<Halt>>
       Log (DEBUG, "Telnet Receiver loop exited");
       Session.Close_Connection;
    end Receiver;
+
+   function Get_Data_Block return String is
+   begin
+      return To_String (Data_Block);
+   end Get_Data_Block;
+
+   procedure Unlock_Data_Block is
+   begin
+      Data_Pending := False;
+   end Unlock_Data_Block;
 
 end Telnet;

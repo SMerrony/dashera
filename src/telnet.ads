@@ -58,6 +58,8 @@ package Telnet is
    --  To send data, call the Send procedure
 
    procedure Send (Str : String);
+   function  Get_Data_Block return String;
+   procedure Unlock_Data_Block;
 
    procedure Close_Connection (Sess : in out Session_T);
 
@@ -67,6 +69,8 @@ package Telnet is
    type Receiver_Acc is access Receiver;
 
    Receiver_Task : Receiver_Acc;
+   Data_Pending  : Boolean := False;
+   Data_Block    : Unbounded_String;
 
    Disconnected : exception;
 

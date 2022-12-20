@@ -31,6 +31,7 @@ with Logging;        use Logging;
 with Session_Logger;
 with Mini_Expect;
 with Redirector;
+with Telnet;
 --  with Viewer;
 
 package body Terminal is
@@ -452,5 +453,13 @@ package body Terminal is
          --  end if;
       end loop;
    end Process;
+
+   function Process_CB return Boolean is
+      Data : constant String := Telnet.Get_Data_Block;
+   begin
+      Telnet.Unlock_Data_Block;
+      Process (Data);
+      return False;
+   end Process_CB;
 
 end Terminal;
