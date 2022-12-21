@@ -43,10 +43,10 @@ package Terminal is
 
    --  procedure Init (Termin : Terminal_Acc_T);
    procedure Process (Str : String);
-   -- Process does the bulk of the actual terminal Emulation
+   --  Process does the bulk of the actual terminal Emulation
 
    function Process_CB return Boolean;
-   -- Process_CB is a callback wrapper for Process
+   --  Process_CB is just a callback wrapper for Process
 
    function Create (Emul : Emulation_T; Text_Only : Boolean) return Terminal_Acc_T;
    procedure Self_Test;

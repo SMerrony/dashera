@@ -3,9 +3,9 @@ dashera (0.15.0) stable; urgency=low
   [SMerrony]
   * Performance: Significant improvements
   * Internal:    Remove Router, Keyboard_Sender and Terminal.Processor tasks
-  * Issue:       Fix rare crash due to data race in Telent/Terminal
+  * Issue:       Fix rare crash due to data race in Telnet/Terminal
 
- -- SMerrony <merrony@gmail.com>  Tue, 20 Dec 2022 10:00:00 +0200
+ -- SMerrony <merrony@gmail.com>  Wed, 21 Dec 2022 10:00:00 +0200
 
 dashera (0.14.0) stable; urgency=low
 

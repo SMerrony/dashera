@@ -177,7 +177,7 @@ package body Telnet is
          --  (re) lock the data block
          Data_Pending := True;
          --  copy the data for retrieval via Get_Data_Block
-         Data_Block := Fwd_US; 
+         Data_Block := Fwd_US;
          --  queue up a process request directly in Terminal
          --  (this is ok as Xmodem does not work via telnet)
          Unused_SI := Glib.Main.Idle_Add (Terminal.Process_CB'Access);
