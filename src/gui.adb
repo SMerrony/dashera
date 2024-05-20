@@ -22,6 +22,7 @@ with Ada.Exceptions;          use Ada.Exceptions;
 with Ada.Sequential_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
+with Ada.Text_IO.Unbounded_IO;
 
 with GNAT.Serial_Communications; use GNAT.Serial_Communications;
 
@@ -64,8 +65,6 @@ with Gtkada.Dialogs;          use Gtkada.Dialogs;
 with Gtkada.File_Selection;
 
 with Interfaces;
-
-with Text_IO.Unbounded_IO;
 
 with BDF_Font;       use BDF_Font;
 with Crt;
@@ -127,6 +126,7 @@ package body GUI is
 
    procedure About_CB (Self : access Gtk.Menu_Item.Gtk_Menu_Item_Record'Class) is
       pragma Unreferenced (Self);
+
       Dialog : Gtk_About_Dialog;
       Dummy_Response : Gtk_Response_Type;
    begin
@@ -353,13 +353,13 @@ package body GUI is
             end loop;
          end loop;
          Ada.Text_IO.Open (File => Templ_File, Mode => Ada.Text_IO.In_File, Name => Filename);
-         Lab := Text_IO.Unbounded_IO.Get_Line (Templ_File);
+         Lab := Ada.Text_IO.Unbounded_IO.Get_Line (Templ_File);
          L_FKeys_Label.Set_Markup ("<small><small>" & To_String (Lab) & "</small></small>");
          R_FKeys_Label.Set_Markup ("<small><small>" & To_String (Lab) & "</small></small>");
          for K in 1 .. 17 loop
             for R in reverse 1 .. 4 loop
                if K /= 6 and then K /= 12 and then not Ada.Text_IO.End_Of_File (Templ_File) then
-                  Lab := "<small><small>" & Label_To_Markup (Text_IO.Unbounded_IO.Get_Line (Templ_File)) &
+                  Lab := "<small><small>" & Label_To_Markup (Ada.Text_IO.Unbounded_IO.Get_Line (Templ_File)) &
                          "</small></small>";
                   Template_Labels (R, K).Set_Markup (To_String (Lab));
                end if;

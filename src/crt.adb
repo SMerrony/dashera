@@ -1,4 +1,4 @@
---  Copyright ©2021,2022 Steve Merrony
+--  Copyright ©2021,2022,2024 Steve Merrony
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,6 @@ with Display_P;   use Display_P;
 with Logging;     use Logging;
 
 package body Crt is
-
-   use type Cairo.Cairo_Surface;
 
    function Blink_Timeout_CB (DA : Gtk.Drawing_Area.Gtk_Drawing_Area) return Boolean is
       Blinking, Any_Blinking : Boolean := False;

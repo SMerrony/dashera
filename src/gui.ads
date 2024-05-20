@@ -1,4 +1,4 @@
---  Copyright (C) 2021,2022 Steve Merrony
+--  Copyright (C) 2021,2022,2024 Steve Merrony
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -41,11 +41,11 @@ package GUI is
    package Handlers is new Gtk.Handlers.Callback (Widget_Type => Gtk.Widget.Gtk_Widget_Record);
    package SB_Timeout_P is new Glib.Main.Generic_Sources (Gtk.Box.Gtk_Box);
 
-   App_SemVer       : constant String := "0.15.0";  --  TODO Update Version each release!
+   App_SemVer       : constant String := "0.15.1";  --  TODO Update Version each release!
    App_Title        : constant String := "DasherA";
    App_Comment      : constant String := "A Data General DASHER terminal emulator";
    App_Author       : constant String := "Stephen Merrony";
-   App_Copyright    : constant String := "Copyright ©2022 S.Merrony";
+   App_Copyright    : constant String := "Copyright (C)2022,2024 S.Merrony";
    App_Icon         : constant String := "DGlogoOrange.ico";
    App_Website      : constant String := "https://github.com/SMerrony/dashera";
 

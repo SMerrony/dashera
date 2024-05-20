@@ -1,4 +1,4 @@
---  Copyright ©2022 Steve Merrony
+--  Copyright ©2022,2024 Steve Merrony
 --
 --  This file is a part of DasherA.
 --
@@ -123,7 +123,6 @@ package body Xmodem is
       Tracing := Trace_Flag;
       if Ada.Directories.Exists (Filename) then
          raise Already_Exists;
-         return;
       end if;
       Create (RX_File, Name => Filename);
       RX_Stream := Stream (RX_File);
@@ -431,7 +430,6 @@ package body Xmodem is
       Tracing := Trace_Flag;
       if not Ada.Directories.Exists (Filename) then
          raise File_Does_Not_Exist;
-         return;
       end if;
       Open (File => TX_File, Mode => In_File, Name => Filename);
       Redirector.Set_Handler (Handlr => Xmodem_Tx);

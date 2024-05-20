@@ -1,4 +1,4 @@
---  Copyright ©2021,2022 Steve Merrony
+--  Copyright ©2021,2022,2024 Steve Merrony
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,6 @@
 
 with Ada.Exceptions;
 with Ada.Streams;           use Ada.Streams;
-with Ada.Unchecked_Conversion;
 
 with Glib.Main;
 
