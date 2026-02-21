@@ -1,3 +1,6 @@
+*N.B. Work on DasherA has been suspended in favour of [DasherG](https://github.com/SMerrony/DasherG).
+Unfortunately, the Ada - Alire - Gtk combination has proved too fragile to maintain across different operating systems.*
+
 # DasherA
 DasherA is a free terminal emulator for Data General DASHER series character-based terminals.
 
